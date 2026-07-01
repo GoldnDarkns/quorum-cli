@@ -47,6 +47,7 @@ _METHOD_REGISTRY: dict[str, tuple[str, str]] = {
     "delphi": ("quorum.methods.delphi", "DelphiMethod"),
     "brainstorm": ("quorum.methods.brainstorm", "BrainstormMethod"),
     "tradeoff": ("quorum.methods.tradeoff", "TradeoffMethod"),
+    "spar": ("quorum.methods.spar", "SparMethod"),
 }
 
 # Cache for loaded method classes

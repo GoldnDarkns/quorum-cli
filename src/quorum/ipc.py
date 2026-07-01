@@ -43,7 +43,7 @@ MODEL_ID_VALID_CHARS = frozenset(
     '0123456789'
     '-_./:@'
 )
-VALID_METHODS = {"standard", "oxford", "advocate", "socratic", "delphi", "brainstorm", "tradeoff"}
+VALID_METHODS = {"standard", "oxford", "advocate", "socratic", "delphi", "brainstorm", "tradeoff", "spar"}
 VALID_SYNTHESIZER_MODES = {"first", "random", "rotate"}
 
 
@@ -737,7 +737,6 @@ class IPCHandler:
             required=True,
             max_length=MAX_QUESTION_LENGTH,
         )
-        model_ids = self._validate_model_ids(params.get("model_ids"), min_count=2)
 
         options = params.get("options", {})
         if not isinstance(options, dict):
@@ -749,6 +748,11 @@ class IPCHandler:
             required=False,
             allowed_values=VALID_METHODS,
         ) or "standard"
+
+        from .agents import METHOD_REQUIREMENTS
+
+        min_models = METHOD_REQUIREMENTS.get(method, {}).get("min", 2)
+        model_ids = self._validate_model_ids(params.get("model_ids"), min_count=min_models)
 
         max_turns = options.get("max_turns")
         if max_turns is not None:
@@ -839,6 +843,10 @@ class IPCHandler:
             valid, error = validate_method_model_count(method, len(model_ids))
             if not valid:
                 raise ValueError(error)
+
+            if role_assignments is None and method == "spar":
+                from .agents import get_role_assignments
+                role_assignments = get_role_assignments(method, model_ids)
 
             # Reset state
             self._cancel_requested = False

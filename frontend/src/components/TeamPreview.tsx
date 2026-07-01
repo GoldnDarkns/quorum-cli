@@ -143,6 +143,12 @@ export function TeamPreview({ assignments, method, onConfirm, onCancel }: TeamPr
     if (role === "Panelists") return "magenta";
     if (role === "Ideators") return "cyan";
     if (role === "Evaluators") return "blue";
+    if (role === "Political") return "magenta";
+    if (role === "Economic") return "green";
+    if (role === "Environmental") return "cyan";
+    if (role === "Social") return "yellow";
+    if (role === "DevilsAdvocate") return "red";
+    if (role === "Moderator") return "blue";
     return "white";
   };
 

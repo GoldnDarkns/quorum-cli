@@ -74,6 +74,15 @@ const getMethods = (): Method[] => [
     evenOnly: false,
   },
   {
+    id: "spar",
+    name: t("method.spar.name"),
+    description: t("method.spar.desc"),
+    requires: t("method.spar.requirement"),
+    bestFor: t("method.spar.useCase"),
+    min: 1,
+    evenOnly: false,
+  },
+  {
     id: "tradeoff",
     name: t("method.tradeoff.name"),
     description: t("method.tradeoff.desc"),

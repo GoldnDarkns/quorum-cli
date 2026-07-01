@@ -42,7 +42,7 @@ const CLEAR_SCREEN = "\x1b[2J\x1b[3J\x1b[H";
 
 export type ViewMode = "input" | "discussion";
 
-export type DiscussionMethod = "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff";
+export type DiscussionMethod = "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff" | "spar";
 
 export interface DiscussionMessage {
   type: "phase" | "answer" | "critique" | "chat" | "position" | "synthesis" | "round_header" | "discussion_header";

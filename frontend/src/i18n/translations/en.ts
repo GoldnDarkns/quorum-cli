@@ -94,6 +94,10 @@ export const en: Translations = {
   "method.tradeoff.desc": "Structured multi-criteria decision analysis",
   "method.tradeoff.useCase": "Comparing options, complex decisions",
   "method.tradeoff.requirement": "2+ models",
+  "method.spar.name": "SPAR",
+  "method.spar.desc": "Geopolitical stress-test: 5 domain agents + moderator",
+  "method.spar.useCase": "Scenario planning, portfolio risk analysis",
+  "method.spar.requirement": "1+ model (Ollama OK)",
 
   // Phase label
   "phase.label": "Phase",
@@ -139,6 +143,11 @@ export const en: Translations = {
   "phase.tradeoff.3": "Evaluate: Score Options",
   "phase.tradeoff.4": "Decision",
 
+  // Phase Names - SPAR
+  "phase.spar.1": "Round 1: Domain Analysis",
+  "phase.spar.2": "Round 2: Cross-Examination",
+  "phase.spar.3": "Moderator Synthesis",
+
   // Phase Messages (backend → frontend)
   "phase.standard.1.msg": "{count} participants will answer independently...",
   "phase.standard.2.msg": "All participants will now critique all answers...",
@@ -167,6 +176,9 @@ export const en: Translations = {
   "phase.tradeoff.2.msg": "Criteria: Establish evaluation dimensions.",
   "phase.tradeoff.3.msg": "Evaluate: Score each alternative on each criterion (1-10).",
   "phase.tradeoff.4.msg": "Synthesizing recommendation with tradeoff analysis.",
+  "phase.spar.1.msg": "Five domain specialists produce independent Round 1 analyses.",
+  "phase.spar.2.msg": "Agents cross-examine each other's Round 1 positions.",
+  "phase.spar.3.msg": "The Moderator synthesises the full debate transcript.",
 
   // Roles
   "role.for": "FOR",
@@ -178,11 +190,19 @@ export const en: Translations = {
   "role.panelist": "PANELIST",
   "role.ideator": "IDEATOR",
   "role.evaluator": "EVALUATOR",
+  "role.political": "POLITICAL",
+  "role.economic": "ECONOMIC",
+  "role.environmental": "ENVIRONMENTAL",
+  "role.social": "SOCIAL",
+  "role.devilsAdvocate": "DEVIL'S ADVOCATE",
+  "role.moderator": "MODERATOR",
 
   // Rounds
   "round.opening": "Opening Statements",
   "round.rebuttal": "Rebuttals",
   "round.closing": "Closing Statements",
+  "round.round1": "Round 1",
+  "round.round2": "Round 2",
 
   // Messages
   "msg.independentAnswer": "(Independent Answer)",
@@ -304,6 +324,7 @@ export const en: Translations = {
   "terminology.result.delphi": "Aggregation",
   "terminology.result.brainstorm": "Selected Ideas",
   "terminology.result.tradeoff": "Decision",
+  "terminology.result.spar": "Moderator Synthesis",
 
   // Method Terminology - Synthesis Labels
   "terminology.synthesis.standard": "Synthesis",
@@ -313,6 +334,7 @@ export const en: Translations = {
   "terminology.synthesis.delphi": "Aggregated Estimate",
   "terminology.synthesis.brainstorm": "Final Ideas",
   "terminology.synthesis.tradeoff": "Recommendation",
+  "terminology.synthesis.spar": "Scenario Assessment",
 
   // Method Terminology - Differences Labels
   "terminology.differences.standard": "Notable Differences",
@@ -322,6 +344,7 @@ export const en: Translations = {
   "terminology.differences.delphi": "Outlier Perspectives",
   "terminology.differences.brainstorm": "Alternative Directions",
   "terminology.differences.tradeoff": "Key Tradeoffs",
+  "terminology.differences.spar": "Dissenting Views",
 
   // Method Terminology - By Labels
   "terminology.by.standard": "Synthesized by",
@@ -331,6 +354,7 @@ export const en: Translations = {
   "terminology.by.delphi": "Aggregated by",
   "terminology.by.brainstorm": "Compiled by",
   "terminology.by.tradeoff": "Analyzed by",
+  "terminology.by.spar": "Moderated by",
 
   // Method Terminology - Consensus Labels
   "terminology.consensus.standard": "Consensus",
@@ -340,6 +364,7 @@ export const en: Translations = {
   "terminology.consensus.delphi": "Convergence",
   "terminology.consensus.brainstorm": "Ideas Selected",
   "terminology.consensus.tradeoff": "Agreement",
+  "terminology.consensus.spar": "Plausibility",
 
   // Method Advisor
   "advisor.title": "METHOD ADVISOR",
@@ -380,4 +405,5 @@ export const en: Translations = {
   "discussion.delphi": "DELPHI CONSENSUS",
   "discussion.brainstorm": "BRAINSTORM SESSION",
   "discussion.tradeoff": "TRADEOFF ANALYSIS",
+  "discussion.spar": "SPAR — SCENARIO PLANNING",
 };

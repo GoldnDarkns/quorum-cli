@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPAR — Literature Survey &amp; Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090F; --s1:#0C1019; --s2:#111623; --s3:#161D2E;
+  --border:#1C2540; --border2:#263660;
+  --text:#C8D4EE; --text2:#586994; --text3:#2D3D60;
+  --blue:#4B8FFF; --purple:#8B7CF6; --amber:#D4963A; --green:#38C9A0; --red:#EF6060;
+  --fd:'Space Grotesk',sans-serif; --fb:'Inter',sans-serif; --fm:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px;line-height:1.66;-webkit-font-smoothing:antialiased;}
+.page{max-width:920px;margin:0 auto;padding:40px 24px 90px;}
+a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(75,143,255,.25);}
+a:hover{border-bottom-color:var(--blue);}
+
+/* ── tab nav ── */
+.topnav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 24px;background:rgba(7,9,15,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+.brand{font-family:var(--fd);font-weight:700;font-size:14px;color:#fff;}
+.brand span{color:var(--blue);}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.tab{font-family:var(--fm);font-size:11px;letter-spacing:.02em;color:var(--text2);background:none;border:1px solid transparent;padding:6px 14px;border-radius:20px;cursor:pointer;}
+.tab:hover{color:var(--text);border-color:var(--border2);}
+.tab.active{color:#fff;background:var(--s2);border-color:var(--border2);}
+.tabpane{display:none;}
+.tabpane.active{display:block;}
+
+/* ── headings/text ── */
+.eyebrow{font-family:var(--fm);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.eyebrow::before{content:'';width:20px;height:1px;background:var(--text3);}
+h1{font-family:var(--fd);font-size:clamp(26px,4vw,40px);font-weight:700;letter-spacing:-.02em;color:#fff;margin-bottom:10px;line-height:1.12;}
+h1 em{font-style:normal;color:var(--blue);}
+.hdr-sub{font-size:13.5px;color:var(--text2);max-width:720px;margin-bottom:6px;}
+h2{font-family:var(--fd);font-size:20px;font-weight:600;color:#fff;margin-bottom:8px;letter-spacing:-.01em;}
+h2.plain{font-family:var(--fd);font-size:20px;color:#fff;margin-bottom:8px;}
+h3{font-family:var(--fd);font-size:14px;font-weight:600;color:#fff;margin:18px 0 6px;}
+p{margin-bottom:11px;}
+.lead{font-size:14px;}
+.muted{color:var(--text2);}
+strong{color:#fff;font-weight:600;}
+.cite{font-family:var(--fm);font-size:11px;color:var(--blue);vertical-align:super;}
+.sec-badge{font-family:var(--fm);font-size:9px;letter-spacing:.14em;text-transform:uppercase;display:inline-flex;gap:6px;padding:3px 11px;border-radius:20px;margin:30px 0 12px;background:rgba(139,124,246,.12);color:var(--purple);border:1px solid rgba(139,124,246,.22);}
+.sec-badge.b{background:rgba(75,143,255,.12);color:var(--blue);border-color:rgba(75,143,255,.22);}
+.sec-badge.g{background:rgba(56,201,160,.12);color:var(--green);border-color:rgba(56,201,160,.22);}
+
+/* timeline */
+.tl{display:flex;gap:8px;margin:24px 0 8px;flex-wrap:wrap;}
+.tl a{flex:1;min-width:150px;border-radius:10px;padding:11px 13px;border:1px solid var(--border);background:var(--s1);text-decoration:none;}
+.tl a:hover{border-color:var(--border2);}
+.tl .e{font-family:var(--fm);font-size:9px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;}
+.tl .n{font-family:var(--fd);font-size:12.5px;color:#fff;font-weight:600;}
+.tl .t1{border-left:3px solid var(--blue);} .tl .t2{border-left:3px solid var(--purple);}
+.tl .t3{border-left:3px solid var(--amber);} .tl .t4{border-left:3px solid var(--green);}
+
+/* era */
+.era{margin:34px 0;padding-top:8px;}
+.era-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px;}
+.era-tag{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 11px;border-radius:20px;}
+.t1 .era-tag{background:rgba(75,143,255,.14);color:var(--blue);border:1px solid rgba(75,143,255,.25);}
+.t2 .era-tag{background:rgba(139,124,246,.14);color:var(--purple);border:1px solid rgba(139,124,246,.25);}
+.t3 .era-tag{background:rgba(212,150,58,.14);color:var(--amber);border:1px solid rgba(212,150,58,.25);}
+.t4 .era-tag{background:rgba(56,201,160,.14);color:var(--green);border:1px solid rgba(56,201,160,.25);}
+.era h2{font-size:21px;}
+.era-q{font-size:12.5px;color:var(--text2);font-style:italic;margin-bottom:12px;}
+
+/* plain-words */
+.pw{background:rgba(75,143,255,.055);border:1px solid rgba(75,143,255,.18);border-left:3px solid var(--blue);border-radius:9px;padding:13px 16px;margin:12px 0 14px;}
+.pw-label{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:7px;}
+.pw p{font-size:13.5px;color:var(--text);margin-bottom:9px;line-height:1.62;}
+.pw p:last-child{margin-bottom:0;}
+.pw b{color:#fff;font-weight:600;}
+
+/* math card */
+.math{background:var(--s1);border:1px solid var(--border2);border-radius:11px;padding:15px 17px;margin:13px 0;}
+.math-label{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.math-label::before{content:'∑';font-size:13px;color:var(--blue);}
+.eq{font-family:var(--fm);font-size:13.5px;color:#fff;background:var(--s3);border:1px solid var(--border);border-radius:7px;padding:11px 14px;margin:9px 0;overflow-x:auto;white-space:nowrap;}
+.eq .v{color:var(--amber);} .eq .o{color:var(--text2);} .eq .f{color:var(--green);}
+.gloss{font-size:11.5px;color:var(--text2);line-height:1.55;}
+.gloss b{color:var(--text);font-weight:500;}
+.limit{background:rgba(239,96,96,.06);border:1px solid rgba(239,96,96,.22);border-radius:9px;padding:11px 14px;margin:12px 0;font-size:12.5px;}
+.limit b{color:var(--red);}
+.arrow-down{text-align:center;color:var(--text3);font-family:var(--fm);font-size:11px;letter-spacing:.1em;margin:8px 0;}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;margin:12px 0;border:1px solid var(--border);border-radius:10px;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:640px;}
+th{background:var(--s2);color:var(--text2);font-family:var(--fm);font-size:9px;letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:10px 12px;border-bottom:1px solid var(--border2);font-weight:500;}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+.tag{font-family:var(--fm);font-size:9px;padding:2px 7px;border-radius:20px;white-space:nowrap;}
+.t-rule{background:rgba(75,143,255,.14);color:var(--blue);border:1px solid rgba(75,143,255,.25);}
+.t-llm{background:rgba(139,124,246,.14);color:var(--purple);border:1px solid rgba(139,124,246,.25);}
+.t-fit{background:rgba(56,201,160,.14);color:var(--green);border:1px solid rgba(56,201,160,.25);}
+
+/* lists */
+ol.refs{list-style:none;counter-reset:r;margin:6px 0;}
+ol.refs li{position:relative;padding-left:36px;margin-bottom:9px;counter-increment:r;font-size:12.5px;color:var(--text2);}
+ol.refs li::before{content:'['counter(r)']';position:absolute;left:0;top:0;font-family:var(--fm);font-size:11px;color:var(--blue);}
+ol.refs li strong{color:var(--text);}
+ol.steps{list-style:none;counter-reset:s;margin:10px 0;}
+ol.steps li{position:relative;padding-left:32px;margin-bottom:10px;counter-increment:s;font-size:13px;}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:21px;height:21px;background:var(--s3);border:1px solid var(--border2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:11px;color:var(--blue);}
+
+/* diagram */
+.diagram{background:var(--s1);border:1px solid var(--border2);border-radius:14px;padding:18px;margin:14px 0;overflow-x:auto;}
+.diagram svg{display:block;margin:0 auto;max-width:100%;height:auto;}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 4px;}
+.leg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text2);}
+.dot{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
+.d0{background:#4B8FFF;} .d1{background:#8B7CF6;} .d2{background:#D4963A;} .d3{background:#38C9A0;}
+pre.code{background:#0a0e16;border:1px solid var(--border);border-radius:10px;padding:15px 16px;overflow-x:auto;font-family:var(--fm);font-size:11.5px;color:var(--text);line-height:1.55;margin:12px 0;}
+
+hr{border:none;height:1px;background:var(--border);margin:30px 0;}
+.foot{margin-top:42px;padding-top:22px;border-top:1px solid var(--border);font-family:var(--fm);font-size:10px;color:var(--text3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+
+/* svg node text */
+.svg-node{font-family:var(--fb);font-size:12px;fill:var(--text);}
+.svg-title{font-family:var(--fd);font-weight:600;font-size:12.5px;fill:#fff;}
+.svg-edge{font-family:var(--fm);font-size:10px;fill:var(--text2);}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">SPAR<span>.</span></div>
+  <div class="tabs">
+    <button class="tab active" data-tab="survey">Literature Survey</button>
+    <button class="tab" data-tab="arch">Architecture</button>
+  </div>
+</nav>
+
+<!-- ============================================================= -->
+<!-- ======================  TAB 1 · SURVEY  ====================== -->
+<!-- ============================================================= -->
+<div id="survey" class="tabpane active">
+<div class="page">
+
+  <div class="eyebrow">AI in Finance · Group 3 · SP Jain · Literature Survey</div>
+  <h1>Four Eras of Scenario Planning: <em>From Intuition to Argument</em></h1>
+  <p class="hdr-sub">The same question — <em>"what could go wrong, and what would it do to us?"</em> — answered with progressively better tools. Each era is traced through its core <strong>method, algorithm, or mathematics</strong>, the limitation it left behind, and the era it forced into being. SPAR is the fourth.</p>
+  <div class="tl">
+    <a href="#e1" class="t1"><div class="e">1960s–1990s</div><div class="n">① Narrative</div></a>
+    <a href="#e2" class="t2"><div class="e">1990s–2010s</div><div class="n">② Quantitative</div></a>
+    <a href="#e3" class="t3"><div class="e">2018–2023</div><div class="n">③ AI / NLP</div></a>
+    <a href="#e4" class="t4"><div class="e">2023–now</div><div class="n">④ Agentic</div></a>
+  </div>
+
+  <!-- ERA 1 -->
+  <div class="era t1" id="e1">
+    <div class="era-head"><span class="era-tag">Era 1 · 1960s–1990s</span><h2>Narrative scenario planning</h2></div>
+    <p class="era-q">The question answered by structured human imagination.</p>
+    <div class="pw">
+      <div class="pw-label">In plain words</div>
+      <p>Picture the very first scenario planners as smart people sitting in a room, imagining the future. The military did it for war planning — "thinking the unthinkable" — and then Shell borrowed it for business: <b>"What if oil prices crash? Let's write out that story now and prepare for it."</b></p>
+      <p>Their superpower was human imagination. The catch: it was <b>just words</b> — no number a bank could act on, slow to produce, and heavily shaped by whoever happened to be in the room. That gap, "stop describing and give me a figure," is exactly what pushed the field into the next era.</p>
+    </div>
+    <p class="lead">Scenario planning began not in finance but in <strong>strategy and defence</strong>. Herman Kahn pioneered "thinking the unthinkable" at the RAND Corporation; Pierre Wack adapted it into a corporate discipline at Royal Dutch Shell, whose <em>Scenarios: Uncharted Waters Ahead</em> <span class="cite">[1]</span> remains canonical. Wack's central claim is the seed of SPAR: <strong>multiple, conflicting viewpoints are required to defeat group-think.</strong> Peter Schoemaker later turned the art into a repeatable procedure <span class="cite">[2]</span>.</p>
+    <div class="math">
+      <div class="math-label">Scenario-axis construction (logic, not equations)</div>
+      <div class="eq"><span class="o">1.</span> rank driving forces by <span class="v">impact</span> × <span class="v">uncertainty</span> → pick the 2 most critical, most uncertain</div>
+      <div class="eq"><span class="o">2.</span> cross them as axes → <span class="f">2 × 2 = 4</span> internally-consistent future worlds</div>
+      <div class="gloss">Supported by the <b>Delphi method</b> (anonymous expert rounds revised toward convergence) and <b>cross-impact analysis</b> (a matrix of how each event shifts the probability of every other). Output = rich narrative worlds, not numbers.</div>
+    </div>
+    <div class="limit"><b>Limitation →</b> Purely verbal. No loss numbers, slow, and dependent on who was in the room. Finance needed a number it could put on a balance sheet.</div>
+    <div class="arrow-down">▼ &nbsp; quantify it</div>
+  </div>
+
+  <!-- ERA 2 -->
+  <div class="era t2" id="e2">
+    <div class="era-head"><span class="era-tag">Era 2 · 1990s–2010s</span><h2>Quantitative stress testing</h2></div>
+    <p class="era-q">The question answered by probability and linear algebra.</p>
+    <div class="pw">
+      <div class="pw-label">In plain words</div>
+      <p>Finance looked at those rich stories and said: <b>"Nice — but give me a number."</b> So it built math tools that crunch decades of market history to answer one question: <b>"How much could I lose, and how likely is that?"</b> Value-at-Risk gives the loss line you'd rarely cross; Monte Carlo rolls the dice on thousands of possible futures; factor models translate a macro move into a per-sector hit.</p>
+      <p>After the 2008 crash, regulators made this mandatory — big banks now <b>must</b> run official stress tests (CCAR/DFAST in the US). The strength was precision. The weakness: these tools only learn from the <b>past</b>, so a brand-new kind of shock the data has never seen catches them off guard. The problem to fix: blind to anything truly novel — and still authored by a single source with nobody to argue back.</p>
+    </div>
+    <p class="lead">Finance made scenarios numerical. The foundations were <strong>Markowitz's</strong> mean-variance theory <span class="cite">[3]</span> and the <strong>CAPM</strong> <span class="cite">[4]</span>, extended by the <strong>Fama–French factor model</strong> <span class="cite">[5]</span> — the direct ancestor of SPAR's Layer 3.</p>
+    <h3>Factor models — the engine SPAR reuses</h3>
+    <div class="math">
+      <div class="math-label">CAPM &amp; Fama–French three-factor</div>
+      <div class="eq"><span class="v">E[Rᵢ]</span> <span class="o">=</span> R_f <span class="o">+</span> <span class="v">βᵢ</span><span class="o">(</span>E[R_m] <span class="o">−</span> R_f<span class="o">)</span> <span class="o">,</span> <span class="v">βᵢ</span> <span class="o">=</span> Cov(Rᵢ,R_m) <span class="o">/</span> Var(R_m)</div>
+      <div class="eq"><span class="v">Rᵢ</span><span class="o">−</span>R_f <span class="o">=</span> αᵢ <span class="o">+</span> <span class="v">βᵢ</span>(R_m−R_f) <span class="o">+</span> <span class="v">sᵢ</span>·SMB <span class="o">+</span> <span class="v">hᵢ</span>·HML <span class="o">+</span> <span class="f">εᵢ</span></div>
+      <div class="gloss"><b>β, s, h</b> are sensitivities estimated by regressing a sector's excess returns on the market, size (SMB) and value (HML) factors. Plug in a scenario's factor moves → get a predicted sector return. <b>This is exactly how SPAR's Layer 3 turns an agreed scenario into per-sector losses.</b></div>
+    </div>
+    <h3>Risk measures — VaR, EWMA volatility, Expected Shortfall</h3>
+    <div class="math">
+      <div class="math-label">Value-at-Risk, volatility updating, tail risk</div>
+      <div class="eq"><span class="v">VaR_α</span> <span class="o">=</span> inf<span class="o">{</span> l <span class="o">:</span> P(L <span class="o">></span> l) <span class="o">≤</span> 1<span class="o">−</span>α <span class="o">}</span> ≈ μ <span class="o">−</span> <span class="v">z_α</span>·σ</div>
+      <div class="eq"><span class="v">σ²ₜ</span> <span class="o">=</span> λ·σ²ₜ₋₁ <span class="o">+</span> (1<span class="o">−</span>λ)·r²ₜ₋₁ <span class="o">,</span> λ <span class="o">=</span> 0.94 &nbsp;<span class="o">(EWMA)</span></div>
+      <div class="eq"><span class="v">ES_α</span> <span class="o">=</span> E<span class="o">[</span> L <span class="o">|</span> L <span class="o">≥</span> VaR_α <span class="o">]</span> &nbsp;<span class="o">(Expected Shortfall)</span></div>
+      <div class="gloss">Popularised by J.P. Morgan's <b>RiskMetrics</b> <span class="cite">[6]</span>. <b>z_α</b> is the normal quantile (1.65 at 95%). Expected Shortfall — also reported by SPAR's Layer 3 — averages the losses <i>beyond</i> the cutoff, fixing VaR's blind spot.</div>
+    </div>
+    <h3>Simulation &amp; regulatory stress tests</h3>
+    <div class="math">
+      <div class="math-label">Monte Carlo path (geometric Brownian motion)</div>
+      <div class="eq"><span class="v">Sₜ₊Δ</span> <span class="o">=</span> Sₜ · exp<span class="o">[</span> (μ <span class="o">−</span> ½σ²)Δ <span class="o">+</span> σ√Δ · <span class="f">Z</span> <span class="o">]</span> <span class="o">,</span> Z ~ N(0,1)</div>
+      <div class="gloss">After 2008 the Fed's <b>CCAR / DFAST</b> <span class="cite">[7]</span> made this mandatory — banks receive fixed adverse macro paths and must project losses, typically via regressions of loss on macro variables.</div>
+    </div>
+    <div class="limit"><b>Limitation →</b> Every estimate is calibrated on <b>history</b>. A structurally novel shock is mispriced, and the scenario is still authored by a single source with no challenge.</div>
+    <div class="arrow-down">▼ &nbsp; let machines read the world</div>
+  </div>
+
+  <!-- ERA 3 -->
+  <div class="era t3" id="e3">
+    <div class="era-head"><span class="era-tag">Era 3 · 2018–2023</span><h2>AI, NLP &amp; financial language models</h2></div>
+    <p class="era-q">The question answered by models that read text, not just tables.</p>
+    <div class="pw">
+      <div class="pw-label">In plain words</div>
+      <p>Then AI got good at <b>language</b>. Earlier machine learning was already quietly running behind the scenes — scoring loan applications, catching fraud — but only on neat tables of numbers. The leap here was that models like FinBERT and BloombergGPT could read the <b>messy text of the world</b> — news, earnings calls, filings — and judge its mood, something pure number-crunching could never do.</p>
+      <p>Now a machine could process not just prices, but the <b>narrative</b> around them. The catch that remained: it was still <b>one model giving one answer</b>, confidently, with no way to question itself or show the reasoning behind its verdict.</p>
+    </div>
+    <p class="lead">Machine learning first spread through <strong>structured-data tasks</strong> — credit scoring, fraud, algorithmic trading — typically with logistic regression and gradient-boosted trees:</p>
+    <div class="math">
+      <div class="math-label">Logistic model for default / fraud probability</div>
+      <div class="eq"><span class="v">P(default | x)</span> <span class="o">=</span> σ(wᵀx) <span class="o">,</span> σ(z) <span class="o">=</span> 1 <span class="o">/</span> (1 <span class="o">+</span> e^<span class="o">−</span>z)</div>
+      <div class="gloss">A weighted sum of features squashed to a 0–1 probability — still the workhorse of credit risk.</div>
+    </div>
+    <h3>The Transformer turn</h3>
+    <div class="math">
+      <div class="math-label">Self-attention (Vaswani et al.)</div>
+      <div class="eq">Attention(<span class="v">Q,K,V</span>) <span class="o">=</span> softmax<span class="o">(</span> <span class="v">Q</span><span class="v">Kᵀ</span> <span class="o">/</span> √d_k <span class="o">)</span> <span class="v">V</span></div>
+      <div class="gloss"><b>Q, K, V</b> = query, key, value projections. The dot-product scores how much each token attends to every other; softmax turns scores into weights. This is the engine under BERT <span class="cite">[9]</span> and every LLM since <span class="cite">[8]</span>.</div>
+    </div>
+    <h3>Financial language models</h3>
+    <p><strong>FinBERT</strong> <span class="cite">[10]</span> fine-tuned BERT on financial text; <strong>BloombergGPT</strong> <span class="cite">[11]</span> (50B params, 363B-token corpus) and open <strong>FinGPT</strong> <span class="cite">[12]</span> brought generative financial NLP:</p>
+    <div class="math">
+      <div class="math-label">Training objectives</div>
+      <div class="eq"><span class="o">MLM (BERT):</span> maximise Σ log P(<span class="v">x_masked</span> <span class="o">|</span> x_context)</div>
+      <div class="eq"><span class="o">Autoregressive (GPT):</span> maximise Σₜ log P(<span class="v">xₜ</span> <span class="o">|</span> x_<sub>&lt;t</sub> ; θ)</div>
+      <div class="eq"><span class="o">Fine-tune classifier:</span> minimise <span class="f">L</span> <span class="o">=</span> <span class="o">−</span>Σ_c <span class="v">y_c</span> log ŷ_c &nbsp;<span class="o">(cross-entropy)</span></div>
+      <div class="gloss"><b>Lopez-Lira &amp; Tang</b> <span class="cite">[13]</span> showed even an off-the-shelf LLM predicts short-horizon returns from headlines — evidence LLMs encode usable financial reasoning.</div>
+    </div>
+    <div class="limit"><b>Limitation →</b> Powerful, but still <b>one model, one answer</b>. No mechanism to interrogate itself, surface a missed channel, or preserve dissent.</div>
+    <div class="arrow-down">▼ &nbsp; make them reason, and argue</div>
+  </div>
+
+  <!-- ERA 4 -->
+  <div class="era t4" id="e4">
+    <div class="era-head"><span class="era-tag">Era 4 · 2023–now</span><h2>Agentic AI &amp; multi-agent debate</h2></div>
+    <p class="era-q">The question answered by a society of reasoning agents — where SPAR lives.</p>
+    <div class="pw">
+      <div class="pw-label">In plain words</div>
+      <p>The newest leap: instead of one AI answering alone, you give several AIs <b>different expert roles and let them argue.</b> Researchers found that AIs which debate and critique each other reach better, more accurate answers than any single one of them does alone — disagreement flushes out mistakes.</p>
+      <p>Notice this quietly circles all the way back to Wack's 1985 insight — that <b>clashing viewpoints prevent group-think</b> — only now it runs with AI agents, at machine speed, with a written record of the whole argument. <b>SPAR lives here</b>, and adds one twist: rather than always debating a fixed number of rounds, it watches the discussion and stops the moment the agents stop learning anything new.</p>
+    </div>
+    <p class="lead">An <strong>agent</strong> uses an LLM as a reasoning core that perceives, plans, uses tools, reflects, and acts. <strong>ReAct</strong> <span class="cite">[14]</span> interleaves reasoning and action; <strong>Reflexion</strong> <span class="cite">[15]</span> adds verbal self-critique:</p>
+    <div class="math">
+      <div class="math-label">Agent control loops</div>
+      <div class="eq"><span class="o">ReAct:</span> (<span class="v">thoughtₜ</span> → <span class="v">actionₜ</span> → observationₜ) repeated until goal</div>
+      <div class="eq"><span class="o">Reflexion:</span> memoryₜ₊₁ <span class="o">=</span> memoryₜ <span class="o">∪</span> <span class="f">selfReflection</span>(resultₜ)</div>
+      <div class="gloss">Reflexion is single-agent self-critique. SPAR's Devil's Advocate externalises the same idea into a separate adversarial agent.</div>
+    </div>
+    <h3>From one agent to a debating society</h3>
+    <p>Surveys mapped autonomous agents <span class="cite">[16]</span>; <strong>Generative Agents</strong> <span class="cite">[17]</span> showed believable simulation; <strong>AutoGen</strong> <span class="cite">[18]</span> and <strong>CAMEL</strong> <span class="cite">[19]</span> made multi-agent conversation a framework. The key result is <strong>multi-agent debate</strong> <span class="cite">[20]</span>:</p>
+    <div class="math">
+      <div class="math-label">Multi-agent debate update (Du et al.)</div>
+      <div class="eq"><span class="v">aᵢ⁽ʳ⁺¹⁾</span> <span class="o">=</span> LLM<span class="o">(</span> q <span class="o">,</span> { <span class="v">aⱼ⁽ʳ⁾</span> }<sub>j≠i</sub> <span class="o">)</span> for rounds r <span class="o">=</span> 0…R</div>
+      <div class="eq">final <span class="o">=</span> consensus / majority over { <span class="v">aᵢ⁽ᴿ⁾</span> }</div>
+      <div class="gloss">In the original method each agent rewrites its answer after <b>reading every other agent's answer</b>, for several rounds. <b>SPAR adapts this:</b> specialist agents may <i>read</i> each other's positions, but are given <b>zero power to remove, vote out, or aggregate</b> one another. All critique flows only through the Devil's Advocate, and all merging only through the Moderator — so agents benefit from seeing other views, yet no agent can be argued out of the room. <b>Liang et al.</b> <span class="cite">[21]</span> show debate counters "degeneration of thought"; in finance, <b>TradingAgents</b> <span class="cite">[23]</span> (surveyed in <span class="cite">[22]</span>) applies bull/bear debate to trade decisions.</div>
+    </div>
+    <div class="math">
+      <div class="math-label">Debate Continuation Score (this work)</div>
+      <div class="eq"><span class="v">DCS</span> <span class="o">=</span> w₁·<span class="f">Disagreement</span> <span class="o">+</span> w₂·<span class="f">InfoGain</span> <span class="o">+</span> w₃·(1<span class="o">−</span><span class="f">RAGexhaustion</span>)</div>
+      <div class="eq"><span class="o">if</span> DCS <span class="o">></span> τ <span class="o">and</span> round <span class="o">&lt;</span> 5 → explore <span class="o">else</span> exploit</div>
+      <div class="gloss">Disagreement = variance of severity ratings; InfoGain = how much positions moved; RAGexhaustion = how repetitive the cited sources have become.</div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- SYNTHESIS -->
+  <span class="sec-badge">Synthesis · Where SPAR fits</span>
+  <h2 class="plain">The gap, across four eras</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Era / Approach</th><th>Core math / method</th><th>Multiple views?</th><th>Self-correcting?</th><th>Scored vs. real shock?</th></tr></thead>
+      <tbody>
+        <tr><td>① Narrative <span class="cite">[1][2]</span></td><td>2×2 axes, Delphi, cross-impact</td><td>Yes (human)</td><td>Informal</td><td>No</td></tr>
+        <tr><td>② Quantitative <span class="cite">[3–7]</span></td><td>Factor models, VaR/ES, Monte Carlo</td><td>No</td><td>No</td><td>Backward-looking</td></tr>
+        <tr><td>③ AI / NLP <span class="cite">[8–13]</span></td><td>Transformers, MLM/AR objectives</td><td>No (1 model)</td><td>No</td><td>Task benchmarks</td></tr>
+        <tr><td>④ Agentic trading <span class="cite">[20][23]</span></td><td>ReAct, debate update</td><td>Yes (agents)</td><td>Partial</td><td>Backtest P&amp;L</td></tr>
+        <tr style="background:rgba(56,201,160,.06);"><td><strong>SPAR (this work)</strong></td><td><strong>Debate + DCS + factor-model L3</strong></td><td><strong>Yes</strong></td><td><strong>Yes (Devil's Advocate)</strong></td><td><strong>Yes (3-D rubric)</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- LAYER 1 RUBRICS -->
+  <span class="sec-badge g">Applying it · Layer 1 evaluation</span>
+  <h2 class="plain">How we judge the agents — rubrics, benchmarks &amp; when to stop</h2>
+  <h3>Two yardsticks, not one</h3>
+  <div class="pw">
+    <div class="pw-label">In plain words</div>
+    <p>Judge <b>how well an agent reasons</b> with the <b>same</b> ruler for everyone (fairness — nobody is punished for their domain). Judge <b>whether an agent was factually right</b> with a <b>domain-specific</b> ruler (the "right answer" for the Monetary agent differs from the Geopolitical one). Split these two and the confusion disappears.</p>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Rubric</th><th>Applies to</th><th>What it measures</th><th>Why SPAR needs it</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Position-change type</strong><br><span class="muted" style="font-size:11px">standardised</span></td><td>All 4 agents + DA</td><td>Evidence-based / consensus-pressure / no-update / unsupported flip</td><td>Separates real reasoning from conformity — contribution 3</td></tr>
+        <tr><td><strong>Evidence grounding</strong><br><span class="muted" style="font-size:11px">standardised</span></td><td>All 4 agents + DA</td><td>% of claims backed by a real retrieved source</td><td>Stops agents inventing unsupported numbers</td></tr>
+        <tr><td><strong>Engagement</strong><br><span class="muted" style="font-size:11px">standardised</span></td><td>All 4 agents + DA</td><td>Did the agent genuinely engage with the Devil's Advocate's critique?</td><td>The debate only adds value if agents update under challenge</td></tr>
+        <tr><td><strong>Calibration</strong><br><span class="muted" style="font-size:11px">standardised</span></td><td>All 4 agents + DA</td><td>Severity + confidence given, and was confidence honest?</td><td>Feeds the Layer 3 confidence bands</td></tr>
+        <tr style="background:rgba(212,150,58,.05)"><td><strong>Channel hit / miss</strong><br><span class="muted" style="font-size:11px">per-agent</span></td><td>Each agent's owned link</td><td>Did the transmission link it owns actually materialise?</td><td>Tests domain correctness where it differs by agent</td></tr>
+        <tr style="background:rgba(212,150,58,.05)"><td><strong>Domain directional accuracy</strong><br><span class="muted" style="font-size:11px">per-agent</span></td><td>Each agent's domain</td><td>e.g. Monetary: right call on Fed/rate direction</td><td>Different domains have different answer keys</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Benchmarks for this layer</h3>
+  <div class="math">
+    <div class="math-label">What to compare against</div>
+    <div class="gloss" style="font-size:12.5px;line-height:1.7;">
+      <b>1 · The baseline.</b> Single-model (no debate) vs. SPAR debate, on the same three scenario metrics (direction, magnitude, transmission completeness).<br>
+      <b>2 · Human expert agreement.</b> A finance person scores sample transcripts; measure agreement with the moderator's scores via <b>Cohen's κ</b>.<br>
+      <b>3 · Ablations.</b> Devil's-Advocate on/off, regime on/off, fixed vs adaptive rounds — does each component earn its place?<br>
+      <b>4 · Channel completeness.</b> Agents' channels vs a ground-truth channel list with <b>precision / recall / F1</b> (recall matters most).
+    </div>
+  </div>
+
+  <h3>Is a 5-round cap unfair? What does the threshold decide?</h3>
+  <div class="pw">
+    <div class="pw-label">In plain words</div>
+    <p>The <b>5-round cap is just a safety net</b>, not the brain. It exists for cost, the fact that LLM debates <b>repeat after a few rounds</b>, and reproducibility. State it openly as a limitation — that's good practice.</p>
+    <p>The <b>real</b> stop is the threshold <b>τ</b> on the Debate Continuation Score: stop when <b>DCS &lt; τ</b> (argument went quiet) <b>or</b> round = 5, whichever first.</p>
+  </div>
+  <div class="math">
+    <div class="math-label">What τ decides — the explore/exploit knob</div>
+    <div class="gloss" style="font-size:12.5px;line-height:1.7;">
+      τ decides the trade-off between <b>thoroughness and noise</b>.<br>
+      • <b>High τ (strict)</b> → stops early → cheaper, but risks ending before every channel surfaces.<br>
+      • <b>Low τ (lenient)</b> → debates longer → thorough, but risks rounds that add only repetition or unjustified position-flips (can inflate a false consensus).<br>
+      So τ marks the point where the <b>value of one more round drops below its cost.</b>
+    </div>
+  </div>
+  <div class="limit" style="background:rgba(56,201,160,.06);border-color:rgba(56,201,160,.25);">
+    <b style="color:var(--green)">How to set τ defensibly →</b> Run all five events to the full 5 rounds once, record the information-gain curve, and set τ at the empirical <b>"elbow"</b> where it flattens; report a sensitivity check at τ±ε. Same cap and τ for every event = fair. The round-count distribution then becomes a finding in its own right.
+  </div>
+
+  <!-- REFERENCES -->
+  <span class="sec-badge b">References · all verified</span>
+  <h2 class="plain">Sources</h2>
+  <ol class="refs">
+    <li><strong>Wack, P.</strong> (1985). Scenarios: Uncharted Waters Ahead. <em>Harvard Business Review.</em> <a href="https://hbr.org/1985/09/scenarios-uncharted-waters-ahead">hbr.org</a></li>
+    <li><strong>Schoemaker, P. J. H.</strong> (1995). Scenario Planning: A Tool for Strategic Thinking. <em>Sloan Management Review,</em> 36(2).</li>
+    <li><strong>Markowitz, H.</strong> (1952). Portfolio Selection. <em>The Journal of Finance,</em> 7(1).</li>
+    <li><strong>Sharpe, W. F.</strong> (1964). Capital Asset Prices (CAPM). <em>The Journal of Finance,</em> 19(3).</li>
+    <li><strong>Fama, E. F. &amp; French, K. R.</strong> (1993). Common Risk Factors in Stock and Bond Returns. <em>Journal of Financial Economics,</em> 33(1).</li>
+    <li><strong>J.P. Morgan / Reuters</strong> (1996). RiskMetrics — Technical Document (4th ed.).</li>
+    <li><strong>U.S. Federal Reserve.</strong> Stress Tests &amp; Capital Planning (CCAR / DFAST). <a href="https://www.federalreserve.gov/supervisionreg/stress-tests-capital-planning.htm">federalreserve.gov</a></li>
+    <li><strong>Vaswani, A. et al.</strong> (2017). Attention Is All You Need. <a href="https://arxiv.org/abs/1706.03762">arXiv:1706.03762</a></li>
+    <li><strong>Devlin, J. et al.</strong> (2018). BERT. <a href="https://arxiv.org/abs/1810.04805">arXiv:1810.04805</a></li>
+    <li><strong>Araci, D.</strong> (2019). FinBERT. <a href="https://arxiv.org/abs/1908.10063">arXiv:1908.10063</a></li>
+    <li><strong>Wu, S. et al.</strong> (2023). BloombergGPT. <a href="https://arxiv.org/abs/2303.17564">arXiv:2303.17564</a></li>
+    <li><strong>Yang, H. et al.</strong> (2023). FinGPT. <a href="https://arxiv.org/abs/2306.06031">arXiv:2306.06031</a></li>
+    <li><strong>Lopez-Lira, A. &amp; Tang, Y.</strong> (2023). Can ChatGPT Forecast Stock Price Movements? <a href="https://arxiv.org/abs/2304.07619">arXiv:2304.07619</a></li>
+    <li><strong>Yao, S. et al.</strong> (2022). ReAct. <a href="https://arxiv.org/abs/2210.03629">arXiv:2210.03629</a></li>
+    <li><strong>Shinn, N. et al.</strong> (2023). Reflexion. <a href="https://arxiv.org/abs/2303.11366">arXiv:2303.11366</a></li>
+    <li><strong>Wang, L. et al.</strong> (2023). A Survey on LLM-based Autonomous Agents. <a href="https://arxiv.org/abs/2308.11432">arXiv:2308.11432</a></li>
+    <li><strong>Park, J. S. et al.</strong> (2023). Generative Agents. <a href="https://arxiv.org/abs/2304.03442">arXiv:2304.03442</a></li>
+    <li><strong>Wu, Q. et al.</strong> (2023). AutoGen. <a href="https://arxiv.org/abs/2308.08155">arXiv:2308.08155</a></li>
+    <li><strong>Li, G. et al.</strong> (2023). CAMEL. <a href="https://arxiv.org/abs/2303.17760">arXiv:2303.17760</a></li>
+    <li><strong>Du, Y. et al.</strong> (2023). Multiagent Debate. <a href="https://arxiv.org/abs/2305.14325">arXiv:2305.14325</a></li>
+    <li><strong>Liang, T. et al.</strong> (2023). Multi-Agent Debate / Divergent Thinking. <a href="https://arxiv.org/abs/2305.19118">arXiv:2305.19118</a></li>
+    <li><strong>Ding, H. et al.</strong> (2024). LLM Agent in Financial Trading: A Survey. <a href="https://arxiv.org/abs/2408.06361">arXiv:2408.06361</a></li>
+    <li><strong>Xiao, Y. et al.</strong> (2024). TradingAgents. <a href="https://arxiv.org/abs/2412.20138">arXiv:2412.20138</a></li>
+  </ol>
+
+  <div class="foot"><span>SPAR · Literature survey · Group 3 · SP Jain</span><span>Narrative → Quantitative → AI/NLP → Agentic</span></div>
+</div>
+</div>
+
+<!-- ============================================================= -->
+<!-- ====================  TAB 2 · ARCHITECTURE  ================== -->
+<!-- ============================================================= -->
+<div id="arch" class="tabpane">
+<div class="page">
+
+  <div class="eyebrow">AI in Finance · Group 3 · SP Jain · Orchestration</div>
+  <h1>SPAR as a <em>LangGraph StateGraph</em></h1>
+  <p class="hdr-sub">The full Layer 0–3 pipeline drawn as a graph of nodes (tasks) and edges (flow). One shared memory passes through every node; the graph's shape decides who runs, when, and what they can see.</p>
+
+  <div class="pw">
+    <div class="pw-label">First, in plain words</div>
+    <p>Think of the system as an assembly line with one <b>clipboard</b> that travels down it. The clipboard is the <b>shared State</b> — it holds everything known so far (the shock, the regime, every agent's position, the scores).</p>
+    <p>Each <b>node</b> is a worker who picks up the clipboard, does one job, writes the result, and passes it on. The <b>edges</b> are the arrows. Some are straight ("always go here next"); some are <b>decisions</b> (a diamond that routes the clipboard based on what's written on it). Agents never talk directly — they only read and write the clipboard, and the graph decides the order.</p>
+  </div>
+
+  <span class="sec-badge b">The graph</span>
+  <h2>Execution flow — Layers 0 → 3</h2>
+  <div class="legend">
+    <div class="leg"><span class="dot d0"></span>Layer 0 · Classify</div>
+    <div class="leg"><span class="dot d1"></span>Layer 1 · Debate</div>
+    <div class="leg"><span class="dot d2"></span>Layer 2 · Moderate</div>
+    <div class="leg"><span class="dot d3"></span>Layer 3 · Quantify</div>
+  </div>
+  <div class="diagram">
+  <svg viewBox="0 0 800 1180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SPAR LangGraph flow">
+    <defs>
+      <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L7,3 L0,6 Z" fill="#4B8FFF"/>
+      </marker>
+    </defs>
+    <!-- edges (drawn first, behind nodes) -->
+    <g stroke="#4B8FFF" stroke-width="1.6" fill="none" marker-end="url(#ah)">
+      <path d="M400,70 L400,100"/>
+      <path d="M400,152 L400,182"/>
+      <path d="M400,234 L400,266"/>
+      <path d="M400,322 L400,356"/>
+      <path d="M400,408 L400,430"/>
+      <path d="M400,516 L400,556"/>            <!-- CC -> MOD -->
+      <path d="M400,612 L400,639"/>            <!-- MOD -> PG -->
+      <path d="M500,677 L598,677"/>            <!-- PG -> HR -->
+      <path d="M400,715 L400,758"/>            <!-- PG -> QF -->
+      <path d="M400,812 L400,846"/>            <!-- QF -> RB -->
+      <path d="M400,900 L400,936"/>            <!-- RB -> END -->
+      <path d="M230,473 C110,473 110,295 218,295"/>   <!-- explore loop CC->DR -->
+      <path d="M685,700 C685,930 600,962 532,962"/>   <!-- HR -> END -->
+    </g>
+    <!-- edge labels -->
+    <g class="svg-edge" text-anchor="middle">
+      <text x="120" y="375">explore</text>
+      <text x="120" y="389">keep debating</text>
+      <text x="470" y="540">exploit</text>
+      <text x="552" y="668">low</text>
+      <text x="416" y="742">ok</text>
+    </g>
+
+    <!-- START -->
+    <rect x="270" y="26" width="260" height="44" rx="22" fill="#0c1019" stroke="#586994"/>
+    <text x="400" y="53" text-anchor="middle" class="svg-title">▶ START · user types a shock</text>
+
+    <!-- L0 RC -->
+    <rect x="250" y="100" width="300" height="52" rx="9" fill="#0d1830" stroke="#4B8FFF"/>
+    <text x="400" y="122" text-anchor="middle" class="svg-title">L0 · Regime Classifier</text>
+    <text x="400" y="140" text-anchor="middle" class="svg-node">rule — read 6 macro conditions</text>
+
+    <!-- L0 SP -->
+    <rect x="210" y="182" width="380" height="52" rx="9" fill="#0d1830" stroke="#4B8FFF"/>
+    <text x="400" y="204" text-anchor="middle" class="svg-title">L0 · Shock Profiler</text>
+    <text x="400" y="222" text-anchor="middle" class="svg-node">LLM — classify shock, write RAG seeds, pick agents</text>
+
+    <!-- L1 DR -->
+    <rect x="220" y="266" width="360" height="56" rx="9" fill="#17103a" stroke="#8B7CF6"/>
+    <text x="400" y="288" text-anchor="middle" class="svg-title">L1 · Debate Round</text>
+    <text x="400" y="306" text-anchor="middle" class="svg-node">4 specialists argue in parallel · read-only notes</text>
+
+    <!-- L1 DA -->
+    <rect x="250" y="356" width="300" height="52" rx="9" fill="#17103a" stroke="#8B7CF6"/>
+    <text x="400" y="378" text-anchor="middle" class="svg-title">L1 · Devil's Advocate</text>
+    <text x="400" y="396" text-anchor="middle" class="svg-node">retrieves &amp; critiques each agent</text>
+
+    <!-- L1 CC diamond -->
+    <polygon points="400,430 540,473 400,516 260,473" fill="#17103a" stroke="#8B7CF6"/>
+    <text x="400" y="469" text-anchor="middle" class="svg-title">L1 · Continuation</text>
+    <text x="400" y="486" text-anchor="middle" class="svg-node">compute Debate Score</text>
+
+    <!-- L2 MOD -->
+    <rect x="210" y="556" width="380" height="56" rx="9" fill="#261b0b" stroke="#D4963A"/>
+    <text x="400" y="578" text-anchor="middle" class="svg-title">L2 · Moderator</text>
+    <text x="400" y="596" text-anchor="middle" class="svg-node">consensus + dissent + plausibility + quality</text>
+
+    <!-- L2 PG diamond -->
+    <polygon points="400,639 500,677 400,715 300,677" fill="#261b0b" stroke="#D4963A"/>
+    <text x="400" y="673" text-anchor="middle" class="svg-title">L2 · Plausibility</text>
+    <text x="400" y="690" text-anchor="middle" class="svg-node">Gate</text>
+
+    <!-- L2 HR -->
+    <rect x="598" y="652" width="174" height="50" rx="9" fill="#261b0b" stroke="#D4963A"/>
+    <text x="685" y="674" text-anchor="middle" class="svg-title">L2 · Human Review</text>
+    <text x="685" y="691" text-anchor="middle" class="svg-node">safety stop</text>
+
+    <!-- L3 QF -->
+    <rect x="220" y="758" width="360" height="54" rx="9" fill="#0a2018" stroke="#38C9A0"/>
+    <text x="400" y="780" text-anchor="middle" class="svg-title">L3 · Quantifier</text>
+    <text x="400" y="798" text-anchor="middle" class="svg-node">factor model → sector loss &amp; VaR</text>
+
+    <!-- L3 RB -->
+    <rect x="240" y="846" width="320" height="54" rx="9" fill="#0a2018" stroke="#38C9A0"/>
+    <text x="400" y="868" text-anchor="middle" class="svg-title">L3 · Report Builder</text>
+    <text x="400" y="886" text-anchor="middle" class="svg-node">VaR + sector heatmap + dissent</text>
+
+    <!-- END -->
+    <rect x="272" y="936" width="256" height="44" rx="22" fill="#0c1019" stroke="#586994"/>
+    <text x="400" y="963" text-anchor="middle" class="svg-title">■ END · risk-manager report</text>
+  </svg>
+  </div>
+
+  <span class="sec-badge b">Anchors</span>
+  <h2>The two anchors: where it begins and ends</h2>
+  <div class="pw">
+    <div class="pw-label">In plain words</div>
+    <p><b>Entry (START → Regime Classifier).</b> The graph wakes the moment a shock is typed. The first worker doesn't judge the shock — it reads <i>what kind of world</i> it is landing in.</p>
+    <p><b>Finish (Report Builder → END).</b> The line ends when the report is assembled. There's a second exit: if the Plausibility Gate finds the scenario too far-fetched, the clipboard is routed to a human instead — a safety stop.</p>
+  </div>
+
+  <span class="sec-badge b">Nodes</span>
+  <h2>The nodes — each worker's single job</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Node</th><th>Layer</th><th>Type</th><th>What it does (simple words)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Regime Classifier</strong></td><td>L0</td><td><span class="tag t-rule">rule</span></td><td>Reads 6 live numbers and labels the market mood — the "weather" the shock arrives in.</td></tr>
+        <tr><td><strong>Shock Profiler</strong></td><td>L0</td><td><span class="tag t-llm">LLM</span></td><td>Reads the shock, decides its type, finds past look-alikes, writes search hints, switches on the relevant agents.</td></tr>
+        <tr><td><strong>Debate Round</strong></td><td>L1</td><td><span class="tag t-llm">LLM</span></td><td>The 4 active specialists each give their read at once, using their own data. They may see others' notes but cannot delete or outvote anyone.</td></tr>
+        <tr><td><strong>Devil's Advocate</strong></td><td>L1</td><td><span class="tag t-llm">LLM</span></td><td>The only critic. Reads every claim and attacks the weakest evidence — challenges, never ranks.</td></tr>
+        <tr><td><strong>Continuation Controller</strong></td><td>L1</td><td><span class="tag t-rule">rule</span></td><td>Decision diamond. Measures if the debate is still producing new information; says "go again" or "done."</td></tr>
+        <tr><td><strong>Moderator</strong></td><td>L2</td><td><span class="tag t-llm">LLM</span></td><td>A fresh judge that didn't debate. Merges everything into one scenario, saves the dissent, scores plausibility &amp; quality.</td></tr>
+        <tr><td><strong>Plausibility Gate</strong></td><td>L2</td><td><span class="tag t-rule">rule</span></td><td>Decision diamond. Too unrealistic → send to a human; otherwise pass on.</td></tr>
+        <tr><td><strong>Human Review</strong></td><td>L2</td><td><span class="tag t-rule">pause</span></td><td>Optional safety stop — a person checks low-plausibility scenarios.</td></tr>
+        <tr><td><strong>Quantifier</strong></td><td>L3</td><td><span class="tag t-fit">fitted</span></td><td>Turns the agreed scenario into numbers — per-sector losses, VaR, tail risk — via the factor model.</td></tr>
+        <tr><td><strong>Report Builder</strong></td><td>L3</td><td><span class="tag t-rule">assemble</span></td><td>Packages the final report: VaR, sector heatmap, dissent, assumptions.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <span class="sec-badge b">Edges</span>
+  <h2>The edges — how the clipboard moves</h2>
+  <p class="muted">Straight edges always fire. Two edges are <strong>conditional</strong> (they branch on what the node decided) — the only places the path can change.</p>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>From → To</th><th>Type</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>START → Regime Classifier</td><td>straight</td><td>Begin: read the world.</td></tr>
+        <tr><td>Regime Classifier → Shock Profiler</td><td>straight</td><td>Know the world, now profile the shock.</td></tr>
+        <tr><td>Shock Profiler → Debate Round</td><td>straight</td><td>Wake the chosen agents and start arguing.</td></tr>
+        <tr><td>Debate Round → Devil's Advocate</td><td>straight</td><td>After agents speak, the critic attacks.</td></tr>
+        <tr><td>Devil's Advocate → Continuation Controller</td><td>straight</td><td>Hand the round to the decision diamond.</td></tr>
+        <tr><td><strong>Continuation → Debate Round</strong></td><td><strong>conditional</strong></td><td><strong>EXPLORE:</strong> score above τ and under 5 rounds → debate again (the loop).</td></tr>
+        <tr><td><strong>Continuation → Moderator</strong></td><td><strong>conditional</strong></td><td><strong>EXPLOIT:</strong> converged or 5-round cap → stop, synthesise.</td></tr>
+        <tr><td>Moderator → Plausibility Gate</td><td>straight</td><td>Send the scenario to the realism check.</td></tr>
+        <tr><td><strong>Plausibility Gate → Human Review</strong></td><td><strong>conditional</strong></td><td>Score too low → escape to a human.</td></tr>
+        <tr><td><strong>Plausibility Gate → Quantifier</strong></td><td><strong>conditional</strong></td><td>Score ok → proceed to the numbers.</td></tr>
+        <tr><td>Quantifier → Report Builder</td><td>straight</td><td>Numbers ready, build the report.</td></tr>
+        <tr><td>Report Builder → END · Human Review → END</td><td>straight</td><td>Two ways to finish: a full report, or a human-flagged stop.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <span class="sec-badge b">Walkthrough</span>
+  <h2>One run, start to finish</h2>
+  <ol class="steps">
+    <li>A user types <em>"US–Iran tanker strike spikes oil."</em> The graph starts.</li>
+    <li><strong>Regime Classifier</strong> notes inflation is already high → a fragile world.</li>
+    <li><strong>Shock Profiler</strong> tags it "geopolitical-energy," wakes the 4 relevant specialists, writes their search hints.</li>
+    <li><strong>Debate Round 1:</strong> the 4 agents each give a view; the <strong>Devil's Advocate</strong> attacks the shakiest claims.</li>
+    <li><strong>Continuation Controller</strong> sees agents still disagree → <em>explore</em> → loops back for Round 2 (stops by Round 5 at the latest).</li>
+    <li>Once converged, <strong>Moderator</strong> writes the consensus + preserved dissent + scores.</li>
+    <li><strong>Plausibility Gate</strong> finds it realistic → <strong>Quantifier</strong> produces sector losses + VaR.</li>
+    <li><strong>Report Builder</strong> assembles the final report → <strong>END</strong>.</li>
+  </ol>
+
+  <div class="pw">
+    <div class="pw-label">The one rule that keeps it fair</div>
+    <p>Every node reads and writes the <b>same shared State</b>. The four specialists may <b>read</b> each other's notes, but have <b>zero power to remove, vote out, or aggregate</b> one another. All critique flows only through the <b>Devil's Advocate</b>; all merging only through the <b>Moderator</b>. That's what stops agents ganging up to silence a weaker one.</p>
+  </div>
+
+  <span class="sec-badge b">Reusable source</span>
+  <h2>Mermaid source (optional — for editable diagrams)</h2>
+  <pre class="code">flowchart TD
+    START([START: user types a shock]) --> RC
+    RC[L0 Regime Classifier] --> SP
+    SP[L0 Shock Profiler - classify, RAG seeds, pick agents] --> DR
+    DR[L1 Debate Round - 4 specialists, read-only notes] --> DA
+    DA[L1 Devils Advocate - critiques each agent] --> CC
+    CC{L1 Continuation - Debate Score}
+    CC --&gt;|explore - keep debating| DR
+    CC --&gt;|exploit - converged or 5 rounds| MOD
+    MOD[L2 Moderator - consensus, dissent, scores] --> PG
+    PG{L2 Plausibility Gate}
+    PG --&gt;|score too low| HR[L2 Human Review]
+    PG --&gt;|score ok| QF[L3 Quantifier - factor model to VaR]
+    QF --> RB[L3 Report Builder - VaR, heatmap, dissent]
+    HR --> ENDN
+    RB --> ENDN([END: risk report])</pre>
+
+  <div class="foot"><span>SPAR · LangGraph StateGraph · Group 3 · SP Jain</span><span>START → L0 → L1 (loop) → L2 → L3 → END</span></div>
+</div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.tabpane').forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+      window.scrollTo(0,0);
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "agent_id": "economic_fiscal_market_gpt4o",
+  "round": 1,
+  "event": "russia_ukraine_invasion_20220224",
+  "direction": "negative",
+  "magnitude_pct": {
+    "SP500": -7.0,
+    "XLE":   8.0,
+    "XLF":   -3.0,
+    "XLK":   -6.0,
+    "ITA":   4.0,
+    "XLY":   -5.0
+  },
+  "confidence": 0.9,
+  "key_assumption": "The market is already pricing significant geopolitical risk, and the invasion will exacerbate inflation concerns leading to a faster Fed rate hike.",
+  "supporting_evidence": [
+    "US equity markets were already selling off for 7 weeks on rate hike fears before the invasion (VIX at 31.0).",
+    "Russia produces ~10-11 million barrels/day of oil, which is about 10% of global supply.",
+    "The Fed has limited room to support markets due to high inflation and will likely need to act quickly."
+  ],
+  "transmission_channels": [
+    "Oil supply uncertainty → WTI spike → energy sector re-rating",
+    "Geopolitical risk → equity market de-rating (S&P 500 forward P/E at ~21x)",
+    "Inflation concerns → faster Fed rate hike → tightening financial conditions"
+  ],
+  "analogue_assessment": {
+    "primary_analogue": "[ANALOGUE 1] Iraqi Invasion of Kuwait · August 2, 1990",
+    "analogue_adjustments": "The current inflation environment is more challenging for the Fed to support markets. The 1990 invasion had lower inflation (3.4% CPI) compared to today's 7.5%. This reduces the Fed's ability to offset market stress through monetary easing."
+  }
+}

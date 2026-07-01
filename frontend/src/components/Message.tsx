@@ -54,6 +54,18 @@ function getRoleColor(role: string | null | undefined): string | null {
       return "cyan";  // Brainstorm ideators
     case "EVALUATOR":
       return "blue";  // Tradeoff evaluators
+    case "POLITICAL":
+      return "magenta";
+    case "ECONOMIC":
+      return "green";
+    case "ENVIRONMENTAL":
+      return "cyan";
+    case "SOCIAL":
+      return "yellow";
+    case "DEVILS_ADVOCATE":
+      return "red";
+    case "MODERATOR":
+      return "blue";
     default:
       return null;  // Use provider color
   }
@@ -82,6 +94,18 @@ function getRoleBadge(role: string | null | undefined): string | null {
       return `[${t("role.ideator")}]`;
     case "EVALUATOR":
       return `[${t("role.evaluator")}]`;
+    case "POLITICAL":
+      return `[${t("role.political")}]`;
+    case "ECONOMIC":
+      return `[${t("role.economic")}]`;
+    case "ENVIRONMENTAL":
+      return `[${t("role.environmental")}]`;
+    case "SOCIAL":
+      return `[${t("role.social")}]`;
+    case "DEVILS_ADVOCATE":
+      return `[${t("role.devilsAdvocate")}]`;
+    case "MODERATOR":
+      return `[${t("role.moderator")}]`;
     default:
       return null;
   }
@@ -98,6 +122,10 @@ function getRoundLabel(roundType: string | null | undefined): string | null {
       return `(${t("round.rebuttal")})`;
     case "closing":
       return `(${t("round.closing")})`;
+    case "round1":
+      return `(${t("round.round1")})`;
+    case "round2":
+      return `(${t("round.round2")})`;
     default:
       return null;
   }
@@ -369,6 +397,7 @@ export function Synthesis({
   const isDelphi = method === "delphi";
   const isBrainstorm = method === "brainstorm";
   const isTradeoff = method === "tradeoff";
+  const isSpar = method === "spar";
 
   // Method-specific result handling
   // Oxford: FOR (green), AGAINST (red), PARTIAL (yellow)
@@ -518,6 +547,7 @@ const getMethodTitles = (): Record<DiscussionMethod, string> => ({
   delphi: t("discussion.delphi"),
   brainstorm: t("discussion.brainstorm"),
   tradeoff: t("discussion.tradeoff"),
+  spar: t("discussion.spar"),
 });
 
 interface DiscussionHeaderProps {
@@ -542,6 +572,7 @@ export function DiscussionHeader({ method, models, roleAssignments }: Discussion
     : method === "delphi" ? "magenta"
     : method === "brainstorm" ? "cyan"
     : method === "tradeoff" ? "blue"
+    : method === "spar" ? "magenta"
     : "blue";
 
   // Render based on method type

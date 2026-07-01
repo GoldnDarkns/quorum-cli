@@ -1,0 +1,30 @@
+{
+  "agent_id": "social_behavioural_deepseek",
+  "round": 1,
+  "event": "russia_ukraine_invasion_20220224",
+  "direction": "negative",
+  "magnitude_pct": {
+    "SP500": -7.0,
+    "XLE":   -9.5,
+    "XLF":   -3.5,
+    "XLK":   -8.0,
+    "ITA":   -4.0,
+    "XLY":   -12.0
+  },
+  "confidence": 0.75,
+  "key_assumption": "The already bearish retail investor sentiment and the rapid fear amplification through social media will lead to a significant market sell-off.",
+  "supporting_evidence": [
+    "US University of Michigan Consumer Sentiment at decade-low levels due to inflation anxiety",
+    "AAII Sentiment Survey showing very bearish retail investors with 46.8% in bearish position",
+    "Petrol pump price shock will create direct consumer anxiety and political pressure on President Biden"
+  ],
+  "transmission_channels": [
+    "Retail panic amplification: already-bearish sentiment may over-sell on invasion news → downside overshoot",
+    "Gasoline shock → consumer confidence → consumer discretionary sector sell-off (XLY specifically exposed)",
+    "Media narrative speed: social media means the fear cycle happens faster than in 1990 Kuwait — less time for rational pricing"
+  ],
+  "analogue_assessment": {
+    "primary_analogue": "[ANALOGUE 2] Russia Crimea Annexation · February 27, 2014",
+    "analogue_adjustments": "The current regime context has higher inflation and tighter financial conditions compared to 2014. This suggests a more negative market reaction due to the already fragile economic environment."
+  }
+}

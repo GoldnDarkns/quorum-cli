@@ -85,7 +85,7 @@ export interface RunDiscussionParams {
   question: string;
   model_ids: string[];
   options?: {
-    method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff";
+    method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff" | "spar" | "spar";
     max_turns?: number;
     synthesizer_mode?: "first" | "random" | "rotate";
     role_assignments?: Record<string, string[]>;
@@ -98,7 +98,7 @@ export interface RunDiscussionResult {
 
 export interface UserSettings {
   selected_models?: string[];
-  discussion_method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff";
+  discussion_method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff" | "spar";
   synthesizer_mode?: "first" | "random" | "rotate";
   max_turns?: number | null;
   response_language?: "en" | "sv" | "de" | "fr" | "es" | "it";
@@ -171,7 +171,7 @@ export interface PhaseStartEvent {
   message_key: string;
   params?: Record<string, string>;
   num_participants: number;
-  method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff";
+  method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff" | "spar";
   total_phases?: number;
 }
 
@@ -195,7 +195,7 @@ export interface ChatMessageEvent {
   content: string;
   role?: "FOR" | "AGAINST" | "ADVOCATE" | "DEFENDER" | "QUESTIONER" | "RESPONDENT" | "PANELIST" | "IDEATOR" | "EVALUATOR" | null;
   round_type?: "opening" | "rebuttal" | "closing" | null;
-  method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff";
+  method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff" | "spar";
 }
 
 export interface FinalPositionEvent {
@@ -213,7 +213,7 @@ export interface SynthesisEvent {
   synthesizer_model: string;
   confidence_breakdown: Record<string, number>;
   message_count: number;
-  method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff";
+  method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff" | "spar";
 }
 
 export interface DiscussionCompleteEvent {

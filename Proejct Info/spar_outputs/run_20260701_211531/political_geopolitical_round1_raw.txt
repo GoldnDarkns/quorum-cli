@@ -1,0 +1,30 @@
+{
+  "agent_id": "political_geopolitical_claude",
+  "round": 1,
+  "event": "russia_ukraine_invasion_20220224",
+  "direction": "negative",
+  "magnitude_pct": {
+    "SP500": -6.0,
+    "XLE":   -8.0,
+    "XLF":   -3.0,
+    "XLK":   -4.0,
+    "ITA":   -2.0,
+    "XLY":   -5.0
+  },
+  "confidence": 0.9,
+  "key_assumption": "The full-scale invasion will lead to significant geopolitical risk premium, triggering a broad sell-off across markets.",
+  "supporting_evidence": [
+    "Putin recognised the Donetsk and Luhansk People's Republics on February 21, indicating a major escalation signal.",
+    "Russia had massed 190,000+ troops on Ukraine's borders over the preceding 3 months, with NATO warnings of imminent invasion since mid-January.",
+    "Ukraine's NATO membership bid is a stated Russian red line, and Russia is violating the Budapest Memorandum by re-arming Ukraine."
+  ],
+  "transmission_channels": [
+    "Geopolitical risk premium: investors demand higher return to hold risky assets → current equity prices must fall",
+    "Sanction uncertainty: breadth of sanctions creates policy uncertainty around European corporate earnings",
+    "Safe-haven flows: flight to USD, gold, US Treasuries as geopolitical uncertainty spikes"
+  ],
+  "analogue_assessment": {
+    "primary_analogue": "Iraq invasion of Kuwait (1990)",
+    "analogue_adjustments": "The current regime context has higher inflation and tighter financial conditions compared to 1990. This reduces the Fed's room for rate hikes, potentially amplifying market reactions."
+  }
+}

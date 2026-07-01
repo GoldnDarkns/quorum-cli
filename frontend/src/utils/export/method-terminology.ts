@@ -38,6 +38,7 @@ const METHOD_CONFIG: Record<DiscussionMethod, { showConsensus: boolean; bannerCo
   delphi: { showConsensus: true, bannerColor: "#7e22ce" },
   brainstorm: { showConsensus: true, bannerColor: "#0891b2" },
   tradeoff: { showConsensus: true, bannerColor: "#1d4ed8" },
+  spar: { showConsensus: true, bannerColor: "#86198f" },
 };
 
 /**

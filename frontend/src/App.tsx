@@ -258,7 +258,7 @@ export function App() {
       phase: number;
       message_key: string;
       params?: Record<string, string>;
-      method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff";
+      method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff" | "spar";
       total_phases?: number;
     }) => {
       // On phase 1, set the discussion ID for filtering subsequent events
@@ -314,7 +314,7 @@ export function App() {
       content: string;
       role?: "FOR" | "AGAINST" | "ADVOCATE" | "DEFENDER" | "QUESTIONER" | "RESPONDENT" | "PANELIST" | "IDEATOR" | "EVALUATOR" | null;
       round_type?: "opening" | "rebuttal" | "closing" | null;
-      method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff";
+      method?: "standard" | "oxford" | "advocate" | "socratic" | "delphi" | "brainstorm" | "tradeoff" | "spar";
     }) => {
       if (isStaleEvent(params.discussion_id)) return;
       // For Oxford mode: inject round header if round changed
@@ -488,17 +488,12 @@ export function App() {
     delphi: { min: 3, evenOnly: false },
     brainstorm: { min: 2, evenOnly: false },
     tradeoff: { min: 2, evenOnly: false },
+    spar: { min: 1, evenOnly: false },
   };
 
   // Start inline method discussion (e.g., /oxford Why is the sky blue?)
   const startInlineMethodDiscussion = useCallback(
     async (method: DiscussionMethod, question: string) => {
-      if (selectedModels.length < 2) {
-        setBackendError(t("app.error.selectModels"));
-        return;
-      }
-
-      // Validate method requirements
       const req = METHOD_REQUIREMENTS[method];
       if (selectedModels.length < req.min) {
         setBackendError(t("app.error.methodMin", { method: method.charAt(0).toUpperCase() + method.slice(1), min: String(req.min) }));
@@ -539,7 +534,7 @@ export function App() {
       const rest = parts.slice(1).join(" ").trim();
 
       // Check for inline method syntax: /method question
-      const inlineMethods: DiscussionMethod[] = ["standard", "oxford", "advocate", "socratic", "delphi", "brainstorm", "tradeoff"];
+      const inlineMethods: DiscussionMethod[] = ["standard", "oxford", "advocate", "socratic", "delphi", "brainstorm", "tradeoff", "spar"];
       if (inlineMethods.includes(cmd as DiscussionMethod) && rest) {
         startInlineMethodDiscussion(cmd as DiscussionMethod, rest);
         return;
@@ -606,12 +601,17 @@ export function App() {
   // Handle question submission
   const handleSubmit = useCallback(
     async (question: string) => {
-      if (selectedModels.length < 2) {
-        setBackendError(t("app.error.selectModels"));
+      const method = useStore.getState().discussionMethod;
+      const req = METHOD_REQUIREMENTS[method];
+      if (selectedModels.length < req.min) {
+        setBackendError(
+          req.min === 1
+            ? t("app.error.selectModels")
+            : t("app.error.methodMin", { method: method.charAt(0).toUpperCase() + method.slice(1), min: String(req.min) })
+        );
         return;
       }
 
-      const method = useStore.getState().discussionMethod;
 
       // For Oxford, Advocate, and Socratic modes, show team preview first
       if (method === "oxford" || method === "advocate" || method === "socratic") {
@@ -629,8 +629,17 @@ export function App() {
         }
       }
 
+      let sparAssignments: RoleAssignments | undefined;
+      if (method === "spar") {
+        try {
+          sparAssignments = (await backend.getRoleAssignments("spar", selectedModels)) || undefined;
+        } catch (err) {
+          console.error("Failed to get SPAR role assignments:", err);
+        }
+      }
+
       // For standard or if role assignment fetch failed, start directly
-      await startDiscussionWithOptions(question);
+      await startDiscussionWithOptions(question, sparAssignments);
     },
     [selectedModels, startDiscussionWithOptions]
   );
@@ -718,9 +727,17 @@ export function App() {
     }
   });
 
-  // Render nothing while backend starts (launcher handles spinner)
+  // Show loading (or errors) while backend starts — avoid a blank screen
   if (!backendReady) {
-    return null;
+    const loadingText = backendError
+      ? t("app.error.generic", { error: backendError })
+      : t("app.loading.backend");
+    return (
+      <Box flexDirection="column" padding={1}>
+        {!backendError && <Spinner text={loadingText} />}
+        {backendError && <Text color="red">{loadingText}</Text>}
+      </Box>
+    );
   }
 
   // Render loading state only for model validation
@@ -870,8 +887,10 @@ export function App() {
               onAdvisorOpen={handleAdvisorOpen}
               disabled={showModels || showMethods || showStatus || showHelp || showSynthesizer || showTeamPreview || showExportSelector || showAdvisor}
               placeholder={
-                selectedModels.length < 2
+                selectedModels.length < (discussionMethod === "spar" ? 1 : 2)
                   ? t("app.placeholder.selectModels")
+                  : discussionMethod === "spar"
+                  ? "Press Enter to start SPAR (Russia-Ukraine scenario)..."
                   : t("app.placeholder.askQuestion")
               }
             />

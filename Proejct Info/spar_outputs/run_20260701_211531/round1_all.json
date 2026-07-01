@@ -1,0 +1,153 @@
+{
+  "political_geopolitical": {
+    "agent_id": "political_geopolitical_claude",
+    "round": 1,
+    "event": "russia_ukraine_invasion_20220224",
+    "direction": "negative",
+    "magnitude_pct": {
+      "SP500": -6.0,
+      "XLE": -8.0,
+      "XLF": -3.0,
+      "XLK": -4.0,
+      "ITA": -2.0,
+      "XLY": -5.0
+    },
+    "confidence": 0.9,
+    "key_assumption": "The full-scale invasion will lead to significant geopolitical risk premium, triggering a broad sell-off across markets.",
+    "supporting_evidence": [
+      "Putin recognised the Donetsk and Luhansk People's Republics on February 21, indicating a major escalation signal.",
+      "Russia had massed 190,000+ troops on Ukraine's borders over the preceding 3 months, with NATO warnings of imminent invasion since mid-January.",
+      "Ukraine's NATO membership bid is a stated Russian red line, and Russia is violating the Budapest Memorandum by re-arming Ukraine."
+    ],
+    "transmission_channels": [
+      "Geopolitical risk premium: investors demand higher return to hold risky assets \u2192 current equity prices must fall",
+      "Sanction uncertainty: breadth of sanctions creates policy uncertainty around European corporate earnings",
+      "Safe-haven flows: flight to USD, gold, US Treasuries as geopolitical uncertainty spikes"
+    ],
+    "analogue_assessment": {
+      "primary_analogue": "Iraq invasion of Kuwait (1990)",
+      "analogue_adjustments": "The current regime context has higher inflation and tighter financial conditions compared to 1990. This reduces the Fed's room for rate hikes, potentially amplifying market reactions."
+    }
+  },
+  "economic_fiscal_market": {
+    "agent_id": "economic_fiscal_market_gpt4o",
+    "round": 1,
+    "event": "russia_ukraine_invasion_20220224",
+    "direction": "negative",
+    "magnitude_pct": {
+      "SP500": -7.0,
+      "XLE": 8.0,
+      "XLF": -3.0,
+      "XLK": -6.0,
+      "ITA": 4.0,
+      "XLY": -5.0
+    },
+    "confidence": 0.9,
+    "key_assumption": "The market is already pricing significant geopolitical risk, and the invasion will exacerbate inflation concerns leading to a faster Fed rate hike.",
+    "supporting_evidence": [
+      "US equity markets were already selling off for 7 weeks on rate hike fears before the invasion (VIX at 31.0).",
+      "Russia produces ~10-11 million barrels/day of oil, which is about 10% of global supply.",
+      "The Fed has limited room to support markets due to high inflation and will likely need to act quickly."
+    ],
+    "transmission_channels": [
+      "Oil supply uncertainty \u2192 WTI spike \u2192 energy sector re-rating",
+      "Geopolitical risk \u2192 equity market de-rating (S&P 500 forward P/E at ~21x)",
+      "Inflation concerns \u2192 faster Fed rate hike \u2192 tightening financial conditions"
+    ],
+    "analogue_assessment": {
+      "primary_analogue": "[ANALOGUE 1] Iraqi Invasion of Kuwait \u00b7 August 2, 1990",
+      "analogue_adjustments": "The current inflation environment is more challenging for the Fed to support markets. The 1990 invasion had lower inflation (3.4% CPI) compared to today's 7.5%. This reduces the Fed's ability to offset market stress through monetary easing."
+    }
+  },
+  "environmental_technology": {
+    "agent_id": "environmental_technology_gemini",
+    "round": 1,
+    "event": "russia_ukraine_invasion_20220224",
+    "direction": "negative",
+    "magnitude_pct": {
+      "SP500": -3.5,
+      "XLE": -8.0,
+      "XLF": -1.5,
+      "XLK": -2.0,
+      "ITA": -4.0,
+      "XLY": -2.5
+    },
+    "confidence": 0.9,
+    "key_assumption": "The invasion will disrupt energy and agricultural supply chains, exacerbating existing semiconductor shortages.",
+    "supporting_evidence": [
+      "Russia produces 10-11 million barrels/day of oil (\u224810% global supply) and exports ~2.5M bbl/day to Europe; Nord Stream 1 pipeline capacity is 55 billion cubic metres/year, with EU gas storage at critically low levels (~35%)",
+      "Ukraine + Russia combined wheat exports: ~29% of global supply; Ukraine produces 70% of global neon gas supply (essential for chip lithography); Russia is #1 producer of palladium (40% global supply)",
+      "NotPetya 2017 precedent shows Russian state-sponsored malware can cause significant global damage, and CISA warnings about potential cyber attacks on financial sector"
+    ],
+    "transmission_channels": [
+      "Oil supply uncertainty \u2192 WTI spike \u2192 energy sector re-rating",
+      "Agricultural disruption \u2192 food price inflation \u2192 consumer discretionary spending reduction",
+      "Neon/palladium shortage \u2192 semiconductor supply constraints \u2192 technology sector earnings pressure",
+      "Cyber risk escalation \u2192 financial sector and SWIFT infrastructure attacks \u2192 market panic"
+    ],
+    "analogue_assessment": {
+      "primary_analogue": "[ANALOGUE 1] Iraqi Invasion of Kuwait \u00b7 August 2, 1990",
+      "analogue_adjustments": "Current regime context has higher inflation (7.5% YoY) and less Fed room for rate hikes compared to 1990's lower inflation environment; however, the energy supply shock risk is similar"
+    }
+  },
+  "social_behavioural": {
+    "agent_id": "social_behavioural_deepseek",
+    "round": 1,
+    "event": "russia_ukraine_invasion_20220224",
+    "direction": "negative",
+    "magnitude_pct": {
+      "SP500": -7.0,
+      "XLE": -9.5,
+      "XLF": -3.5,
+      "XLK": -8.0,
+      "ITA": -4.0,
+      "XLY": -12.0
+    },
+    "confidence": 0.75,
+    "key_assumption": "The already bearish retail investor sentiment and the rapid fear amplification through social media will lead to a significant market sell-off.",
+    "supporting_evidence": [
+      "US University of Michigan Consumer Sentiment at decade-low levels due to inflation anxiety",
+      "AAII Sentiment Survey showing very bearish retail investors with 46.8% in bearish position",
+      "Petrol pump price shock will create direct consumer anxiety and political pressure on President Biden"
+    ],
+    "transmission_channels": [
+      "Retail panic amplification: already-bearish sentiment may over-sell on invasion news \u2192 downside overshoot",
+      "Gasoline shock \u2192 consumer confidence \u2192 consumer discretionary sector sell-off (XLY specifically exposed)",
+      "Media narrative speed: social media means the fear cycle happens faster than in 1990 Kuwait \u2014 less time for rational pricing"
+    ],
+    "analogue_assessment": {
+      "primary_analogue": "[ANALOGUE 2] Russia Crimea Annexation \u00b7 February 27, 2014",
+      "analogue_adjustments": "The current regime context has higher inflation and tighter financial conditions compared to 2014. This suggests a more negative market reaction due to the already fragile economic environment."
+    }
+  },
+  "devils_advocate": {
+    "agent_id": "devils_advocate_claude",
+    "round": 1,
+    "event": "russia_ukraine_invasion_20220224",
+    "direction": "positive",
+    "magnitude_pct": {
+      "SP500": 3.0,
+      "XLE": 8.0,
+      "XLF": -1.0,
+      "XLK": -2.0,
+      "ITA": -3.0,
+      "XLY": -4.0
+    },
+    "confidence": 0.7,
+    "key_assumption": "The market is already pricing in the invasion, and sophisticated investors have likely hedged their positions, leading to a relief rally.",
+    "supporting_evidence": [
+      "VIX closed at 31.0 on February 23, 2022, reflecting significant uncertainty before the event.",
+      "The S&P 500 was already down 8.8% YTD as of February 23, indicating that the market may be overpricing the negative impact of the invasion.",
+      "Major investment banks had published invasion scenarios and investors might have already hedged their positions."
+    ],
+    "transmission_channels": [
+      "Uncertainty resolution \u2192 Market relief rally",
+      "Fed's inability to cut rates \u2192 No Fed put support",
+      "Energy sector outperformance \u2192 XLE ETF gains"
+    ],
+    "analogue_assessment": {
+      "primary_analogue": "Iraq War Launch (2003)",
+      "analogue_adjustments": "The current regime context has higher inflation and a tightening monetary policy, which may result in a more muted market reaction compared to the 2003 scenario. The geopolitical architecture is also different with NATO involvement."
+    }
+  }
+}

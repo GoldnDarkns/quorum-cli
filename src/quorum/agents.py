@@ -164,7 +164,7 @@ Make ONE contribution to move the discussion forward:
 Be brief and direct. Address the other models, not a user."""
 
 # Valid methods for reference
-VALID_METHODS = {"standard", "oxford", "advocate", "socratic", "delphi", "brainstorm", "tradeoff"}
+VALID_METHODS = {"standard", "oxford", "advocate", "socratic", "delphi", "brainstorm", "tradeoff", "spar"}
 
 # Method requirements for model count validation
 METHOD_REQUIREMENTS = {
@@ -175,6 +175,7 @@ METHOD_REQUIREMENTS = {
     "delphi": {"min": 3, "even_only": False},      # 3+ for meaningful aggregation
     "brainstorm": {"min": 2, "even_only": False},  # 2+ for idea building
     "tradeoff": {"min": 2, "even_only": False},    # 2+ neutral evaluators
+    "spar": {"min": 1, "even_only": False},       # 1+ (same model can play all roles)
 }
 
 
@@ -220,6 +221,14 @@ def get_role_assignments(method: str, model_ids: list[str]) -> dict[str, list[st
     elif method == "tradeoff":
         # All models are neutral "Evaluators" - no explicit role assignment
         return {"Evaluators": model_ids}
+
+    elif method == "spar":
+        role_names = ["Political", "Economic", "Environmental", "Social", "DevilsAdvocate"]
+        assignments: dict[str, list[str]] = {}
+        for i, role in enumerate(role_names):
+            assignments[role] = [model_ids[i % len(model_ids)]]
+        assignments["Moderator"] = [model_ids[5]] if len(model_ids) >= 6 else [model_ids[0]]
+        return assignments
 
     return None
 

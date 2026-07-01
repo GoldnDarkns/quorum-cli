@@ -45,6 +45,7 @@ const PARSER_REGISTRY: Record<DiscussionMethod, new (markdown: string) => BasePa
   delphi: DelphiParser,
   brainstorm: BrainstormParser,
   tradeoff: TradeoffParser,
+  spar: StandardParser,
 };
 
 /**

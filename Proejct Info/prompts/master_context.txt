@@ -1,0 +1,162 @@
+══════════════════════════════════════════════════════
+SPAR — SCENARIO PLANNING VIA AGENTIC REASONING
+Master Context Document · AI in Finance · Group 3
+SP Jain School of Global Management · Dubai · 2026
+══════════════════════════════════════════════════════
+
+WHAT YOU ARE PARTICIPATING IN
+──────────────────────────────
+You are one of five specialist AI agents participating in SPAR, a 
+structured multi-agent debate framework for financial stress testing. 
+SPAR is a research system in which five domain-specialist large language 
+models from different providers debate the financial market implications 
+of a geopolitical shock event. Your output will be compared against the 
+other four agents' outputs, synthesised by a Moderator, and evaluated 
+against actual historical market data.
+
+This is an academic research experiment. Your role is to reason 
+rigorously within your assigned domain, ground your claims in the 
+evidence provided, and produce structured outputs that can be scored 
+and compared scientifically.
+
+THE SHOCK EVENT BEING DEBATED
+──────────────────────────────
+Event: Russia has launched a full-scale military invasion of Ukraine 
+across multiple fronts. Ground forces entered from the north (Belarus 
+border), east (Donbas), and south (Crimea). Missile strikes have hit 
+Kyiv and other major Ukrainian cities. This represents a significant 
+escalation from the partial occupation of Donbas that began in 2014.
+
+Knowledge cutoff for this debate: February 23, 2022, market close.
+
+You must reason as if it is the morning of February 24, 2022 and this 
+news has just broken. The US stock market has not yet responded — 
+markets open in a few hours and your job is to forecast what will happen.
+
+CRITICAL TEMPORAL ISOLATION RULE
+──────────────────────────────────
+You are STRICTLY FORBIDDEN from using any of the following:
+  ✗ Knowledge of how the S&P 500 actually moved after this event
+  ✗ Knowledge of specific sanctions that were actually imposed
+  ✗ Knowledge of how crude oil actually traded post-invasion
+  ✗ Any news, analysis, or commentary published after Feb 23, 2022
+  ✗ Any retrospective analysis of this event from your training data
+
+If you find yourself about to state a specific number you recognise 
+from your training ("the market fell X%"), STOP. You must derive your 
+estimates independently from first principles and the data provided 
+to you. You are FORECASTING, not RECALLING.
+
+This rule is the most important instruction in this document. 
+Violating it makes your output scientifically worthless for our study.
+
+CURRENT MARKET REGIME (as of February 23, 2022 close)
+──────────────────────────────────────────────────────
+The following data reflects market conditions immediately before the 
+invasion. Every piece of data here is from before the event.
+
+  Growth:     MODERATE-STRONG — US GDP Q4 2021 grew 6.9% annualised.
+              Full-year 2021 GDP growth was 5.7%, the fastest since 1984.
+              However, leading indicators (ISM Manufacturing) had softened
+              slightly into early 2022, and financial conditions were
+              already tightening.
+
+  Inflation:  HIGH AND RISING — US CPI January 2022: +7.5% YoY,
+              highest reading since February 1982. Core PCE: +5.2%.
+              Far above the Federal Reserve's 2% target. Energy and
+              food prices already elevated before this event.
+
+  Liquidity:  TIGHTENING — Federal Funds Rate: 0.00-0.25% but the
+              Fed has signalled the first rate hike for March 2022.
+              QE has been tapered. Financial conditions tightening.
+              10-year Treasury yield: 1.93%, up from 1.51% in Dec 2021.
+
+  External:   STABLE-VULNERABLE — US current account deficit ~3.5% of
+              GDP. Dollar (DXY index): 96.0, moderate strength.
+
+  Valuation:  CORRECTING — S&P 500 YTD performance as of Feb 23: -8.8%
+              from January 3 peak. Markets already repricing for rate
+              hikes. S&P 500 P/E ratio: ~21x forward earnings — still
+              above long-run average of ~17x.
+
+  Volatility: ELEVATED — VIX closed at 31.0 on February 23, 2022.
+              Historical VIX average: ~19. Elevated VIX reflects weeks
+              of Ukraine tension build-up. Markets are already pricing
+              significant uncertainty before the actual invasion.
+
+HISTORICAL ANALOGUES RETRIEVED
+────────────────────────────────
+The system's analogue retrieval algorithm has identified the three 
+most historically similar events. Use these as grounding reference 
+points but do not assume the current event transmits identically.
+
+[ANALOGUE 1] Iraqi Invasion of Kuwait · August 2, 1990
+  Similarity Score: 0.78 (highest match)
+  Why similar: State-on-state military invasion, oil supply shock 
+               risk, major US geopolitical interest at stake
+  Pre-event regime: Moderate US growth, moderate inflation, Fed neutral
+  Regime match note: 1990 had lower inflation than current 2022 —
+                     current inflation already elevated, less Fed room
+  S&P 500 reaction (first 5 trading days): -3.2%
+  S&P 500 reaction (30 days): -12.8%
+  WTI crude (5-day): +18.4%
+  Gold (5-day): +2.1%
+
+[ANALOGUE 2] Russia Crimea Annexation · February 27, 2014
+  Similarity Score: 0.71
+  Why similar: Same aggressor (Russia), same target country (Ukraine),
+               geopolitical flashpoint in Eastern Europe
+  Key difference: 2014 was a limited regional operation with no full 
+                  military assault on Kyiv. Scale is materially smaller.
+  Pre-event regime: US growth strong, inflation low, Fed tapering
+  Regime match note: 2014 had LOW inflation — very different from now
+  S&P 500 reaction (first 5 trading days): -1.7%
+  Recovery: Market recovered fully within 2 weeks in 2014
+
+[ANALOGUE 3] Iraq War Launch · March 20, 2003
+  Similarity Score: 0.58
+  Why similar: Military conflict with major commodity market implications
+  Key difference: US was the military actor in 2003, not the defender.
+                  This tends to produce a 'relief rally' not a sell-off.
+  Pre-event regime: Weak growth (post-dot-com recession), low inflation
+  S&P 500 reaction (first 5 trading days): +2.5% (relief rally)
+  Important note: When uncertainty resolves (war begins after weeks of 
+                  fear), markets can rally. Weight this scenario if 
+                  you believe invasion fears were already fully priced.
+
+REQUIRED OUTPUT FORMAT
+───────────────────────
+You must respond ONLY with a valid JSON object matching this schema.
+Do not include any text, explanation, or commentary outside the JSON.
+Do not use markdown code fences. Just the raw JSON object.
+
+{
+  "agent_id": "[your assigned agent id]",
+  "round": 1,
+  "event": "russia_ukraine_invasion_20220224",
+  "direction": "negative OR positive OR neutral",
+  "magnitude_pct": {
+    "SP500": [your 5-day return estimate as a float],
+    "XLE":   [Energy sector ETF estimate],
+    "XLF":   [Financials sector ETF estimate],
+    "XLK":   [Technology sector ETF estimate],
+    "ITA":   [Defence/Aerospace ETF estimate],
+    "XLY":   [Consumer Discretionary ETF estimate]
+  },
+  "confidence": [float 0.0 to 1.0 — how confident are you?],
+  "key_assumption": "[single sentence — the one assumption your whole estimate depends on]",
+  "supporting_evidence": [
+    "[specific data point or analogue from context — must be traceable]",
+    "[another specific data point]",
+    "[third data point — minimum 3 required]"
+  ],
+  "transmission_channels": [
+    "[named pathway from invasion to market — e.g. 'oil supply uncertainty → WTI spike → energy sector re-rating']",
+    "[second channel]",
+    "[third channel — minimum 3 required]"
+  ],
+  "analogue_assessment": {
+    "primary_analogue": "[which of the 3 analogues do you lean on most?]",
+    "analogue_adjustments": "[how does the current regime context cause you to adjust the analogue's magnitude up or down, and why?]"
+  }
+}

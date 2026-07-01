@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPAR — Research Proposal Presentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070A12; --s1:#0C1120; --s2:#111828; --s3:#162030;
+  --border:#1B2640; --border2:#243560;
+  --text:#C8D6EE; --text2:#556080; --text3:#2A3858;
+  --blue:#4D92FF; --blue-d:rgba(77,146,255,.10);
+  --purple:#9080F5; --purple-d:rgba(144,128,245,.10);
+  --gold:#D49838; --gold-d:rgba(212,152,56,.10);
+  --green:#35C49C; --green-d:rgba(53,196,156,.10);
+  --red:#EE5F5F; --red-d:rgba(238,95,95,.10);
+  --teal:#2DD4BF;
+  --fd:'Space Grotesk',sans-serif;
+  --fb:'Inter',sans-serif;
+  --fm:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased;}
+
+/* ── PROGRESS BAR ── */
+#progress{position:fixed;top:0;left:0;height:2px;background:var(--blue);transition:width .35s ease;z-index:200;}
+
+/* ── NAV ── */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 32px;
+  background:rgba(7,10,18,.85);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.nav-brand{font-family:var(--fd);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.01em;}
+.nav-brand em{font-style:normal;color:var(--blue);}
+.nav-center{font-family:var(--fm);font-size:11px;color:var(--text2);letter-spacing:.04em;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-counter{font-family:var(--fm);font-size:11px;color:var(--text2);}
+.nav-btn{
+  background:var(--s1);border:1px solid var(--border2);
+  color:var(--text2);font-size:14px;width:30px;height:30px;
+  border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.nav-btn:hover{background:var(--s2);color:var(--text);}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed;}
+
+/* ── SLIDE CONTAINER ── */
+#deck{height:100vh;overflow:hidden;}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:72px 48px 60px;
+  opacity:0;pointer-events:none;
+  transition:opacity .4s ease,transform .4s ease;
+  transform:translateY(20px);
+  overflow-y:auto;
+}
+.slide.active{opacity:1;pointer-events:all;transform:translateY(0);}
+.slide.exit{opacity:0;transform:translateY(-20px);}
+
+/* ── SLIDE INNER ── */
+.slide-inner{width:100%;max-width:900px;margin:0 auto;}
+
+/* ── TYPOGRAPHY ── */
+.eyebrow{
+  font-family:var(--fm);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text3);margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.eyebrow::before{content:'';width:18px;height:1px;background:var(--text3);}
+.eyebrow.blue{color:var(--blue);}
+.eyebrow.blue::before{background:var(--blue);}
+.eyebrow.gold{color:var(--gold);}
+.eyebrow.gold::before{background:var(--gold);}
+.eyebrow.green{color:var(--green);}
+.eyebrow.green::before{background:var(--green);}
+.eyebrow.purple{color:var(--purple);}
+.eyebrow.purple::before{background:var(--purple);}
+
+h1{font-family:var(--fd);font-size:clamp(34px,5vw,58px);font-weight:700;letter-spacing:-.025em;color:#fff;line-height:1.05;margin-bottom:16px;}
+h1 em{font-style:normal;color:var(--blue);}
+h2{font-family:var(--fd);font-size:clamp(22px,3vw,34px);font-weight:600;letter-spacing:-.018em;color:#fff;line-height:1.1;margin-bottom:12px;}
+h2 em{font-style:normal;color:var(--blue);}
+h3{font-family:var(--fd);font-size:16px;font-weight:600;color:#fff;margin-bottom:6px;}
+p{font-size:14px;color:var(--text2);line-height:1.72;margin-bottom:10px;}
+p:last-child{margin-bottom:0;}
+strong{color:var(--text);font-weight:500;}
+
+/* ── PILL / TAG ── */
+.pill{font-family:var(--fm);font-size:10px;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);color:var(--text2);background:var(--s1);white-space:nowrap;display:inline-block;}
+.pill-blue  {background:var(--blue-d);  border-color:rgba(77,146,255,.28);  color:var(--blue);}
+.pill-purple{background:var(--purple-d);border-color:rgba(144,128,245,.28); color:var(--purple);}
+.pill-gold  {background:var(--gold-d);  border-color:rgba(212,152,56,.28);  color:var(--gold);}
+.pill-green {background:var(--green-d); border-color:rgba(53,196,156,.28);  color:var(--green);}
+.pill-red   {background:var(--red-d);   border-color:rgba(238,95,95,.28);   color:var(--red);}
+
+/* ── CARD ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;}
+.card-blue  {border-color:rgba(77,146,255,.28);  background:var(--blue-d);}
+.card-purple{border-color:rgba(144,128,245,.28); background:var(--purple-d);}
+.card-gold  {border-color:rgba(212,152,56,.28);  background:var(--gold-d);}
+.card-green {border-color:rgba(53,196,156,.28);  background:var(--green-d);}
+.card-red   {border-color:rgba(238,95,95,.28);   background:var(--red-d);}
+
+/* ── GRID HELPERS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+@media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+
+/* ── DIVIDER ── */
+hr{border:none;height:1px;background:var(--border);margin:18px 0;}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+.tbl th{background:var(--s2);color:var(--text2);font-family:var(--fm);font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:9px 12px;border-bottom:1px solid var(--border2);text-align:left;font-weight:500;}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl-wrap{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:14px;}
+
+/* ── FLOW ARROW ── */
+.flow-arrow{display:flex;align-items:center;justify-content:center;gap:8px;padding:5px 0;color:var(--text3);font-family:var(--fm);font-size:10px;letter-spacing:.06em;}
+.flow-arrow::before,.flow-arrow::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── HIGHLIGHT QUOTE ── */
+.hq{border-left:3px solid var(--blue);background:var(--blue-d);border-radius:0 10px 10px 0;padding:14px 18px;margin:14px 0;}
+.hq p{color:var(--text);font-size:14px;}
+
+/* ── NUMBER BIG ── */
+.stat-row{display:flex;gap:20px;flex-wrap:wrap;margin:18px 0;}
+.stat{flex:1;min-width:100px;background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center;}
+.stat-num{font-family:var(--fd);font-size:28px;font-weight:700;color:#fff;line-height:1;margin-bottom:4px;}
+.stat-lbl{font-size:11px;color:var(--text2);}
+
+/* ── LAYER BANDS ── */
+.layer{border-radius:12px;padding:16px 18px;margin-bottom:8px;}
+.l0{background:var(--blue-d);  border:1.5px solid rgba(77,146,255,.28);}
+.l1{background:var(--purple-d);border:1.5px solid rgba(144,128,245,.28);}
+.l2{background:var(--gold-d);  border:1.5px solid rgba(212,152,56,.28);}
+.l3{background:var(--green-d); border:1.5px solid rgba(53,196,156,.28);}
+.layer-tag{font-family:var(--fm);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;display:inline-block;}
+.lt0{color:var(--blue);}  .lt1{color:var(--purple);}
+.lt2{color:var(--gold);}  .lt3{color:var(--green);}
+.layer h3{font-size:13px;margin-bottom:4px;}
+.layer p{font-size:12px;margin-bottom:0;}
+
+/* ── AGENT MINI ── */
+.agents{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px;}
+.agent{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:7px;padding:7px 8px;text-align:center;font-size:11px;color:var(--text);}
+.agent.da{border-color:rgba(238,95,95,.3);background:rgba(238,95,95,.06);color:var(--red);}
+
+/* ── CHAIN ── */
+.chain{background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:12px 14px;margin-top:10px;}
+.chain-nodes{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin-top:6px;}
+.chain-node{background:var(--s2);border:1px solid var(--border2);border-radius:5px;padding:4px 9px;font-size:11px;color:var(--text);white-space:nowrap;}
+.chain-arr{font-family:var(--fm);font-size:11px;color:var(--text3);padding:0 3px;}
+
+/* ── RUBRIC SCORE ── */
+.rubric{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.rub-item{display:flex;align-items:center;gap:12px;background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:10px 14px;}
+.rub-icon{font-size:16px;flex-shrink:0;}
+.rub-name{font-family:var(--fd);font-size:13px;font-weight:600;color:#fff;margin-bottom:2px;}
+.rub-desc{font-size:11.5px;color:var(--text2);}
+.rub-score{margin-left:auto;flex-shrink:0;font-family:var(--fm);font-size:12px;color:var(--green);white-space:nowrap;}
+
+/* ── TIMELINE ── */
+.timeline{display:flex;flex-direction:column;gap:6px;margin-top:12px;}
+.tl-item{display:flex;gap:14px;align-items:flex-start;}
+.tl-dot{flex-shrink:0;width:8px;height:8px;border-radius:50%;margin-top:6px;}
+.tl-line{display:flex;flex-direction:column;gap:2px;}
+.tl-date{font-family:var(--fm);font-size:10px;color:var(--text2);letter-spacing:.06em;}
+.tl-task{font-size:13px;color:var(--text);}
+
+/* ── SPECIAL SLIDE: TITLE ── */
+.slide-title{background:radial-gradient(ellipse 70% 60% at 15% 50%,rgba(77,146,255,.07) 0%,transparent 65%), radial-gradient(ellipse 60% 70% at 85% 40%,rgba(212,152,56,.05) 0%,transparent 65%);}
+
+/* ── SLIDE NUMBER DOTS ── */
+#dots{position:fixed;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:5px;z-index:100;}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--text3);cursor:pointer;transition:all .2s;}
+.dot.on{background:var(--blue);transform:scale(1.4);}
+
+/* scroll within slide */
+.slide{scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
+.slide::-webkit-scrollbar{width:4px;}
+.slide::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<nav id="nav">
+  <div class="nav-brand">SPAR <em>·</em> Research Proposal</div>
+  <div class="nav-center" id="slide-section">Introduction</div>
+  <div class="nav-right">
+    <span class="nav-counter" id="counter">1 / 16</span>
+    <button class="nav-btn" id="prev" onclick="go(-1)">‹</button>
+    <button class="nav-btn" id="next" onclick="go(1)">›</button>
+  </div>
+</nav>
+
+<div id="dots"></div>
+
+<div id="deck">
+
+<!-- ═══════════════════════════════════════ S1 — TITLE -->
+<div class="slide slide-title" data-section="Introduction">
+  <div class="slide-inner" style="text-align:center">
+    <div class="eyebrow blue" style="justify-content:center;margin-bottom:20px">AI in Finance · SP Jain School of Global Management · Group 3</div>
+    <h1 style="font-size:clamp(38px,6vw,68px);margin-bottom:10px">
+      SPAR
+    </h1>
+    <div style="font-family:var(--fd);font-size:clamp(16px,2.5vw,24px);color:var(--text2);font-weight:400;margin-bottom:24px;letter-spacing:-.01em">
+      <em style="font-style:normal;color:#fff">Scenario Planning</em> via <em style="font-style:normal;color:var(--blue)">Agentic Reasoning</em>
+    </div>
+    <p style="font-size:15px;max-width:580px;margin:0 auto 32px;color:var(--text2)">
+      A multi-frontier-LLM debate framework for geopolitical financial stress testing — grounded in historical analogues, validated against real market outcomes.
+    </p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:36px">
+      <span class="pill pill-blue">AI in Finance</span>
+      <span class="pill pill-purple">Multi-Agent Debate</span>
+      <span class="pill pill-gold">Geopolitical Risk</span>
+      <span class="pill pill-green">US Financial Markets</span>
+      <span class="pill">LangGraph</span>
+      <span class="pill">S&P 500</span>
+    </div>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <div class="stat" style="min-width:110px"><div class="stat-num" style="color:var(--blue)">5</div><div class="stat-lbl">Frontier LLMs</div></div>
+      <div class="stat" style="min-width:110px"><div class="stat-num" style="color:var(--purple)">4</div><div class="stat-lbl">System layers</div></div>
+      <div class="stat" style="min-width:110px"><div class="stat-num" style="color:var(--gold)">3</div><div class="stat-lbl">Research contributions</div></div>
+      <div class="stat" style="min-width:110px"><div class="stat-num" style="color:var(--green)">2</div><div class="stat-lbl">Shock scenarios</div></div>
+    </div>
+    <div style="margin-top:36px;font-family:var(--fm);font-size:10px;color:var(--text3);letter-spacing:.06em">Faculty · Dr. Guha &nbsp;·&nbsp; Submission · 31 July 2026 &nbsp;·&nbsp; Presentation · 9 July 2026</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S2 — THE PROBLEM -->
+<div class="slide" data-section="Problem">
+  <div class="slide-inner">
+    <div class="eyebrow red">The Problem</div>
+    <h2>Why existing stress tests fail</h2>
+    <p>When a geopolitical shock occurs — a military strike, a sanctions announcement, an energy supply disruption — financial institutions need to know the market impact <strong>immediately</strong>. Today they cannot.</p>
+    <div class="g2" style="margin-top:18px">
+      <div class="card card-red">
+        <h3 style="color:var(--red);font-size:13px;margin-bottom:8px">❌ What exists today</h3>
+        <p style="font-size:12.5px;margin-bottom:7px"><strong>Fixed templates</strong> — calibrated to 2008, updated manually over weeks, cannot adapt to novel events.</p>
+        <p style="font-size:12.5px;margin-bottom:7px"><strong>Single-model AI</strong> — one LLM has one perspective, no mechanism to challenge its own assumptions, hallucinates with confidence.</p>
+        <p style="font-size:12.5px;margin-bottom:7px"><strong>No domain separation</strong> — political, economic, geopolitical, and market dynamics all lumped into one unstructured prompt.</p>
+        <p style="font-size:12.5px"><strong>No validation</strong> — nobody checks if the AI's scenario is plausible or historically grounded before it reaches a risk manager.</p>
+      </div>
+      <div class="card card-blue">
+        <h3 style="color:var(--blue);font-size:13px;margin-bottom:8px">✓ What risk managers actually need</h3>
+        <p style="font-size:12.5px;margin-bottom:7px"><strong>Speed</strong> — scenario in under 60 seconds, not weeks of manual analysis.</p>
+        <p style="font-size:12.5px;margin-bottom:7px"><strong>Multiple perspectives</strong> — political, economic, monetary, and market analysts all weighing in simultaneously.</p>
+        <p style="font-size:12.5px;margin-bottom:7px"><strong>Structured disagreement</strong> — where experts disagree preserved as tail-risk signals, not averaged away.</p>
+        <p style="font-size:12.5px"><strong>Auditable reasoning</strong> — every claim traceable to a data source or historical analogue, not a black-box output.</p>
+      </div>
+    </div>
+    <div class="hq" style="margin-top:16px">
+      <p><strong>The core gap:</strong> no existing system combines real-time geopolitical shock intake, structured multi-agent debate across domain specialists, historical analogue retrieval, and validated portfolio impact estimation in a single auditable pipeline.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S3 — RESEARCH QUESTION -->
+<div class="slide" data-section="Research Question">
+  <div class="slide-inner" style="text-align:center">
+    <div class="eyebrow blue" style="justify-content:center">Research Question</div>
+    <h2 style="font-size:clamp(20px,3vw,30px);max-width:700px;margin:0 auto 24px">Does a structured debate between domain-specialist LLMs from <em>different model providers</em> produce more accurate and complete financial stress scenarios than a single prompted model?</h2>
+    <hr>
+    <div class="g3" style="margin-top:24px;text-align:left">
+      <div class="card">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Hypothesis</div>
+        <p style="font-size:13px">Multi-agent debate across genuinely different frontier LLMs produces scenarios that are more <strong>directionally accurate</strong>, more <strong>complete</strong> in transmission channel coverage, and better <strong>calibrated</strong> in magnitude than a single model.</p>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Why "different providers"</div>
+        <p style="font-size:13px">Claude, GPT-4o, Gemini, DeepSeek, and Grok have genuinely different training data, geographic biases, and reasoning tendencies. This diversity is real — not simulated through personas in one model.</p>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">How we prove it</div>
+        <p style="font-size:13px">Run five historical geopolitical events through both systems. Score outputs against actual S&P 500 outcomes on three rubrics. Compare scores. Report honestly — including failures.</p>
+      </div>
+    </div>
+    <div class="stat-row" style="margin-top:20px;justify-content:center">
+      <div class="stat"><div class="stat-num" style="color:var(--blue);font-size:22px">2</div><div class="stat-lbl">Shock types tested</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--purple);font-size:22px">5</div><div class="stat-lbl">Historical events</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--gold);font-size:22px">3</div><div class="stat-lbl">Scoring metrics</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--green);font-size:22px">2</div><div class="stat-lbl">Systems compared</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S4 — LITERATURE -->
+<div class="slide" data-section="Literature">
+  <div class="slide-inner">
+    <div class="eyebrow purple">Literature Review</div>
+    <h2>Four streams of prior work</h2>
+    <div class="g2" style="margin-top:14px">
+      <div class="card" style="border-left:3px solid var(--blue)">
+        <div class="pill pill-blue" style="margin-bottom:8px">Stream 1 · Stress Testing</div>
+        <h3 style="font-size:13px">Traditional scenario generation</h3>
+        <p style="font-size:12px">Basel III and CCAR established fixed shock frameworks. <strong>Brunnermeier et al. (2020)</strong> showed these fail under novel tail events. Static templates cannot handle geopolitical shocks whose form has never been seen before.</p>
+      </div>
+      <div class="card" style="border-left:3px solid var(--purple)">
+        <div class="pill pill-purple" style="margin-bottom:8px">Stream 2 · Multi-Agent Debate</div>
+        <h3 style="font-size:13px">LLM debate reduces hallucination</h3>
+        <p style="font-size:12px"><strong>Du et al. (2023)</strong> proved that multiple LLM instances critiquing each other improves factual accuracy and reduces overconfidence. <strong>FinDebate (2025)</strong> applied this to earnings analysis. Neither studied geopolitical shocks or used different model providers.</p>
+      </div>
+      <div class="card" style="border-left:3px solid var(--gold)">
+        <div class="pill pill-gold" style="margin-bottom:8px">Stream 3 · Geopolitical Risk</div>
+        <h3 style="font-size:13px">GPR index and market transmission</h3>
+        <p style="font-size:12px"><strong>Caldara & Iacoviello (2022)</strong> built the GPR index — the backbone of our retrieval. <strong>Ramiah, Xu & Moosa (2015)</strong> showed S&P 500 sector reactions vary significantly by shock category. <strong>Baker, Bloom & Davis (2016)</strong> documented policy uncertainty transmission channels.</p>
+      </div>
+      <div class="card" style="border-left:3px solid var(--green)">
+        <div class="pill pill-green" style="margin-bottom:8px">Stream 4 · LLM + Finance</div>
+        <h3 style="font-size:13px">LLMs for financial analysis</h3>
+        <p style="font-size:12px"><strong>BloombergGPT (2023)</strong> showed domain-specific training improves financial tasks. <strong>Soleimani et al. (2025)</strong> used RAG for G7 stress scenarios — acknowledged plausibility validation as unsolved. No paper uses multi-LLM debate for geopolitical scenario generation.</p>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:12px 16px;background:var(--s1);border:1px solid var(--border);border-radius:9px;font-size:12.5px;color:var(--text2)">
+      <strong style="color:var(--text)">What all four streams miss:</strong> a system that combines structured debate, multiple model providers, geopolitical retrieval, and empirical validation against real historical market outcomes — for US financial markets specifically.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S5 — GAP -->
+<div class="slide" data-section="Research Gap">
+  <div class="slide-inner">
+    <div class="eyebrow gold">Research Gap</div>
+    <h2>Three gaps — three contributions</h2>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px">
+      <div class="card card-blue">
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <div style="font-family:var(--fd);font-size:32px;font-weight:700;color:rgba(77,146,255,.3);flex-shrink:0;line-height:1">01</div>
+          <div>
+            <h3 style="font-size:14px;margin-bottom:4px">No structured analogue retrieval for US geopolitical shocks</h3>
+            <p style="font-size:12.5px">Existing papers either use fixed shock templates or retrieve analogues by keyword alone. Nobody has designed a three-dimensional matching system — by shock category, geographic proximity, and economic regime — grounded in the GPR index and FRED macro data. <strong style="color:var(--blue)">We build this and use it as our retrieval backbone.</strong></p>
+          </div>
+        </div>
+      </div>
+      <div class="card card-purple">
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <div style="font-family:var(--fd);font-size:32px;font-weight:700;color:rgba(144,128,245,.3);flex-shrink:0;line-height:1">02</div>
+          <div>
+            <h3 style="font-size:14px;margin-bottom:4px">Multi-agent debate never tested with genuinely different model providers</h3>
+            <p style="font-size:12.5px">Du et al. and FinDebate use the same model prompted differently. We use Claude, GPT-4o, Gemini Pro, DeepSeek, and Grok — five companies with genuinely different training data, geographic emphases, and reasoning tendencies. <strong style="color:var(--purple)">We compare model-diversity debate vs. persona-diversity debate as a research experiment.</strong></p>
+          </div>
+        </div>
+      </div>
+      <div class="card card-gold">
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <div style="font-family:var(--fd);font-size:32px;font-weight:700;color:rgba(212,152,56,.3);flex-shrink:0;line-height:1">03</div>
+          <div>
+            <h3 style="font-size:14px;margin-bottom:4px">No validated plausibility framework for LLM-generated scenarios</h3>
+            <p style="font-size:12.5px">Soleimani et al. (2025) explicitly acknowledge this as an open problem. We solve it with a three-pronged framework: historical analogue match, internal economic consistency, and benchmark comparison against Federal Reserve stress scenario language. <strong style="color:var(--gold)">We also introduce a four-type position-change decomposition as a debate quality metric.</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S6 — PROBLEM STATEMENT -->
+<div class="slide" data-section="Problem Statement">
+  <div class="slide-inner" style="text-align:center">
+    <div class="eyebrow blue" style="justify-content:center">Formal Problem Statement</div>
+    <div style="background:var(--s1);border:1px solid var(--border2);border-radius:16px;padding:32px 36px;max-width:800px;margin:16px auto 24px;text-align:left">
+      <div style="font-family:var(--fm);font-size:9px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px">Problem Statement</div>
+      <p style="font-size:15px;color:var(--text);line-height:1.75;margin-bottom:0">
+        Financial institutions lack a <strong>rapid, auditable, and multi-perspective</strong> method for translating novel geopolitical shock narratives into structured, historically-grounded portfolio risk estimates. Existing approaches — static scenario templates and single-model AI generation — fail to capture the multi-domain nature of geopolitical transmission, produce unverifiable outputs, and cannot adapt to shock types unseen in their calibration data.
+      </p>
+    </div>
+    <div style="background:var(--s1);border:1px solid var(--border2);border-radius:16px;padding:24px 36px;max-width:800px;margin:0 auto;text-align:left">
+      <div style="font-family:var(--fm);font-size:9px;color:var(--green);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px">What we propose</div>
+      <p style="font-size:15px;color:var(--text);line-height:1.75;margin-bottom:0">
+        <strong>SPAR</strong> — a four-layer agentic framework in which <strong>five frontier LLMs</strong> from different providers debate geopolitical shocks as domain specialists, grounded in historically retrieved analogues, with an adaptive explore/exploit stopping criterion, and validated against real S&P 500 sector outcomes through a structured three-metric scoring rubric.
+      </p>
+    </div>
+    <div style="margin-top:20px;font-size:13px;color:var(--text2)">
+      <strong style="color:var(--text)">Traditional stress testing asks:</strong> "What if 2008 happens again?" &nbsp;·&nbsp;
+      <strong style="color:var(--blue)">SPAR asks:</strong> "Given today's regime, through which channels would <em>this</em> shock move the portfolio?"
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S7 — ARCHITECTURE OVERVIEW -->
+<div class="slide" data-section="Architecture">
+  <div class="slide-inner">
+    <div class="eyebrow blue">Architecture</div>
+    <h2>Four-layer system overview</h2>
+    <p style="font-size:13px">Data flows top to bottom. The user types a shock. The system classifies it, debates it, validates it, and quantifies it. Two conditional decision points control the flow — the Explore/Exploit loop and the Plausibility Gate.</p>
+
+    <div style="margin-top:16px">
+      <div class="layer l0">
+        <span class="layer-tag lt0">Layer 0 · Classification</span>
+        <h3>Regime classifier → 6-axis shock profiler → targeted RAG</h3>
+        <p>Reads current market regime (6 conditions). Profiles the shock (7 types, historical analogues, transmission channels, GPR baseline). Routes only relevant agents. Seeds each agent's RAG with specific queries.</p>
+      </div>
+      <div class="flow-arrow">↓ &nbsp;targeted context packages → activated agents only</div>
+      <div class="layer l1">
+        <span class="layer-tag lt1">Layer 1 · Debate + Explore/Exploit</span>
+        <h3>Specialist agents debate → adaptive stopping criterion</h3>
+        <p>Active agents debate in structured rounds. After each round: Disagreement Score + Information Gain + RAG Exhaustion → Debate Continuation Score. If above threshold: explore (another round, max 5). If below: exploit (pass to Layer 2).</p>
+        <div class="agents" style="margin-top:10px">
+          <div class="agent">🏛🌐 Political &amp; Geopolitical</div>
+          <div class="agent">📈💰 Economic, Fiscal &amp; Market</div>
+          <div class="agent">🌿💻 Environmental &amp; Technology</div>
+          <div class="agent">👥 Social &amp; Behavioural</div>
+          <div class="agent da">😈 Devil's Advocate</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓ &nbsp;full debate transcript → moderator</div>
+      <div class="layer l2">
+        <span class="layer-tag lt2">Layer 2 · Moderation + Validation</span>
+        <h3>Consensus + minority dissent + plausibility gate</h3>
+        <p>Separate moderator LLM synthesises debate into consensus scenario JSON and preserves minority views. Scores plausibility (0–100). Plausibility Gate: below threshold → human review; above → Layer 3.</p>
+      </div>
+      <div class="flow-arrow">↓ &nbsp;validated scenario JSON → impact model</div>
+      <div class="layer l3">
+        <span class="layer-tag lt3">Layer 3 · Quantification</span>
+        <h3>Factor model → VaR → sector heatmap → report</h3>
+        <p>Macro scenario variables mapped to S&P 500 sector sensitivities via calibrated factor model. Outputs: portfolio VaR, Expected Shortfall, sector P&L heatmap, confidence bands, plain-English narrative.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S8 — LANGGRAPH -->
+<div class="slide" data-section="Architecture">
+  <div class="slide-inner">
+    <div class="eyebrow blue">LangGraph Implementation</div>
+    <h2>Why LangGraph and how it works</h2>
+    <div class="g2" style="margin-top:16px">
+      <div>
+        <div class="card card-blue" style="margin-bottom:10px">
+          <h3 style="font-size:13px;margin-bottom:6px">What LangGraph does</h3>
+          <p style="font-size:12.5px">LangGraph is the orchestration framework that manages the multi-agent pipeline as a directed graph — controlling which agent runs when, how information flows between them, and when to loop vs. exit.</p>
+        </div>
+        <div class="card" style="margin-bottom:10px">
+          <h3 style="font-size:13px;margin-bottom:6px">🗂 Shared State</h3>
+          <p style="font-size:12.5px">Every agent reads and writes to a shared state object — the common whiteboard. Contains: shock description, regime profile, all agent positions per round, round counter, and final scenario. No agent can delete another's output.</p>
+        </div>
+        <div class="card">
+          <h3 style="font-size:13px;margin-bottom:6px">📦 Nodes &amp; Edges</h3>
+          <p style="font-size:12.5px"><strong>Nodes</strong> = agents and decision logic. <strong>Straight edges</strong> = always proceed. <strong>Conditional edges</strong> = the two decision diamonds (Continuation Controller and Plausibility Gate). Only these two points can change the flow.</p>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--fm);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Flow diagram</div>
+        <div style="background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px;font-family:var(--fm);font-size:11px;color:var(--text2);line-height:2.1">
+          <div style="color:var(--blue)">START → Regime Classifier</div>
+          <div style="padding-left:12px">→ Shock Profiler</div>
+          <div style="padding-left:24px">→ Debate Round (4 domain agents)</div>
+          <div style="padding-left:36px">→ Devil's Advocate</div>
+          <div style="padding-left:36px">→ <span style="color:var(--gold)">◆ Continuation Controller</span></div>
+          <div style="padding-left:48px">→ <span style="color:var(--purple)">EXPLORE: loop ↑ back</span></div>
+          <div style="padding-left:48px">→ <span style="color:var(--green)">EXPLOIT: Moderator</span></div>
+          <div style="padding-left:36px">→ <span style="color:var(--gold)">◆ Plausibility Gate</span></div>
+          <div style="padding-left:48px">→ <span style="color:var(--red)">LOW: Human Review → END</span></div>
+          <div style="padding-left:48px">→ <span style="color:var(--green)">OK: Quantifier → Report → END</span></div>
+        </div>
+        <div class="card" style="margin-top:10px;border-color:rgba(144,128,245,.28);background:var(--purple-d)">
+          <h3 style="font-size:12px;color:var(--purple);margin-bottom:4px">The explore/exploit loop in code</h3>
+          <p style="font-size:11.5px">The Continuation Controller computes Disagreement Score + Information Gain + RAG Exhaustion → combined threshold τ. LangGraph's conditional edge branches on this: if score > τ AND rounds &lt; 5, route back to Debate Round. Otherwise route to Moderator. This replaces fixed round count with adaptive stopping.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S9 — NARROWED SCOPE -->
+<div class="slide" data-section="Implementation">
+  <div class="slide-inner">
+    <div class="eyebrow green">Implementation Plan · Scope</div>
+    <h2>Narrowed for research rigour</h2>
+    <p style="font-size:13px">We narrowed our scope to where data is most abundant, geography is well-covered by free APIs, and transmission chains are cleanly documentable for validation. Here are the decisions and the reasoning behind each.</p>
+    <div class="g3" style="margin-top:16px">
+      <div class="card card-green">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--green);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Geography</div>
+        <h3 style="font-size:14px;margin-bottom:6px">United States · S&P 500</h3>
+        <p style="font-size:12px">US markets have the deepest, cleanest, most API-accessible data globally. FRED, yfinance, GDELT, GPR — all free, all reliable, all covering US from the 1990s. Eliminates the data availability problem entirely.</p>
+      </div>
+      <div class="card card-blue">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Shock Type 1</div>
+        <h3 style="font-size:14px;margin-bottom:6px">Geopolitical military escalation</h3>
+        <p style="font-size:12px">GPR index has documented every major military escalation since 1985. Transmission chain is well-studied: risk premium → VIX spike → dollar → defensive sectors. Abundant historical analogues.</p>
+      </div>
+      <div class="card card-gold">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Shock Type 2</div>
+        <h3 style="font-size:14px;margin-bottom:6px">Energy supply disruption</h3>
+        <p style="font-size:12px">Crude oil supply shocks — well-documented via FRED oil series going back to 1970s. Clear sector differentiation: energy wins, airlines and consumer discretionary lose. Clean to validate.</p>
+      </div>
+    </div>
+    <div class="tbl-wrap" style="margin-top:16px">
+      <table class="tbl">
+        <thead><tr><th>Test event</th><th>Shock type</th><th>Date</th><th>S&P 500 reaction</th><th>Data availability</th></tr></thead>
+        <tbody>
+          <tr><td><strong>9/11 Attacks</strong></td><td><span class="pill pill-blue">Military/Terror</span></td><td>Sep 2001</td><td>−11.6% in 5 days</td><td>Excellent · all APIs</td></tr>
+          <tr><td><strong>Iraq War launch</strong></td><td><span class="pill pill-blue">Military</span></td><td>Mar 2003</td><td>+3.5% (relief rally)</td><td>Excellent · all APIs</td></tr>
+          <tr><td><strong>Russia-Ukraine invasion</strong></td><td><span class="pill pill-gold">Geopolitical + Energy</span></td><td>Feb 2022</td><td>−12% over 3 weeks</td><td>Excellent · all APIs</td></tr>
+          <tr><td><strong>Hamas attack (Oct 7)</strong></td><td><span class="pill pill-blue">Military/Terror</span></td><td>Oct 2023</td><td>−2.4% week 1</td><td>Excellent · all APIs</td></tr>
+          <tr><td><strong>US-China tariff escalation</strong></td><td><span class="pill pill-gold">Trade/Policy</span></td><td>Apr 2025</td><td>−10.5% in 4 days</td><td>Excellent · all APIs</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--text2)"><strong style="color:var(--text)">Sector focus:</strong> Energy (XLE), Financials (XLF), Technology (XLK), Defence (ITA), Consumer Discretionary (XLY), and the VIX as the fear proxy. All available free via yfinance.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S10 — LLM DESIGN -->
+<div class="slide" data-section="Implementation">
+  <div class="slide-inner">
+    <div class="eyebrow purple">Implementation Plan · LLM Design</div>
+    <h2>Two approaches — tested and compared</h2>
+    <p style="font-size:13px">We run both approaches on the same five events and compare them. The comparison itself is a research finding.</p>
+    <div class="g2" style="margin-top:14px">
+      <div class="card" style="border-color:rgba(144,128,245,.28);background:var(--purple-d)">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--purple);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Approach A · Baseline</div>
+        <h3 style="font-size:14px;margin-bottom:8px">Single LLM · 5 personas</h3>
+        <p style="font-size:12.5px;margin-bottom:10px">One frontier model (Claude) called five times with five different system prompts — one per merged domain agent. Same underlying weights, different instruction. This is the baseline that we compare against.</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="pill">Political &amp; Geo · Claude</span>
+          <span class="pill">Econ, Fiscal &amp; Market · Claude</span>
+          <span class="pill">Env &amp; Tech · Claude</span>
+          <span class="pill">Social &amp; Behav · Claude</span>
+          <span class="pill pill-red">DA · Claude</span>
+        </div>
+      </div>
+      <div class="card card-blue">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Approach B · Proposed system</div>
+        <h3 style="font-size:14px;margin-bottom:8px">5 Frontier LLMs · different providers</h3>
+        <p style="font-size:12.5px;margin-bottom:10px">Five different model providers, each assigned a domain role. Genuinely different training data and geographic biases. We rotate assignments across events to control for model-specific effects.</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="pill pill-blue">Political &amp; Geo · Claude</span>
+          <span class="pill pill-green">Econ, Fiscal &amp; Market · GPT-4o</span>
+          <span class="pill pill-gold">Env &amp; Tech · Gemini</span>
+          <span class="pill pill-purple">Social &amp; Behav · DeepSeek</span>
+          <span class="pill pill-red">DA · Grok</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px">
+      <div style="font-family:var(--fm);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Role rotation across events — controls for model-specific bias</div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Event</th><th>Political &amp; Geo</th><th>Econ, Fiscal &amp; Market</th><th>Env &amp; Tech</th><th>Social &amp; Behav</th><th>Devil's Advocate</th></tr></thead>
+          <tbody>
+            <tr><td>9/11 (2001)</td><td>Claude</td><td>GPT-4o</td><td>Gemini</td><td>DeepSeek</td><td>Grok</td></tr>
+            <tr><td>Iraq War (2003)</td><td>GPT-4o</td><td>Gemini</td><td>DeepSeek</td><td>Grok</td><td>Claude</td></tr>
+            <tr><td>Russia-Ukraine (2022)</td><td>Gemini</td><td>DeepSeek</td><td>Grok</td><td>Claude</td><td>GPT-4o</td></tr>
+            <tr><td>Oct 7 Hamas (2023)</td><td>DeepSeek</td><td>Grok</td><td>Claude</td><td>GPT-4o</td><td>Gemini</td></tr>
+            <tr><td>US-China Tariffs (2025)</td><td>Grok</td><td>Claude</td><td>GPT-4o</td><td>Gemini</td><td>DeepSeek</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:11.5px;color:var(--text2);margin-top:8px">Each model plays each role exactly once. If DeepSeek consistently produces better outputs regardless of which role it plays, that tells us something about model quality vs. debate structure. That is a finding.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S11 — DATA -->
+<div class="slide" data-section="Implementation">
+  <div class="slide-inner">
+    <div class="eyebrow green">Implementation Plan · Data</div>
+    <h2>API-first pipeline · everything free</h2>
+    <p style="font-size:13px">No manual downloads. Every data source is accessible via API in Python. Total setup time: one afternoon.</p>
+    <div class="tbl-wrap" style="margin-top:14px">
+      <table class="tbl">
+        <thead><tr><th>Source</th><th>What it provides</th><th>Used by</th><th>Access</th></tr></thead>
+        <tbody>
+          <tr><td><strong>yfinance</strong></td><td>S&P 500, sector ETFs (XLE, XLF, XLK, ITA, XLY), VIX — daily since 1993</td><td>Econ, Fiscal &amp; Market agent</td><td><span class="pill pill-green">pip install yfinance · no key</span></td></tr>
+          <tr><td><strong>FRED API</strong></td><td>US CPI, GDP, Fed Funds Rate, WTI crude, yield curve, unemployment — 800k+ series</td><td>Econ, Fiscal &amp; Market · regime classifier</td><td><span class="pill pill-green">Free API key · fredapi library</span></td></tr>
+          <tr><td><strong>GPR Index</strong></td><td>Geopolitical Risk Index 1985–2026 · country-specific series · monthly</td><td>Political &amp; Geo agent · analogue retrieval</td><td><span class="pill pill-green">Free CSV · matteoiacoviello.com</span></td></tr>
+          <tr><td><strong>GDELT API</strong></td><td>Global events database · 300+ categories · near real-time · geographic coding</td><td>All agents · news RAG</td><td><span class="pill pill-green">Free API · no key · Python SDK</span></td></tr>
+          <tr><td><strong>NewsAPI</strong></td><td>WSJ, NYT, Reuters, Bloomberg headlines + article text</td><td>All agents · news RAG</td><td><span class="pill pill-blue">Free tier · 100 req/day · API key</span></td></tr>
+          <tr><td><strong>Federal Reserve FSR</strong></td><td>Financial Stability Reports — expert scenario language for plausibility benchmark</td><td>Plausibility Gate</td><td><span class="pill pill-green">Free PDFs · federalreserve.gov</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:16px">
+      <div style="font-family:var(--fm);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Analogue matching · three-dimensional retrieval</div>
+      <div class="chain">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">For any input shock, retrieve the top 3 historical analogues by matching on:</div>
+        <div class="chain-nodes">
+          <div class="chain-node" style="border-color:rgba(77,146,255,.35);color:var(--blue)">Shock category<br><span style="font-size:10px;color:var(--text2)">GPR event taxonomy</span></div>
+          <div class="chain-arr">×</div>
+          <div class="chain-node" style="border-color:rgba(144,128,245,.35);color:var(--purple)">Geographic proximity<br><span style="font-size:10px;color:var(--text2)">US actor involvement</span></div>
+          <div class="chain-arr">×</div>
+          <div class="chain-node" style="border-color:rgba(212,152,56,.35);color:var(--gold)">Economic regime<br><span style="font-size:10px;color:var(--text2)">FRED recession indicator</span></div>
+          <div class="chain-arr">→</div>
+          <div class="chain-node" style="border-color:rgba(53,196,156,.35);color:var(--green)">Top 3 analogues<br><span style="font-size:10px;color:var(--text2)">with actual S&P 500 Δ%</span></div>
+        </div>
+        <div style="font-size:11px;color:var(--text2);margin-top:8px">Grounded in: Caldara & Iacoviello (2022), Baker Bloom & Davis (2016), Ramiah Xu & Moosa (2015)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S12 — EVALUATION -->
+<div class="slide" data-section="Evaluation">
+  <div class="slide-inner">
+    <div class="eyebrow gold">Evaluation · Rubrics</div>
+    <h2>How we score and compare</h2>
+    <p style="font-size:13px">Three primary metrics. Scored for both Approach A (single LLM personas) and Approach B (multi-LLM debate) on all five events. Pre-registered before running any experiments.</p>
+    <div class="rubric" style="margin-top:16px">
+      <div class="rub-item">
+        <div class="rub-icon">🎯</div>
+        <div style="flex:1">
+          <div class="rub-name">Metric 1 — Directional Accuracy</div>
+          <div class="rub-desc">Did the system correctly predict whether the S&P 500 (or key sector) moved up or down after the shock? Binary — 0 or 1 per sector per event. We check five sectors per event: Energy, Financials, Technology, Defence, Consumer Discretionary.</div>
+        </div>
+        <div class="rub-score">0 or 1 · binary</div>
+      </div>
+      <div class="rub-item">
+        <div class="rub-icon">📐</div>
+        <div style="flex:1">
+          <div class="rub-name">Metric 2 — Magnitude Calibration</div>
+          <div class="rub-desc">Was the estimated percentage move within a reasonable range of what actually happened? We define a tolerance band: within 20% of actual = 1 point, within 40% = 0.5 points, outside 40% = 0 points. Prevents the system from getting credit for directional accuracy on wildly wrong magnitudes.</div>
+        </div>
+        <div class="rub-score">0, 0.5, or 1</div>
+      </div>
+      <div class="rub-item">
+        <div class="rub-icon">🔗</div>
+        <div style="flex:1">
+          <div class="rub-name">Metric 3 — Transmission Channel Completeness</div>
+          <div class="rub-desc">What fraction of the actual transmission channels (documented in post-event academic literature) did the system identify? E.g., for Russia-Ukraine: did agents mention crude price, European growth slowdown, defence spending, INR pressure, and supply chain disruption? Each missed channel costs points.</div>
+        </div>
+        <div class="rub-score">0 to 1 · continuous</div>
+      </div>
+    </div>
+    <div class="g2" style="margin-top:16px">
+      <div class="card">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Position-change decomposition · debate quality</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:12px;display:flex;gap:8px;align-items:center"><span style="color:var(--green)">✓ Evidence-based revision</span> — agent cites new data</div>
+          <div style="font-size:12px;display:flex;gap:8px;align-items:center"><span style="color:var(--gold)">⚠ Consensus pressure</span> — agent changes because others did</div>
+          <div style="font-size:12px;display:flex;gap:8px;align-items:center"><span style="color:var(--text2)">– No meaningful update</span> — same position, different words</div>
+          <div style="font-size:12px;display:flex;gap:8px;align-items:center"><span style="color:var(--red)">✗ Unsupported flip</span> — reversal with no reason given</div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Scoring approach</div>
+        <p style="font-size:12px;margin-bottom:6px">Each scenario scored independently by two group members. Inter-rater agreement measured (Cohen's κ). Disagreements resolved by structured discussion. Final scores averaged.</p>
+        <p style="font-size:12px">All raw scores, agent outputs, and debate transcripts published as supplementary material for reproducibility.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S13 — LIMITATIONS -->
+<div class="slide" data-section="Evaluation">
+  <div class="slide-inner">
+    <div class="eyebrow red">Honest Limitations</div>
+    <h2>What we know we cannot fully solve</h2>
+    <p style="font-size:13px">A paper that knows its limits is more credible than one that pretends it has none. These are documented upfront, not buried in footnotes.</p>
+    <div class="g2" style="margin-top:16px">
+      <div class="card card-red">
+        <h3 style="font-size:13px;color:var(--red);margin-bottom:6px">⚠ Look-ahead bias</h3>
+        <p style="font-size:12px;margin-bottom:6px">Our LLMs were trained on data that includes post-event analyses of 9/11 and Iraq War. They are not truly predicting — they are pattern-matching against training data that includes the outcome.</p>
+        <p style="font-size:12px"><strong>Mitigation:</strong> Use the April 2025 US-China tariff event (very recent, less post-event literature in training data). Acknowledge explicitly. Frame as proof-of-concept.</p>
+      </div>
+      <div class="card card-red">
+        <h3 style="font-size:13px;color:var(--red);margin-bottom:6px">⚠ Model overlap</h3>
+        <p style="font-size:12px;margin-bottom:6px">Claude, GPT-4o, and Gemini all trained on largely overlapping internet data. Diversity may be smaller than assumed for well-documented events.</p>
+        <p style="font-size:12px"><strong>Mitigation:</strong> Measure initial position variance across agents before debate. Report it. If variance is low, acknowledge it as a finding about model homogenisation.</p>
+      </div>
+      <div class="card card-red">
+        <h3 style="font-size:13px;color:var(--red);margin-bottom:6px">⚠ Non-stationarity</h3>
+        <p style="font-size:12px;margin-bottom:6px">A 9/11-scale shock in 2001 hit markets without algorithmic trading, ETF dominance, or social-media-driven sentiment. The same shock in 2026 transmits differently.</p>
+        <p style="font-size:12px"><strong>Mitigation:</strong> Weight recent events more heavily. Include regime condition in analogue matching to partially account for structural differences.</p>
+      </div>
+      <div class="card card-red">
+        <h3 style="font-size:13px;color:var(--red);margin-bottom:6px">⚠ LLM non-reproducibility</h3>
+        <p style="font-size:12px;margin-bottom:6px">The same prompt returns different outputs on different runs. Scientific papers require reproducibility.</p>
+        <p style="font-size:12px"><strong>Mitigation:</strong> Temperature = 0 for all calls. Document exact model versions. Run each scenario three times and report all three outputs with mean and variance.</p>
+      </div>
+    </div>
+    <div class="hq" style="margin-top:14px">
+      <p><strong>The honest framing for the paper:</strong> This paper validates SPAR on historical events where outcomes are known. The practical use case is forward-looking — a risk manager using the system on currently unfolding events. Future work should evaluate real-time deployment with expert benchmark validation.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S14 — CONTRIBUTIONS -->
+<div class="slide" data-section="Contributions">
+  <div class="slide-inner">
+    <div class="eyebrow blue">Research Contributions</div>
+    <h2>Three novel claims</h2>
+    <p style="font-size:13px">What a peer reviewer needs to see to accept this paper. Each claim is independently testable and directly tied to a gap in the literature.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:18px">
+      <div class="card card-blue">
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="font-family:var(--fd);font-size:38px;font-weight:700;color:rgba(77,146,255,.25);flex-shrink:0;line-height:1;margin-top:2px">01</div>
+          <div>
+            <h3 style="font-size:14px;margin-bottom:4px">Three-dimensional geopolitical analogue retrieval framework for US equity markets</h3>
+            <p style="font-size:12.5px">Matching by shock category × geographic proximity × economic regime — calibrated on GPR, FRED, and S&P 500 data from 1985–2026. First retrieval framework specifically designed for geopolitical stress scenario generation. <span class="pill pill-blue">Extends: Caldara & Iacoviello (2022)</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="card card-purple">
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="font-family:var(--fd);font-size:38px;font-weight:700;color:rgba(144,128,245,.25);flex-shrink:0;line-height:1;margin-top:2px">02</div>
+          <div>
+            <h3 style="font-size:14px;margin-bottom:4px">Empirical comparison of model-diversity vs. persona-diversity in financial debate</h3>
+            <p style="font-size:12.5px">First study to compare five different frontier LLM providers as debate agents against five personas in one model. Runs on five historical events with pre-registered scoring rubric. Answers whether genuine model diversity improves scenario quality over simulated diversity. <span class="pill pill-purple">Extends: Du et al. (2023) · FinDebate (2025)</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="card card-gold">
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="font-family:var(--fd);font-size:38px;font-weight:700;color:rgba(212,152,56,.25);flex-shrink:0;line-height:1;margin-top:2px">03</div>
+          <div>
+            <h3 style="font-size:14px;margin-bottom:4px">Four-type position-change decomposition as a debate quality metric</h3>
+            <p style="font-size:12.5px">Classifies every agent position revision as evidence-based, consensus-pressure, no meaningful update, or unsupported flip. Measures genuine reasoning quality vs. social conformity in multi-agent LLM debate. Solves the open validation problem noted by Soleimani et al. (2025). <span class="pill pill-gold">Solves gap in: Soleimani et al. (2025)</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S15 — TIMELINE -->
+<div class="slide" data-section="Timeline">
+  <div class="slide-inner">
+    <div class="eyebrow green">Timeline</div>
+    <h2>Six weeks to submission</h2>
+    <div class="g2" style="margin-top:18px;align-items:start">
+      <div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--blue)"></div>
+            <div class="tl-line">
+              <div class="tl-date">Week 1 · June 30 – July 6</div>
+              <div class="tl-task"><strong>Setup &amp; dry run</strong> — API connections confirmed, all five events data pulled, one complete end-to-end pilot run on Russia-Ukraine 2022 to validate pipeline works</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--gold)"></div>
+            <div class="tl-line">
+              <div class="tl-date">July 9 · Milestone</div>
+              <div class="tl-task"><strong style="color:var(--gold)">Submission presentation due</strong> — architecture, methodology, data plan, preliminary pilot results</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--purple)"></div>
+            <div class="tl-line">
+              <div class="tl-date">Week 2–3 · July 7–20</div>
+              <div class="tl-task"><strong>Full experiment</strong> — all five events × two approaches × rotation table. Score every output. Run each scenario three times for reproducibility check. Compile results table.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--teal)"></div>
+            <div class="tl-line">
+              <div class="tl-date">Week 4 · July 21–27</div>
+              <div class="tl-task"><strong>Analysis &amp; writing</strong> — results analysis, discussion, limitations section. First complete draft of all sections.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--green)"></div>
+            <div class="tl-line">
+              <div class="tl-date">Week 5–6 · July 28–31</div>
+              <div class="tl-task"><strong>Revision &amp; submission</strong> — full review pass, references, abstract tightened, supplementary materials prepared.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--green);box-shadow:0 0 8px var(--green)"></div>
+            <div class="tl-line">
+              <div class="tl-date">July 31 · Target submission</div>
+              <div class="tl-task"><strong style="color:var(--green)">Paper submitted</strong> — targeting ICAIF 2026 or SSRN working paper with journal submission to follow</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card card-blue" style="margin-bottom:10px">
+          <h3 style="font-size:13px;margin-bottom:6px">Division of work</h3>
+          <p style="font-size:12px;margin-bottom:0">Member 1: LangGraph pipeline, API integrations, LLM API calls<br>Member 2: Data collection, scoring rubric, results analysis<br>Member 3: Paper writing, literature review, presentation<br>All members: Scoring the outputs independently (required for inter-rater reliability)</p>
+        </div>
+        <div class="card card-gold">
+          <h3 style="font-size:13px;margin-bottom:6px">Before Sunday — must confirm</h3>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="font-size:12px;display:flex;gap:8px;align-items:center"><span style="color:var(--green)">☐</span> All five API keys working</div>
+            <div style="font-size:12px;display:flex;gap:8px;align-items:center"><span style="color:var(--green)">☐</span> yfinance returns data for all five events</div>
+            <div style="font-size:12px;display:flex;gap:8px;align-items:center"><span style="color:var(--green)">☐</span> GPR CSV downloaded and loaded</div>
+            <div style="font-size:12px;display:flex;gap:8px;align-items:center"><span style="color:var(--green)">☐</span> Hypothesis written and signed</div>
+            <div style="font-size:12px;display:flex;gap:8px;align-items:center"><span style="color:var(--green)">☐</span> Scoring rubric finalised before first agent call</div>
+            <div style="font-size:12px;display:flex;gap:8px;align-items:center"><span style="color:var(--green)">☐</span> Pilot run on Russia-Ukraine completed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ S16 — CLOSE -->
+<div class="slide" data-section="Conclusion">
+  <div class="slide-inner" style="text-align:center">
+    <div class="eyebrow blue" style="justify-content:center">Conclusion</div>
+    <h2 style="max-width:680px;margin:0 auto 20px">SPAR is not just a better stress test. It is a different kind of thinking about risk.</h2>
+    <p style="font-size:14px;max-width:620px;margin:0 auto 24px;color:var(--text2)">Traditional models ask what happened before. SPAR asks which specialists would disagree about what is happening now — and what their disagreement tells us about the tail risks the consensus is missing.</p>
+    <div class="card card-blue" style="max-width:700px;margin:0 auto 20px;text-align:left">
+      <div style="font-family:var(--fm);font-size:9px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">One-line pitch</div>
+      <p style="font-size:15px;color:var(--text);line-height:1.7;margin-bottom:0">A structured, auditable bridge between unstructured geopolitical shock narratives and portfolio-level risk estimates — using five frontier LLMs in domain-specialist debate, grounded in historical analogues, validated against real S&P 500 outcomes.</p>
+    </div>
+    <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin:20px 0">
+      <div class="stat" style="min-width:130px"><div class="stat-num" style="color:var(--blue);font-size:20px">5 LLMs</div><div class="stat-lbl">Different providers</div></div>
+      <div class="stat" style="min-width:130px"><div class="stat-num" style="color:var(--purple);font-size:20px">5 events</div><div class="stat-lbl">Historical validation</div></div>
+      <div class="stat" style="min-width:130px"><div class="stat-num" style="color:var(--gold);font-size:20px">3 metrics</div><div class="stat-lbl">Pre-registered rubric</div></div>
+      <div class="stat" style="min-width:130px"><div class="stat-num" style="color:var(--green);font-size:20px">31 July</div><div class="stat-lbl">Submission target</div></div>
+    </div>
+    <div style="font-family:var(--fm);font-size:11px;color:var(--text3);letter-spacing:.06em;margin-top:10px">
+      AI in Finance · Dr. Guha · SP Jain School of Global Management · Dubai · Group 3
+    </div>
+  </div>
+</div>
+
+</div><!-- end deck -->
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let cur = 0;
+
+// build dots
+const dotContainer = document.getElementById('dots');
+slides.forEach(function(_,i){
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' on':'');
+  d.onclick = function(){ goTo(i); };
+  dotContainer.appendChild(d);
+});
+
+function goTo(n){
+  if(n<0||n>=total) return;
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('exit');
+  setTimeout(function(){slides[cur].classList.remove('exit');},400);
+  cur = n;
+  slides[cur].classList.add('active');
+  slides[cur].scrollTop = 0;
+  update();
+}
+
+function go(d){ goTo(cur+d); }
+
+function update(){
+  document.getElementById('counter').textContent = (cur+1) + ' / ' + total;
+  document.getElementById('progress').style.width = ((cur+1)/total*100) + '%';
+  document.getElementById('slide-section').textContent = slides[cur].dataset.section || '';
+  document.querySelectorAll('.dot').forEach(function(d,i){ d.className = 'dot'+(i===cur?' on':''); });
+  document.getElementById('prev').disabled = cur===0;
+  document.getElementById('next').disabled = cur===total-1;
+}
+
+// keyboard
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') go(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') go(-1);
+});
+
+// init
+slides[0].classList.add('active');
+update();
+</script>
+</body>
+</html>

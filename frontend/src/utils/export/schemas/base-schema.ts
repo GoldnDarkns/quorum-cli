@@ -14,7 +14,8 @@ export type DiscussionMethod =
   | "socratic"
   | "delphi"
   | "brainstorm"
-  | "tradeoff";
+  | "tradeoff"
+  | "spar";
 
 /** Base metadata common to all methods */
 export interface BaseMetadata {

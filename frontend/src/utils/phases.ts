@@ -50,4 +50,9 @@ export const getPhaseNames = (): Record<string, Record<number, string>> => ({
     3: t("phase.tradeoff.3"),
     4: t("phase.tradeoff.4"),
   },
+  spar: {
+    1: t("phase.spar.1"),
+    2: t("phase.spar.2"),
+    3: t("phase.spar.3"),
+  },
 });

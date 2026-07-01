@@ -19,10 +19,8 @@ export function ModelSelector({ onSelect }: ModelSelectorProps) {
     toggleSelectedModel,
     validatedModels,
     invalidModels,
+    discussionMethod,
   } = useStore();
-
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [confirming, setConfirming] = useState(false);
 
   // Flatten models into a list
   const allModels: { provider: string; model: ModelInfo }[] = [];
@@ -31,6 +29,12 @@ export function ModelSelector({ onSelect }: ModelSelectorProps) {
       allModels.push({ provider, model });
     }
   }
+
+  const minModels =
+    discussionMethod === "spar" ? 1 : allModels.length === 1 ? 1 : 2;
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [confirming, setConfirming] = useState(false);
 
   useInput((input, key) => {
     if (key.escape) {
@@ -62,7 +66,7 @@ export function ModelSelector({ onSelect }: ModelSelectorProps) {
     }
 
     if (key.return) {
-      if (selectedModels.length >= 2) {
+      if (selectedModels.length >= minModels) {
         onSelect();  // Models already saved in store, just soft reload
       } else {
         setConfirming(true);
@@ -108,10 +112,15 @@ export function ModelSelector({ onSelect }: ModelSelectorProps) {
       {/* Selected count */}
       <Box marginBottom={1}>
         <Text>{t("selector.model.selected")}</Text>
-        <Text color={selectedModels.length >= 2 ? "green" : "yellow"} bold>
+        <Text color={selectedModels.length >= minModels ? "green" : "yellow"} bold>
           {selectedModels.length}
         </Text>
-        <Text dimColor> {t("selector.model.minimum")}</Text>
+        <Text dimColor>
+          {" "}
+          {discussionMethod === "spar" || allModels.length === 1
+            ? "(1+ required)"
+            : t("selector.model.minimum")}
+        </Text>
       </Box>
 
       {/* Model list */}
@@ -173,10 +182,14 @@ export function ModelSelector({ onSelect }: ModelSelectorProps) {
       })}
 
       {/* Warning if less than 2 selected */}
-      {confirming && selectedModels.length < 2 && (
+      {confirming && selectedModels.length < minModels && (
         <Box marginTop={1}>
           <Text color="yellow">
-            ⚠ {t("selector.model.warning")}
+            ⚠ {discussionMethod === "spar"
+              ? "Select at least 1 model for SPAR"
+              : allModels.length === 1
+              ? "Select the available model, then press Enter"
+              : t("selector.model.warning")}
           </Text>
         </Box>
       )}

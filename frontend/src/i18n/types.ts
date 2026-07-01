@@ -93,6 +93,10 @@ export type TranslationKey =
   | "method.tradeoff.desc"
   | "method.tradeoff.useCase"
   | "method.tradeoff.requirement"
+  | "method.spar.name"
+  | "method.spar.desc"
+  | "method.spar.useCase"
+  | "method.spar.requirement"
 
   // Phase label
   | "phase.label"
@@ -138,6 +142,11 @@ export type TranslationKey =
   | "phase.tradeoff.3"
   | "phase.tradeoff.4"
 
+  // Phase Names - SPAR
+  | "phase.spar.1"
+  | "phase.spar.2"
+  | "phase.spar.3"
+
   // Phase Messages (backend → frontend translation keys)
   | "phase.standard.1.msg"
   | "phase.standard.2.msg"
@@ -166,6 +175,9 @@ export type TranslationKey =
   | "phase.tradeoff.2.msg"
   | "phase.tradeoff.3.msg"
   | "phase.tradeoff.4.msg"
+  | "phase.spar.1.msg"
+  | "phase.spar.2.msg"
+  | "phase.spar.3.msg"
 
   // Roles
   | "role.for"
@@ -177,11 +189,19 @@ export type TranslationKey =
   | "role.panelist"
   | "role.ideator"
   | "role.evaluator"
+  | "role.political"
+  | "role.economic"
+  | "role.environmental"
+  | "role.social"
+  | "role.devilsAdvocate"
+  | "role.moderator"
 
   // Rounds
   | "round.opening"
   | "round.rebuttal"
   | "round.closing"
+  | "round.round1"
+  | "round.round2"
 
   // Messages
   | "msg.independentAnswer"
@@ -303,6 +323,7 @@ export type TranslationKey =
   | "terminology.result.delphi"
   | "terminology.result.brainstorm"
   | "terminology.result.tradeoff"
+  | "terminology.result.spar"
   | "terminology.synthesis.standard"
   | "terminology.synthesis.oxford"
   | "terminology.synthesis.advocate"
@@ -310,6 +331,7 @@ export type TranslationKey =
   | "terminology.synthesis.delphi"
   | "terminology.synthesis.brainstorm"
   | "terminology.synthesis.tradeoff"
+  | "terminology.synthesis.spar"
   | "terminology.differences.standard"
   | "terminology.differences.oxford"
   | "terminology.differences.advocate"
@@ -317,6 +339,7 @@ export type TranslationKey =
   | "terminology.differences.delphi"
   | "terminology.differences.brainstorm"
   | "terminology.differences.tradeoff"
+  | "terminology.differences.spar"
   | "terminology.by.standard"
   | "terminology.by.oxford"
   | "terminology.by.advocate"
@@ -324,6 +347,7 @@ export type TranslationKey =
   | "terminology.by.delphi"
   | "terminology.by.brainstorm"
   | "terminology.by.tradeoff"
+  | "terminology.by.spar"
   | "terminology.consensus.standard"
   | "terminology.consensus.oxford"
   | "terminology.consensus.advocate"
@@ -331,6 +355,7 @@ export type TranslationKey =
   | "terminology.consensus.delphi"
   | "terminology.consensus.brainstorm"
   | "terminology.consensus.tradeoff"
+  | "terminology.consensus.spar"
 
   // Method Advisor
   | "advisor.title"
@@ -370,7 +395,8 @@ export type TranslationKey =
   | "discussion.socratic"
   | "discussion.delphi"
   | "discussion.brainstorm"
-  | "discussion.tradeoff";
+  | "discussion.tradeoff"
+  | "discussion.spar";
 
 export type Translations = Record<TranslationKey, string>;
 

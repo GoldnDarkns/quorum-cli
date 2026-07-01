@@ -1,0 +1,31 @@
+{
+  "agent_id": "environmental_technology_gemini",
+  "round": 1,
+  "event": "russia_ukraine_invasion_20220224",
+  "direction": "negative",
+  "magnitude_pct": {
+    "SP500": -3.5,
+    "XLE":   -8.0,
+    "XLF":   -1.5,
+    "XLK":   -2.0,
+    "ITA":   -4.0,
+    "XLY":   -2.5
+  },
+  "confidence": 0.9,
+  "key_assumption": "The invasion will disrupt energy and agricultural supply chains, exacerbating existing semiconductor shortages.",
+  "supporting_evidence": [
+    "Russia produces 10-11 million barrels/day of oil (≈10% global supply) and exports ~2.5M bbl/day to Europe; Nord Stream 1 pipeline capacity is 55 billion cubic metres/year, with EU gas storage at critically low levels (~35%)",
+    "Ukraine + Russia combined wheat exports: ~29% of global supply; Ukraine produces 70% of global neon gas supply (essential for chip lithography); Russia is #1 producer of palladium (40% global supply)",
+    "NotPetya 2017 precedent shows Russian state-sponsored malware can cause significant global damage, and CISA warnings about potential cyber attacks on financial sector"
+  ],
+  "transmission_channels": [
+    "Oil supply uncertainty → WTI spike → energy sector re-rating",
+    "Agricultural disruption → food price inflation → consumer discretionary spending reduction",
+    "Neon/palladium shortage → semiconductor supply constraints → technology sector earnings pressure",
+    "Cyber risk escalation → financial sector and SWIFT infrastructure attacks → market panic"
+  ],
+  "analogue_assessment": {
+    "primary_analogue": "[ANALOGUE 1] Iraqi Invasion of Kuwait · August 2, 1990",
+    "analogue_adjustments": "Current regime context has higher inflation (7.5% YoY) and less Fed room for rate hikes compared to 1990's lower inflation environment; however, the energy supply shock risk is similar"
+  }
+}

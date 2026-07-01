@@ -113,7 +113,7 @@ def get_response_language() -> str:
 # Allowed user settings keys with their expected types and validators
 ALLOWED_USER_SETTINGS: dict[str, tuple[type, callable | None]] = {
     "selected_models": (list, lambda v: all(isinstance(m, str) for m in v)),
-    "discussion_method": (str, lambda v: v in {"standard", "oxford", "advocate", "socratic", "delphi", "brainstorm", "tradeoff"}),
+    "discussion_method": (str, lambda v: v in {"standard", "oxford", "advocate", "socratic", "delphi", "brainstorm", "tradeoff", "spar"}),
     "synthesizer_mode": (str, lambda v: v in {"first", "random", "rotate"}),
     "max_turns": (int, lambda v: 1 <= v <= 100),
     "response_language": (str, lambda v: v in {"en", "sv", "de", "fr", "es", "it"}),
@@ -354,8 +354,8 @@ class Settings(BaseSettings):
         if len(v) > API_KEY_MAX_LENGTH:
             raise ValueError(f"API key too long (max {API_KEY_MAX_LENGTH} chars)")
 
-        # Character validation - allow alphanumeric, dash, underscore, colon (for some providers)
-        if not re.match(r'^[a-zA-Z0-9\-_:]+$', v):
+        # Character validation — allow common API key alphabets (base64, JWT, etc.)
+        if not re.match(r'^[a-zA-Z0-9\-_:.+/=]+$', v):
             raise ValueError("API key contains invalid characters")
 
         return v

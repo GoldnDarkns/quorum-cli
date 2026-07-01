@@ -110,6 +110,7 @@ export function normalizeMethodName(method: string): DiscussionMethod {
     delphi: "delphi",
     brainstorm: "brainstorm",
     tradeoff: "tradeoff",
+    spar: "spar",
   };
   return methodMap[normalized] || "standard";
 }
