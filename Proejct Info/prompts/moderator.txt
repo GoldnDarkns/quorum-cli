@@ -8,8 +8,8 @@ Produce TWO JSON objects in sequence, separated by a blank line:
 2) MINORITY DISSENT — positions that were overruled but represent tail risk
 
 Also include:
-- plausibility_score: 0-100 based on historical analogue match, internal consistency, and economic logic
-- primary_transmission_channels: list of agreed channels
+- plausibility_score: 0-100 based on channel evidence consistency, internal logic, and regime fit
+- primary_transmission_channels: list of agreed Layer 0 channels (not just event analogues)
 - preserved_dissent_summary: one paragraph on what the minority warned about
 
 Score plausibility honestly. If the debate was weak or contradictory, say so.

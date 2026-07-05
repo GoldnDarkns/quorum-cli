@@ -492,7 +492,8 @@ async def validate_model(model_id: str, timeout: float | None = None) -> tuple[b
 
     # Ollama models need longer timeout (must load into GPU/memory)
     if timeout is None:
-        timeout = 60.0 if model_id.startswith("ollama:") else 30.0
+        settings = get_settings()
+        timeout = float(settings.model_timeout) if model_id.startswith("ollama:") else 30.0
 
     try:
         # Use pooled client - if validation succeeds, client stays in pool for reuse

@@ -22,7 +22,20 @@
 
 ---
 
-Multi-agent AI discussion system for structured debates. Ask multiple AI models (Claude, GPT, Gemini, Grok, and local models via Ollama) a question and let them debate, brainstorm, or deliberate using seven different methods.
+## SPAR Research Fork (This Repository)
+
+This fork extends Quorum with **SPAR** (Scenario Planning via Agentic Reasoning) for geopolitical financial stress-testing.
+
+**Latest overhaul (July 2026):**
+- **Layer 0** — transmission-channel-first evidence pipeline (replaces top-3 historical analogues)
+- **Live sequential debate** — agents read each other's outputs and respond in Round 2
+- **Offline Ollama** — tuned for local models on consumer GPUs
+
+**Full documentation:** [Word](docs/SPAR_Overhaul_And_Updates.docx) · [PDF](docs/SPAR_Overhaul_And_Updates.pdf)
+
+Run SPAR: `quorum` → `/method spar` → ask your shock scenario question.
+
+--- Ask multiple AI models (Claude, GPT, Gemini, Grok, and local models via Ollama) a question and let them debate, brainstorm, or deliberate using seven different methods.
 
 ## Quick Install (pip)
 

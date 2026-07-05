@@ -146,6 +146,7 @@ export type TranslationKey =
   | "phase.spar.1"
   | "phase.spar.2"
   | "phase.spar.3"
+  | "phase.spar.4"
 
   // Phase Messages (backend → frontend translation keys)
   | "phase.standard.1.msg"
@@ -178,6 +179,7 @@ export type TranslationKey =
   | "phase.spar.1.msg"
   | "phase.spar.2.msg"
   | "phase.spar.3.msg"
+  | "phase.spar.4.msg"
 
   // Roles
   | "role.for"

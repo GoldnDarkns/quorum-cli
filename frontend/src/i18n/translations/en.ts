@@ -144,9 +144,10 @@ export const en: Translations = {
   "phase.tradeoff.4": "Decision",
 
   // Phase Names - SPAR
-  "phase.spar.1": "Round 1: Domain Analysis",
-  "phase.spar.2": "Round 2: Cross-Examination",
-  "phase.spar.3": "Moderator Synthesis",
+  "phase.spar.1": "Layer 0: Channel Prioritization",
+  "phase.spar.2": "Round 1: Domain Analysis",
+  "phase.spar.3": "Round 2: Live Debate",
+  "phase.spar.4": "Moderator Synthesis",
 
   // Phase Messages (backend → frontend)
   "phase.standard.1.msg": "{count} participants will answer independently...",
@@ -176,9 +177,10 @@ export const en: Translations = {
   "phase.tradeoff.2.msg": "Criteria: Establish evaluation dimensions.",
   "phase.tradeoff.3.msg": "Evaluate: Score each alternative on each criterion (1-10).",
   "phase.tradeoff.4.msg": "Synthesizing recommendation with tradeoff analysis.",
-  "phase.spar.1.msg": "Five domain specialists produce independent Round 1 analyses.",
-  "phase.spar.2.msg": "Agents cross-examine each other's Round 1 positions.",
-  "phase.spar.3.msg": "The Moderator synthesises the full debate transcript.",
+  "phase.spar.1.msg": "Transmission channels are scored and evidence is retrieved per channel.",
+  "phase.spar.2.msg": "Five domain specialists produce independent Round 1 analyses.",
+  "phase.spar.3.msg": "Agents speak in turn, read the transcript, and respond to each other directly.",
+  "phase.spar.4.msg": "The Moderator synthesises the full debate transcript.",
 
   // Roles
   "role.for": "FOR",

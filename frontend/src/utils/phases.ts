@@ -54,5 +54,6 @@ export const getPhaseNames = (): Record<string, Record<number, string>> => ({
     1: t("phase.spar.1"),
     2: t("phase.spar.2"),
     3: t("phase.spar.3"),
+    4: t("phase.spar.4"),
   },
 });

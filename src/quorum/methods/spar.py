@@ -13,18 +13,25 @@ from .base import (
     SynthesisResult,
     ThinkingIndicator,
 )
+from .spar_layer0 import Layer0State, build_agent_system_prompt, run_layer0_pipeline
 
-ROUND2_INSTRUCTION = """Round 2 — Cross-Examination.
+ROUND2_LIVE_DEBATE_INSTRUCTION = """LIVE DEBATE — Round 2 (sequential panel).
 
-Here are the Round 1 outputs from all agents:
-{round1_json}
+You are the {role_label} specialist. Read the full transcript below — including what other agents already said in THIS round before you.
 
-You must:
-1) Identify one point of genuine agreement with at least one other agent, citing their specific claim.
-2) Identify one factual or logical disagreement with at least one other agent, citing evidence from the Master Context.
-3) If your direction or magnitude estimate changes from Round 1, your supporting_evidence must include a new data point that justifies the change — not just exposure to another agent's opinion.
+=== DEBATE TRANSCRIPT ===
+{transcript}
+=== END TRANSCRIPT ===
 
-Return updated JSON with round: 2 and a response_to field added. JSON only, no markdown fences."""
+Respond in clear prose (3–6 short paragraphs). This is a live war-room debate, NOT a JSON report.
+
+You MUST:
+1) Name at least one other agent by role (POLITICAL, ECONOMIC, ENVIRONMENTAL, SOCIAL, or DEVILS_ADVOCATE) and reference their specific claim from the transcript.
+2) Explain where you agree and where you disagree, using evidence from your Layer 0 packet or Master Context.
+3) If you change your Round 1 view, state what changed and cite a transmission channel — not just "I heard another agent."
+4) Address the panel directly (e.g. "Economic agent, your oil channel assumes…").
+
+Do NOT output JSON. Write as if speaking aloud in the room."""
 
 SPAR_AGENT_SPECS: list[tuple[str, str, str, str]] = [
     ("Political", "political_geopolitical", "agent1_political_geopolitical.txt", "POLITICAL"),
@@ -106,10 +113,15 @@ def _format_agent_response(raw: str, parsed: dict[str, Any] | None) -> str:
         for item in channels[:3]:
             parts.append(f"- {item}")
 
-    analogue = parsed.get("analogue_assessment")
-    if isinstance(analogue, dict):
-        primary = analogue.get("primary_analogue", "N/A")
-        parts.append(f"\n**Analogue:** {primary}")
+    channel_assessment = parsed.get("channel_assessment")
+    if isinstance(channel_assessment, dict):
+        primary = channel_assessment.get("primary_channel", "N/A")
+        parts.append(f"\n**Primary channel:** {primary}")
+    else:
+        analogue = parsed.get("analogue_assessment")
+        if isinstance(analogue, dict):
+            primary = analogue.get("primary_analogue", "N/A")
+            parts.append(f"\n**Analogue:** {primary}")
 
     response_to = parsed.get("response_to")
     if response_to:
@@ -118,12 +130,26 @@ def _format_agent_response(raw: str, parsed: dict[str, Any] | None) -> str:
     return "\n".join(parts) if parts else raw
 
 
-class SparMethod(BaseMethodOrchestrator):
-    """SPAR: five domain specialists debate a geopolitical shock, then a moderator synthesizes.
+def _build_round1_transcript(round1_displays: dict[str, str]) -> str:
+    """Human-readable Round 1 transcript for live debate."""
+    sections: list[str] = ["=== ROUND 1 — Independent analyses ===\n"]
+    for _role_key, agent_id, _prompt_file, ipc_role in SPAR_AGENT_SPECS:
+        body = round1_displays.get(agent_id, "(no output)")
+        sections.append(f"--- {ipc_role} ---\n{body}\n")
+    return "\n".join(sections)
 
-    Phase 1: Round 1 — independent domain analysis (JSON)
-    Phase 2: Round 2 — cross-examination and revision
-    Phase 3: Moderator synthesis
+
+def _role_label(ipc_role: str) -> str:
+    return ipc_role.replace("_", " ").title()
+
+
+class SparMethod(BaseMethodOrchestrator):
+    """SPAR: Layer 0 channel-first RAG, then five specialists debate, then moderator.
+
+    Phase 1: Layer 0 — transmission channel prioritization and evidence routing
+    Phase 2: Round 1 — independent domain analysis (JSON)
+    Phase 3: Round 2 — live sequential debate (agents read and respond to each other)
+    Phase 4: Moderator synthesis
     """
 
     @property
@@ -132,7 +158,7 @@ class SparMethod(BaseMethodOrchestrator):
 
     @property
     def total_phases(self) -> int:
-        return 3
+        return 4
 
     def _model_for_role(self, role_key: str) -> str:
         if self.role_assignments and role_key in self.role_assignments:
@@ -143,25 +169,42 @@ class SparMethod(BaseMethodOrchestrator):
             return self.model_ids[idx % len(self.model_ids)]
         return self.model_ids[0]
 
+    def _system_for_agent(self, layer0: Layer0State, role_key: str, prompt_file: str) -> str:
+        master = _load_prompt("master_context.txt")
+        agent_prompt = _load_prompt(prompt_file)
+        return build_agent_system_prompt(master, layer0, role_key, agent_prompt)
+
     async def run_stream(self, task: str) -> AsyncIterator[MessageType]:
-        """Run SPAR debate with live UI streaming."""
+        """Run SPAR with Layer 0 pipeline, then debate with live UI streaming."""
         self._original_task = task
         round1_results: dict[str, Any] = {}
+        round1_displays: dict[str, str] = {}
         round2_results: dict[str, Any] = {}
+        debate_transcript: list[str] = []
 
-        # === PHASE 1: Round 1 ===
+        # === PHASE 1: Layer 0 — channel-first evidence pipeline ===
         yield self._create_phase_marker(1)
+        layer0 = run_layer0_pipeline(task)
+        self._message_count += 1
+        yield self._create_team_message(
+            self.model_ids[0],
+            layer0.summary_text,
+            "LAYER0",
+            round_type="layer0",
+        )
+
+        # === PHASE 2: Round 1 ===
+        yield self._create_phase_marker(2)
 
         for role_key, agent_id, prompt_file, ipc_role in SPAR_AGENT_SPECS:
             model_id = self._model_for_role(role_key)
             yield ThinkingIndicator(model=model_id)
 
-            master = _load_prompt("master_context.txt")
-            agent_prompt = _load_prompt(prompt_file)
-            system = f"{master}\n\n{agent_prompt}"
-            user_msg = task.strip() or "Produce your Round 1 JSON output now. JSON only."
+            system = self._system_for_agent(layer0, role_key, prompt_file)
+            user_msg = task.strip() or layer0.shock_text
+            user_msg = f"{user_msg}\n\nProduce your Round 1 JSON output now. JSON only."
             if "json" not in user_msg.lower():
-                user_msg = f"{user_msg}\n\nProduce your Round 1 JSON output now. JSON only."
+                user_msg = f"{user_msg}\n\nJSON only."
 
             raw = await self._get_model_response(model_id, system, user_msg)
 
@@ -173,46 +216,50 @@ class SparMethod(BaseMethodOrchestrator):
                 round1_results[agent_id] = {"parse_error": str(exc), "raw_preview": raw[:500]}
 
             display = _format_agent_response(raw, parsed)
+            round1_displays[agent_id] = display
             self._message_count += 1
             yield self._create_team_message(model_id, display, ipc_role, round_type="round1")
 
-        # === PHASE 2: Round 2 ===
-        yield self._create_phase_marker(2)
-        round1_blob = json.dumps(round1_results, indent=2)
-        round2_user = ROUND2_INSTRUCTION.format(round1_json=round1_blob)
+        # === PHASE 3: Round 2 — live sequential debate ===
+        yield self._create_phase_marker(3)
+        debate_transcript.append(_build_round1_transcript(round1_displays))
+        debate_transcript.append("\n=== ROUND 2 — Live cross-examination ===\n")
 
         for role_key, agent_id, prompt_file, ipc_role in SPAR_AGENT_SPECS:
             model_id = self._model_for_role(role_key)
             yield ThinkingIndicator(model=model_id)
 
-            master = _load_prompt("master_context.txt")
-            agent_prompt = _load_prompt(prompt_file)
-            system = f"{master}\n\n{agent_prompt}"
+            system = self._system_for_agent(layer0, role_key, prompt_file)
+            transcript_so_far = "\n".join(debate_transcript)
+            round2_user = ROUND2_LIVE_DEBATE_INSTRUCTION.format(
+                role_label=_role_label(ipc_role),
+                transcript=transcript_so_far,
+            )
             raw = await self._get_model_response(model_id, system, round2_user)
 
-            parsed = None
-            try:
-                parsed = _parse_json_response(raw)
-                round2_results[agent_id] = parsed
-            except (json.JSONDecodeError, ValueError) as exc:
-                round2_results[agent_id] = {"parse_error": str(exc), "raw_preview": raw[:500]}
+            round2_results[agent_id] = {"round": 2, "live_response": raw}
+            debate_transcript.append(f"--- {ipc_role} (speaking now) ---\n{raw}\n")
 
-            display = _format_agent_response(raw, parsed)
             self._message_count += 1
-            yield self._create_team_message(model_id, display, ipc_role, round_type="round2")
+            yield self._create_team_message(model_id, raw, ipc_role, round_type="round2")
 
-        # === PHASE 3: Moderator ===
-        yield self._create_phase_marker(3)
+        # === PHASE 4: Moderator ===
+        yield self._create_phase_marker(4)
 
         moderator_model = self._model_for_role("Moderator")
         yield ThinkingIndicator(model=moderator_model)
 
         master = _load_prompt("master_context.txt")
         mod = _load_prompt("moderator.txt")
-        system = f"{master}\n\n{mod}"
-        transcript = {"round1": round1_results, "round2": round2_results}
+        shared = build_agent_system_prompt(master, layer0, "Moderator", mod)
+        transcript = {
+            "layer0": layer0.to_dict(),
+            "round1": round1_results,
+            "round2": round2_results,
+            "live_debate_transcript": "\n".join(debate_transcript),
+        }
         user_msg = f"Full debate transcript:\n{json.dumps(transcript, indent=2)}"
-        synthesis = await self._get_model_response(moderator_model, system, user_msg)
+        synthesis = await self._get_model_response(moderator_model, shared, user_msg)
         self._message_count += 1
 
         self._synthesis_result = SynthesisResult(

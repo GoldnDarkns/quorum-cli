@@ -84,45 +84,20 @@ invasion. Every piece of data here is from before the event.
               of Ukraine tension build-up. Markets are already pricing
               significant uncertainty before the actual invasion.
 
-HISTORICAL ANALOGUES RETRIEVED
-────────────────────────────────
-The system's analogue retrieval algorithm has identified the three 
-most historically similar events. Use these as grounding reference 
-points but do not assume the current event transmits identically.
+EVIDENCE RETRIEVAL METHOD (Layer 0 — channel-first, not analogue-first)
+──────────────────────────────────────────────────────────────────────
+Before you debate, the system runs a Layer 0 control pipeline:
 
-[ANALOGUE 1] Iraqi Invasion of Kuwait · August 2, 1990
-  Similarity Score: 0.78 (highest match)
-  Why similar: State-on-state military invasion, oil supply shock 
-               risk, major US geopolitical interest at stake
-  Pre-event regime: Moderate US growth, moderate inflation, Fed neutral
-  Regime match note: 1990 had lower inflation than current 2022 —
-                     current inflation already elevated, less Fed room
-  S&P 500 reaction (first 5 trading days): -3.2%
-  S&P 500 reaction (30 days): -12.8%
-  WTI crude (5-day): +18.4%
-  Gold (5-day): +2.1%
+  Shock → Regime → Channel Prioritizer → Per-channel evidence retrieval
+  → Agent-specific evidence packets
 
-[ANALOGUE 2] Russia Crimea Annexation · February 27, 2014
-  Similarity Score: 0.71
-  Why similar: Same aggressor (Russia), same target country (Ukraine),
-               geopolitical flashpoint in Eastern Europe
-  Key difference: 2014 was a limited regional operation with no full 
-                  military assault on Kyiv. Scale is materially smaller.
-  Pre-event regime: US growth strong, inflation low, Fed tapering
-  Regime match note: 2014 had LOW inflation — very different from now
-  S&P 500 reaction (first 5 trading days): -1.7%
-  Recovery: Market recovered fully within 2 weeks in 2014
+You will receive:
+  1) Shared primary/secondary transmission-channel evidence (below, injected at runtime)
+  2) An agent-specific evidence packet routed to your domain
 
-[ANALOGUE 3] Iraq War Launch · March 20, 2003
-  Similarity Score: 0.58
-  Why similar: Military conflict with major commodity market implications
-  Key difference: US was the military actor in 2003, not the defender.
-                  This tends to produce a 'relief rally' not a sell-off.
-  Pre-event regime: Weak growth (post-dot-com recession), low inflation
-  S&P 500 reaction (first 5 trading days): +2.5% (relief rally)
-  Important note: When uncertainty resolves (war begins after weeks of 
-                  fear), markets can rally. Weight this scenario if 
-                  you believe invasion fears were already fully priced.
+Do NOT anchor on a single historical war analogue. Instead, reason through
+the activated transmission channels (energy, inflation, Fed constraint,
+sanctions, safe-haven flows, etc.) and cite traceable evidence from your packet.
 
 REQUIRED OUTPUT FORMAT
 ───────────────────────
@@ -146,17 +121,17 @@ Do not use markdown code fences. Just the raw JSON object.
   "confidence": [float 0.0 to 1.0 — how confident are you?],
   "key_assumption": "[single sentence — the one assumption your whole estimate depends on]",
   "supporting_evidence": [
-    "[specific data point or analogue from context — must be traceable]",
-    "[another specific data point]",
+    "[specific data point from your Layer 0 evidence packet — must be traceable]",
+    "[another specific data point from a transmission channel]",
     "[third data point — minimum 3 required]"
   ],
   "transmission_channels": [
-    "[named pathway from invasion to market — e.g. 'oil supply uncertainty → WTI spike → energy sector re-rating']",
-    "[second channel]",
+    "[activated channel pathway — e.g. 'Energy/Commodity Shock → WTI spike → XLE re-rating']",
+    "[second channel from Layer 0 primary/secondary list]",
     "[third channel — minimum 3 required]"
   ],
-  "analogue_assessment": {
-    "primary_analogue": "[which of the 3 analogues do you lean on most?]",
-    "analogue_adjustments": "[how does the current regime context cause you to adjust the analogue's magnitude up or down, and why?]"
+  "channel_assessment": {
+    "primary_channel": "[which Layer 0 channel drives your estimate most?]",
+    "channel_adjustments": "[how does the current regime cause you to adjust magnitude vs channel history?]"
   }
 }

@@ -46,6 +46,9 @@ MODEL_ID_VALID_CHARS = frozenset(
 VALID_METHODS = {"standard", "oxford", "advocate", "socratic", "delphi", "brainstorm", "tradeoff", "spar"}
 VALID_SYNTHESIZER_MODES = {"first", "random", "rotate"}
 
+# Serialize Ollama validation — parallel loads compete for GPU VRAM and time out
+_ollama_validation_lock = asyncio.Lock()
+
 
 # === Rate Limiter ===
 
@@ -636,7 +639,12 @@ class IPCHandler:
             raise ValueError("Missing required parameter: model_id")
         model_id = self._validate_model_id(model_id_raw)
 
-        success, error = await validate_model(model_id)
+        # Ollama models must validate one at a time to avoid VRAM contention
+        if model_id.startswith("ollama:"):
+            async with _ollama_validation_lock:
+                success, error = await validate_model(model_id)
+        else:
+            success, error = await validate_model(model_id)
 
         # Cache successful validations
         if success:
