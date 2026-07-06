@@ -14,15 +14,19 @@ SPAR_KEYS = [
     "phase.spar.1",
     "phase.spar.2",
     "phase.spar.3",
+    "phase.spar.4",
     "phase.spar.1.msg",
     "phase.spar.2.msg",
     "phase.spar.3.msg",
+    "phase.spar.4.msg",
+    "role.layer0",
     "role.political",
     "role.economic",
     "role.environmental",
     "role.social",
     "role.devilsAdvocate",
     "role.moderator",
+    "round.layer0",
     "round.round1",
     "round.round2",
     "terminology.result.spar",
@@ -42,22 +46,39 @@ def parse_ts(path: Path) -> tuple[str, dict[str, str]]:
     return text, entries
 
 
+def upsert_keys(text: str, entries: dict[str, str], en_entries: dict[str, str], keys: list[str]) -> str:
+    """Replace existing SPAR keys or append missing ones."""
+    updated = text
+    missing: list[str] = []
+    for key in keys:
+        if key not in en_entries:
+            continue
+        pattern = rf'  "{re.escape(key)}": "[^"]*",\n'
+        replacement = f'  "{key}": "{en_entries[key]}",\n'
+        if re.search(pattern, updated):
+            updated = re.sub(pattern, replacement, updated, count=1)
+        elif key not in entries:
+            missing.append(key)
+    if missing:
+        block = "\n".join(f'  "{key}": "{en_entries[key]}",' for key in missing)
+        anchor = '  "discussion.tradeoff":'
+        if anchor not in updated:
+            raise SystemExit("Anchor not found for missing keys")
+        updated = updated.replace(anchor, block + "\n" + anchor, 1)
+    return updated, missing
+
+
 def main() -> None:
     _, en_entries = parse_ts(TRANSLATIONS / "en.ts")
     for lang in ("de", "es", "fr", "it", "sv"):
         path = TRANSLATIONS / f"{lang}.ts"
         text, entries = parse_ts(path)
-        missing = [key for key in SPAR_KEYS if key not in entries]
-        if not missing:
+        updated, missing = upsert_keys(text, entries, en_entries, SPAR_KEYS)
+        if updated != text:
+            path.write_text(updated, encoding="utf-8")
+            print(f"{lang}: synced {len(SPAR_KEYS)} keys ({len(missing)} added)")
+        else:
             print(f"{lang}: ok")
-            continue
-        block = "\n".join(f'  "{key}": "{en_entries[key]}",' for key in missing)
-        anchor = '  "discussion.tradeoff":'
-        if anchor not in text:
-            raise SystemExit(f"Anchor not found in {path}")
-        text = text.replace(anchor, block + "\n" + anchor, 1)
-        path.write_text(text, encoding="utf-8")
-        print(f"{lang}: added {len(missing)} keys")
 
 
 if __name__ == "__main__":

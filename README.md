@@ -35,7 +35,11 @@ This fork extends Quorum with **SPAR** (Scenario Planning via Agentic Reasoning)
 
 Run SPAR: `quorum` → `/method spar` → ask your shock scenario question.
 
---- Ask multiple AI models (Claude, GPT, Gemini, Grok, and local models via Ollama) a question and let them debate, brainstorm, or deliberate using seven different methods.
+**Interactive dashboard:** [spar-overhaul-dashboard.html](Proejct%20Info/spar-overhaul-dashboard.html)
+
+---
+
+Ask multiple AI models (Claude, GPT, Gemini, Grok, and local models via Ollama) a question and let them debate, brainstorm, or deliberate using eight different methods (including SPAR).
 
 ## Quick Install (pip)
 

@@ -191,6 +191,7 @@ export type TranslationKey =
   | "role.panelist"
   | "role.ideator"
   | "role.evaluator"
+  | "role.layer0"
   | "role.political"
   | "role.economic"
   | "role.environmental"
@@ -202,6 +203,7 @@ export type TranslationKey =
   | "round.opening"
   | "round.rebuttal"
   | "round.closing"
+  | "round.layer0"
   | "round.round1"
   | "round.round2"
 

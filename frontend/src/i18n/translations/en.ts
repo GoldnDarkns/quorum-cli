@@ -192,6 +192,7 @@ export const en: Translations = {
   "role.panelist": "PANELIST",
   "role.ideator": "IDEATOR",
   "role.evaluator": "EVALUATOR",
+  "role.layer0": "LAYER 0",
   "role.political": "POLITICAL",
   "role.economic": "ECONOMIC",
   "role.environmental": "ENVIRONMENTAL",
@@ -203,6 +204,7 @@ export const en: Translations = {
   "round.opening": "Opening Statements",
   "round.rebuttal": "Rebuttals",
   "round.closing": "Closing Statements",
+  "round.layer0": "Layer 0",
   "round.round1": "Round 1",
   "round.round2": "Round 2",
 

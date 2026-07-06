@@ -54,6 +54,8 @@ function getRoleColor(role: string | null | undefined): string | null {
       return "cyan";  // Brainstorm ideators
     case "EVALUATOR":
       return "blue";  // Tradeoff evaluators
+    case "LAYER0":
+      return "blue";
     case "POLITICAL":
       return "magenta";
     case "ECONOMIC":
@@ -94,6 +96,8 @@ function getRoleBadge(role: string | null | undefined): string | null {
       return `[${t("role.ideator")}]`;
     case "EVALUATOR":
       return `[${t("role.evaluator")}]`;
+    case "LAYER0":
+      return `[${t("role.layer0")}]`;
     case "POLITICAL":
       return `[${t("role.political")}]`;
     case "ECONOMIC":
@@ -122,6 +126,8 @@ function getRoundLabel(roundType: string | null | undefined): string | null {
       return `(${t("round.rebuttal")})`;
     case "closing":
       return `(${t("round.closing")})`;
+    case "layer0":
+      return `(${t("round.layer0")})`;
     case "round1":
       return `(${t("round.round1")})`;
     case "round2":

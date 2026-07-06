@@ -500,6 +500,16 @@ def main() -> None:
 
     # --- 1. Executive Summary ---
     pdf.add_page()
+    pdf.info_box(
+        "Architecture note",
+        [
+            "This pilot run (run_20260701_211531) used the pre-overhaul pipeline:",
+            "no Layer 0 channel prioritization; Round 2 was JSON cross-exam (not live debate).",
+            "Current SPAR (July 2026): Layer 0 -> Round 1 JSON -> Round 2 live prose -> Moderator.",
+            "See docs/SPAR_Overhaul_And_Updates.pdf for the full architecture update.",
+        ],
+    )
+
     pdf.section_title("1. Executive Summary")
     sp500_vals = []
     for a in AGENT_ORDER:
@@ -565,8 +575,12 @@ def main() -> None:
     # --- 3. Methodology ---
     pdf.section_title("3. Methodology & Pipeline")
     pdf.body_text(
-        "SPAR uses a two-layer deliberation architecture. Layer 1 runs two rounds of agent "
-        "forecasts; Layer 2 has a moderator synthesize the debate into actionable conclusions."
+        "Historical pilot pipeline (this run): Round 1 independent JSON forecasts -> Round 2 JSON "
+        "cross-examination -> Moderator synthesis. No Layer 0 channel router."
+    )
+    pdf.body_text(
+        "Current SPAR architecture (post-overhaul): Layer 0 transmission-channel evidence routing "
+        "-> Round 1 domain JSON -> Round 2 live sequential debate (prose) -> Moderator."
     )
     steps = [
         "Round 1: Each agent independently produces a structured JSON forecast (direction, ETF magnitudes, confidence, evidence, analogues).",
