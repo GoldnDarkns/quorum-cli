@@ -80,8 +80,7 @@ ROUND 1 INSTRUCTION:
 ─────────────────────
 Produce your Round 1 independent assessment now.
 You have not seen any other agent's output — this is intentional.
-Base your assessment solely on the Master Context and the 
-domain-specific context above. Focus your transmission channels 
-specifically on physical supply chain disruption, semiconductor 
-risk, and cyber escalation pathways.
+Base your assessment on the Master Context and your Layer 0 evidence packet.
+Focus your transmission_channels on Supply Chain Disruption, Energy/Commodity,
+and Cyber/Operational channels from Layer 0.
 Output the JSON object and nothing else.

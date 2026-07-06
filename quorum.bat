@@ -1,6 +1,7 @@
 @echo off
 REM Quorum launcher for Windows
 setlocal
+chcp 65001 >nul 2>&1
 
 set "SCRIPT_DIR=%~dp0"
 set "FRONTEND_DIR=%SCRIPT_DIR%frontend"

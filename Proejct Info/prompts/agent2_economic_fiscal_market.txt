@@ -74,12 +74,17 @@ KEY VALUATION FRAMEWORK:
   • Rule of thumb: 100bps increase in equity risk premium ≈ -15% on P/E 
     at current levels. A partial GPR shock might move risk premium 20-40bps.
 
-ANALOGUE GUIDANCE FOR YOUR DOMAIN:
-Kuwait 1990 is most relevant economically. Key parallel: oil supply 
-shock risk → inflation concern → market de-rating. Key current 
-difference: 1990 inflation was moderate (3.4% CPI); 2022 inflation 
-is already 7.5%. The Fed has far LESS room to support markets through 
-monetary easing in 2022 than it had in 1990. This is an amplifier.
+CHANNEL GUIDANCE FOR YOUR DOMAIN (Layer 0 — not analogue-first):
+Use your Layer 0 evidence packet. Your primary channels are typically:
+  • Energy / Commodity Price Shock — WTI $92, Russia ~10% global supply
+  • Inflation Shock — CPI 7.5% amplifies energy pass-through
+  • Monetary Policy Constraint — Fed boxed in (cannot ease into 7.5% CPI)
+  • Credit / Financial Conditions — European bank exposure (XLF)
+  • Relief Rally / Priced-In — VIX 31, S&P YTD -8.8% (weigh as dampener)
+Kuwait 1990 data may appear under the Energy channel — use it as one
+data point within that channel, not as your sole anchor. The 2022 regime
+(high inflation + tightening) strengthens inflation and Fed-constraint channels
+relative to 1990.
 
 YOUR AGENT ID FOR THE JSON OUTPUT: "economic_fiscal_market_gpt4o"
 

@@ -22,6 +22,13 @@ API_KEY_MAX_LENGTH = 200  # Maximum reasonable API key length
 _TEST_MODE = False
 
 
+def _sanitize_unicode(text: str) -> str:
+    """Remove lone surrogates / invalid UTF-8 so JSON IPC won't crash on Windows."""
+    if not isinstance(text, str):
+        return str(text)
+    return text.encode("utf-8", errors="replace").decode("utf-8")
+
+
 def _write_secure_file(path: Path, content: str) -> None:
     """Write content to file with restrictive permissions (0600).
 
@@ -157,15 +164,27 @@ def get_input_history() -> list[str]:
     if not INPUT_HISTORY_CACHE.exists():
         return []
     try:
-        data = json.loads(INPUT_HISTORY_CACHE.read_text())
-        return data.get("history", [])
-    except (json.JSONDecodeError, OSError, KeyError, TypeError):
-        # Corrupted or inaccessible history file - return empty list
+        data = json.loads(INPUT_HISTORY_CACHE.read_text(encoding="utf-8"))
+        history = data.get("history", [])
+        if not isinstance(history, list):
+            return []
+        cleaned = [_sanitize_unicode(item) for item in history if isinstance(item, str) and item.strip()]
+        # Rewrite if sanitization changed anything (fixes corrupted history on load)
+        if cleaned != history:
+            _write_secure_file(
+                INPUT_HISTORY_CACHE,
+                json.dumps({"history": cleaned}, ensure_ascii=False, indent=2),
+            )
+        return cleaned
+    except (json.JSONDecodeError, OSError, KeyError, TypeError, UnicodeError):
         return []
 
 
 def add_to_input_history(input_text: str, max_items: int = 100) -> None:
     """Add an input to history (deduplicates and limits size)."""
+    input_text = _sanitize_unicode(input_text).strip()
+    if not input_text:
+        return
     history = get_input_history()
 
     # Remove if already exists (will be re-added at end)
@@ -178,7 +197,7 @@ def add_to_input_history(input_text: str, max_items: int = 100) -> None:
     if len(history) > max_items:
         history = history[-max_items:]
 
-    _write_secure_file(INPUT_HISTORY_CACHE, json.dumps({"history": history}))
+    _write_secure_file(INPUT_HISTORY_CACHE, json.dumps({"history": history}, ensure_ascii=False, indent=2))
 
 
 def _get_active_env_file() -> Path:

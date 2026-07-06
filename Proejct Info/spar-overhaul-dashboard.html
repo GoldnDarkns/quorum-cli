@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPAR Overhaul — Transmission-Channel-First Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05070D; --s1:#0B0F1A; --s2:#101828; --s3:#162035;
+  --border:#1A2540; --border2:#263660;
+  --text:#C8D6EE; --text2:#5A6A94; --text3:#2D3D60;
+  --blue:#4D92FF; --blue-g:rgba(77,146,255,.45);
+  --purple:#9080F5; --purple-g:rgba(144,128,245,.4);
+  --gold:#D49838; --gold-g:rgba(212,152,56,.4);
+  --green:#35C49C; --green-g:rgba(53,196,156,.4);
+  --red:#EE5F5F; --teal:#2DD4BF;
+  --fd:'Space Grotesk',sans-serif; --fb:'Inter',sans-serif; --fm:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── CANVAS BG ── */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+#cursor-glow{position:fixed;width:420px;height:420px;border-radius:50%;pointer-events:none;z-index:1;
+  background:radial-gradient(circle,rgba(77,146,255,.07) 0%,transparent 70%);
+  transform:translate(-50%,-50%);transition:opacity .3s;opacity:0}
+body:hover #cursor-glow{opacity:1}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;
+  padding:12px 28px;background:rgba(5,7,13,.82);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);
+  transition:box-shadow .3s}
+nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.4)}
+.brand{font-family:var(--fd);font-weight:700;font-size:15px;color:#fff}
+.brand em{font-style:normal;color:var(--blue)}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{font-family:var(--fm);font-size:10px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--text2);text-decoration:none;padding:6px 12px;border-radius:20px;border:1px solid transparent;transition:all .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--text);background:var(--s1);border-color:var(--border2)}
+.badge-new{font-family:var(--fm);font-size:9px;background:rgba(53,196,156,.15);color:var(--green);
+  border:1px solid rgba(53,196,156,.3);padding:3px 9px;border-radius:20px;letter-spacing:.06em}
+
+/* ── LAYOUT ── */
+.page{position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:88px 24px 100px}
+section{margin-bottom:72px;scroll-margin-top:80px}
+.eyebrow{font-family:var(--fm);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);
+  margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.eyebrow::before{content:'';width:18px;height:1px;background:var(--text3)}
+.eyebrow.blue{color:var(--blue)}.eyebrow.blue::before{background:var(--blue)}
+.eyebrow.green{color:var(--green)}.eyebrow.green::before{background:var(--green)}
+.eyebrow.gold{color:var(--gold)}.eyebrow.gold::before{background:var(--gold)}
+h1{font-family:var(--fd);font-size:clamp(32px,5vw,56px);font-weight:700;letter-spacing:-.025em;color:#fff;line-height:1.08;margin-bottom:14px}
+h1 em,h2 em{font-style:normal;color:var(--blue)}
+h2{font-family:var(--fd);font-size:clamp(22px,3vw,32px);font-weight:600;color:#fff;margin-bottom:10px;letter-spacing:-.015em}
+h3{font-family:var(--fd);font-size:15px;font-weight:600;color:#fff;margin-bottom:6px}
+.lead{font-size:15px;color:var(--text2);max-width:720px;margin-bottom:20px}
+strong{color:#fff;font-weight:600}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:40px 0 56px}
+.hero-pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:24px 0 36px}
+.pill{font-family:var(--fm);font-size:10px;padding:5px 12px;border-radius:20px;border:1px solid var(--border2);
+  color:var(--text2);background:var(--s1)}
+.pill-b{background:rgba(77,146,255,.1);border-color:rgba(77,146,255,.28);color:var(--blue)}
+.pill-p{background:rgba(144,128,245,.1);border-color:rgba(144,128,245,.28);color:var(--purple)}
+.pill-g{background:rgba(53,196,156,.1);border-color:rgba(53,196,156,.28);color:var(--green)}
+.pill-a{background:rgba(212,152,56,.1);border-color:rgba(212,152,56,.28);color:var(--gold)}
+.hero-cta{display:inline-flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btn{font-family:var(--fm);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+  padding:10px 20px;border-radius:8px;border:1px solid var(--border2);background:var(--s1);color:var(--text);
+  cursor:pointer;text-decoration:none;transition:all .25s}
+.btn:hover{background:var(--s2);border-color:var(--blue);color:#fff;transform:translateY(-2px);box-shadow:0 8px 24px rgba(77,146,255,.15)}
+.btn-primary{background:rgba(77,146,255,.15);border-color:rgba(77,146,255,.4);color:var(--blue)}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:28px 0}
+@media(max-width:800px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:20px 18px;
+  position:relative;overflow:hidden;cursor:default;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s,box-shadow .3s}
+.kpi::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--glow,transparent) 0%,transparent 60%);
+  opacity:0;transition:opacity .35s}
+.kpi:hover{transform:translateY(-6px) scale(1.02);border-color:var(--border2);box-shadow:0 16px 40px rgba(0,0,0,.35)}
+.kpi:hover::before{opacity:1}
+.kpi[data-color="blue"]{--glow:rgba(77,146,255,.12)}
+.kpi[data-color="purple"]{--glow:rgba(144,128,245,.12)}
+.kpi[data-color="green"]{--glow:rgba(53,196,156,.12)}
+.kpi[data-color="gold"]{--glow:rgba(212,152,56,.12)}
+.kpi-icon{font-size:22px;margin-bottom:10px;display:block}
+.kpi-val{font-family:var(--fd);font-size:32px;font-weight:700;color:#fff;line-height:1;margin-bottom:4px;
+  transition:color .3s}
+.kpi:hover .kpi-val{color:var(--blue)}
+.kpi[data-color="purple"]:hover .kpi-val{color:var(--purple)}
+.kpi[data-color="green"]:hover .kpi-val{color:var(--green)}
+.kpi[data-color="gold"]:hover .kpi-val{color:var(--gold)}
+.kpi-lbl{font-size:11px;color:var(--text2);line-height:1.4}
+.kpi-delta{font-family:var(--fm);font-size:10px;margin-top:8px;padding:3px 8px;border-radius:12px;display:inline-block}
+.kpi-delta.up{background:rgba(53,196,156,.12);color:var(--green)}
+.kpi-delta.new{background:rgba(77,146,255,.12);color:var(--blue)}
+
+/* ── COMPARE TOGGLE ── */
+.compare-wrap{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px;margin-top:20px}
+.toggle-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:24px}
+.toggle-label{font-family:var(--fm);font-size:11px;color:var(--text2);letter-spacing:.04em}
+.toggle-label.active{color:#fff;font-weight:500}
+.toggle-track{width:52px;height:28px;background:var(--s2);border:1px solid var(--border2);border-radius:14px;
+  cursor:pointer;position:relative;transition:background .3s}
+.toggle-track.on{background:rgba(77,146,255,.2);border-color:rgba(77,146,255,.4)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;background:var(--text2);border-radius:50%;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),background .3s}
+.toggle-track.on .toggle-thumb{transform:translateX(24px);background:var(--blue)}
+.compare-panel{display:none;animation:fadeUp .5s ease}
+.compare-panel.visible{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.compare-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.compare-cols{grid-template-columns:1fr}}
+.compare-col{border-radius:12px;padding:18px;border:1.5px solid}
+.col-old{background:rgba(238,95,95,.04);border-color:rgba(238,95,95,.2)}
+.col-new{background:rgba(53,196,156,.04);border-color:rgba(53,196,156,.2)}
+.col-tag{font-family:var(--fm);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.col-old .col-tag{color:var(--red)}.col-new .col-tag{color:var(--green)}
+.compare-col ul{list-style:none;font-size:13px;color:var(--text2)}
+.compare-col li{padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:flex-start}
+.compare-col li:last-child{border-bottom:none}
+.compare-col li::before{flex-shrink:0;font-size:12px}
+.col-old li::before{content:'✗';color:var(--red)}
+.col-new li::before{content:'✓';color:var(--green)}
+
+/* ── PIPELINE ── */
+.pipeline{display:flex;flex-direction:column;gap:0;margin:24px 0}
+.pipe-step{display:grid;grid-template-columns:48px 1fr;gap:16px;position:relative;padding-bottom:8px}
+.pipe-step:not(:last-child)::before{content:'';position:absolute;left:23px;top:48px;bottom:0;width:2px;
+  background:linear-gradient(180deg,var(--line-color,var(--border)) 0%,transparent 100%)}
+.pipe-num{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--fm);font-size:13px;font-weight:500;border:1.5px solid;flex-shrink:0;
+  transition:transform .3s,box-shadow .3s}
+.pipe-step:hover .pipe-num{transform:scale(1.08);box-shadow:0 0 24px var(--line-glow,transparent)}
+.pipe-body{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px 18px;
+  transition:border-color .3s,transform .3s}
+.pipe-step:hover .pipe-body{border-color:var(--border2);transform:translateX(4px)}
+.pipe-step[data-layer="0"]{--line-color:rgba(77,146,255,.4);--line-glow:rgba(77,146,255,.2)}
+.pipe-step[data-layer="0"] .pipe-num{background:rgba(77,146,255,.12);border-color:rgba(77,146,255,.35);color:var(--blue)}
+.pipe-step[data-layer="1"]{--line-color:rgba(144,128,245,.4);--line-glow:rgba(144,128,245,.2)}
+.pipe-step[data-layer="1"] .pipe-num{background:rgba(144,128,245,.12);border-color:rgba(144,128,245,.35);color:var(--purple)}
+.pipe-step[data-layer="2"]{--line-color:rgba(212,152,56,.4);--line-glow:rgba(212,152,56,.2)}
+.pipe-step[data-layer="2"] .pipe-num{background:rgba(212,152,56,.12);border-color:rgba(212,152,56,.35);color:var(--gold)}
+.pipe-step[data-layer="3"]{--line-color:rgba(53,196,156,.4);--line-glow:rgba(53,196,156,.2)}
+.pipe-step[data-layer="3"] .pipe-num{background:rgba(53,196,156,.12);border-color:rgba(53,196,156,.35);color:var(--green)}
+.pipe-tag{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.pipe-body p{font-size:12.5px;color:var(--text2);margin:0}
+
+/* ── CHANNEL CHART ── */
+.chart-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px;margin-top:20px}
+.chart-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+.chart-legend{display:flex;gap:12px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}
+.leg-dot{width:8px;height:8px;border-radius:2px}
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:grid;grid-template-columns:200px 1fr 48px;gap:12px;align-items:center;cursor:pointer}
+@media(max-width:600px){.bar-row{grid-template-columns:1fr 48px}.bar-track{display:none}}
+.bar-label{font-size:12px;color:var(--text);transition:color .2s}
+.bar-row:hover .bar-label{color:#fff}
+.bar-track{height:28px;background:var(--s2);border-radius:6px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:6px;width:0;transition:width 1.2s cubic-bezier(.2,.8,.2,1);position:relative;overflow:hidden}
+.bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
+  animation:shimmer 2s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.bar-fill.primary{background:linear-gradient(90deg,#2a5aa8,var(--blue))}
+.bar-fill.secondary{background:linear-gradient(90deg,#5a4a9a,var(--purple))}
+.bar-fill.watchlist{background:linear-gradient(90deg,#6a5020,var(--gold))}
+.bar-fill.inactive{background:linear-gradient(90deg,#2a2a2a,var(--text3))}
+.bar-score{font-family:var(--fm);font-size:12px;color:var(--text2);text-align:right;transition:color .2s}
+.bar-row:hover .bar-score{color:#fff}
+.bar-tooltip{position:fixed;background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;
+  font-size:12px;color:var(--text);pointer-events:none;z-index:300;opacity:0;transition:opacity .2s;max-width:280px;
+  box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.bar-tooltip.visible{opacity:1}
+.bar-tooltip strong{display:block;color:#fff;margin-bottom:4px;font-family:var(--fd)}
+
+/* ── DEBATE SIMULATOR ── */
+.debate-sim{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px;margin-top:20px}
+.debate-controls{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.debate-btn{font-family:var(--fm);font-size:10px;padding:8px 14px;border-radius:8px;border:1px solid var(--border2);
+  background:var(--s2);color:var(--text2);cursor:pointer;transition:all .2s}
+.debate-btn:hover,.debate-btn.active{background:rgba(77,146,255,.12);border-color:rgba(77,146,255,.35);color:var(--blue)}
+.debate-feed{max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:4px}
+.debate-feed::-webkit-scrollbar{width:4px}
+.debate-feed::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.msg{border-radius:10px;padding:12px 14px;border:1px solid var(--border);opacity:0;transform:translateX(-12px);
+  animation:msgIn .5s ease forwards}
+@keyframes msgIn{to{opacity:1;transform:none}}
+.msg-role{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.msg-text{font-size:12.5px;color:var(--text2);line-height:1.6}
+.msg.political{border-left:3px solid var(--blue)}.msg.political .msg-role{color:var(--blue)}
+.msg.economic{border-left:3px solid var(--green)}.msg.economic .msg-role{color:var(--green)}
+.msg.environmental{border-left:3px solid var(--teal)}.msg.environmental .msg-role{color:var(--teal)}
+.msg.social{border-left:3px solid var(--purple)}.msg.social .msg-role{color:var(--purple)}
+.msg.da{border-left:3px solid var(--red)}.msg.da .msg-role{color:var(--red)}
+.msg.system{border-left:3px solid var(--gold);background:rgba(212,152,56,.04)}.msg.system .msg-role{color:var(--gold)}
+
+/* ── FORMULA ── */
+.formula-box{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:20px 24px;
+  font-family:var(--fm);font-size:13px;color:var(--text);line-height:1.8;margin:20px 0;overflow-x:auto}
+.formula-box .w{color:var(--blue)}.formula-box .op{color:var(--text3)}
+.weights{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:16px}
+@media(max-width:700px){.weights{grid-template-columns:repeat(2,1fr)}}
+.weight-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;
+  transition:transform .3s,border-color .3s}
+.weight-card:hover{transform:translateY(-4px);border-color:var(--blue)}
+.weight-pct{font-family:var(--fd);font-size:24px;font-weight:700;color:var(--blue);margin-bottom:4px}
+.weight-name{font-size:10px;color:var(--text2)}
+
+/* ── MATH SECTION ── */
+.math-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+@media(max-width:800px){.math-grid{grid-template-columns:1fr}}
+.math-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:20px;transition:border-color .3s,transform .3s}
+.math-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.math-card.full{grid-column:1/-1}
+.math-card h3{font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.math-card h3 span{font-family:var(--fm);font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(77,146,255,.12);color:var(--blue)}
+.formula-block{background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:16px 18px;
+  font-family:var(--fm);font-size:12.5px;line-height:2;color:var(--text);overflow-x:auto;margin:10px 0}
+.formula-block .sym{color:var(--purple)}.formula-block .num{color:var(--gold)}.formula-block .fn{color:var(--blue)}
+.formula-block .sub{color:var(--text3);font-size:11px}
+.math-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+.math-table th,.math-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.math-table th{font-family:var(--fm);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500}
+.math-table td{color:var(--text2)}
+.math-table tr:hover td{color:var(--text);background:rgba(77,146,255,.03)}
+.math-table .pct{font-family:var(--fm);color:var(--blue);font-weight:500}
+.math-table .tier-p{color:var(--blue)}.math-table .tier-s{color:var(--purple)}.math-table .tier-w{color:var(--gold)}.math-table .tier-i{color:var(--text3)}
+.worked-example{background:rgba(77,146,255,.04);border:1px solid rgba(77,146,255,.2);border-radius:12px;padding:18px;margin-top:14px}
+.worked-example h4{font-family:var(--fd);font-size:13px;color:var(--blue);margin-bottom:10px}
+.worked-step{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)}
+.worked-step:last-child{border-bottom:none}
+.worked-step .ws-num{font-family:var(--fm);font-size:10px;color:var(--text3);width:20px;flex-shrink:0;padding-top:2px}
+.worked-step .ws-val{font-family:var(--fm);color:var(--gold);margin-left:auto;flex-shrink:0}
+.ontology-box{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px;margin-top:20px}
+.ontology-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media(max-width:700px){.ontology-cols{grid-template-columns:1fr}}
+.ont-col{border-radius:12px;padding:18px;border:1.5px solid}
+.ont-fixed{background:rgba(77,146,255,.04);border-color:rgba(77,146,255,.25)}
+.ont-dynamic{background:rgba(53,196,156,.04);border-color:rgba(53,196,156,.25)}
+.ont-col h4{font-family:var(--fd);font-size:14px;margin-bottom:8px}
+.ont-fixed h4{color:var(--blue)}.ont-dynamic h4{color:var(--green)}
+.ont-col p,.ont-col ul{font-size:12.5px;color:var(--text2)}
+.ont-col ul{margin-top:8px;padding-left:18px}
+.ont-col li{margin-bottom:4px}
+.shock-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.shock-tab{font-family:var(--fm);font-size:10px;padding:8px 14px;border-radius:8px;border:1px solid var(--border2);
+  background:var(--s2);color:var(--text2);cursor:pointer;transition:all .2s}
+.shock-tab:hover,.shock-tab.active{background:rgba(77,146,255,.12);border-color:rgba(77,146,255,.35);color:var(--blue)}
+.component-bars{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.comp-row{display:grid;grid-template-columns:140px 1fr 56px;gap:10px;align-items:center;font-size:11px}
+.comp-label{color:var(--text2)}.comp-val{font-family:var(--fm);color:var(--gold);text-align:right}
+.comp-track{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.comp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--blue),var(--purple));width:0;transition:width .8s ease}
+
+/* ── ROADMAP ── */
+.roadmap{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+@media(max-width:700px){.roadmap{grid-template-columns:1fr}}
+.rm-card{border-radius:12px;padding:18px;border:1.5px solid;position:relative;overflow:hidden}
+.rm-card.done{background:rgba(53,196,156,.05);border-color:rgba(53,196,156,.25)}
+.rm-card.partial{background:rgba(77,146,255,.05);border-color:rgba(77,146,255,.25)}
+.rm-card.future{background:var(--s1);border-color:var(--border)}
+.rm-status{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.rm-card.done .rm-status{color:var(--green)}
+.rm-card.partial .rm-status{color:var(--blue)}
+.rm-card.future .rm-status{color:var(--text3)}
+.rm-card h3{font-size:14px;margin-bottom:8px}
+.rm-card p{font-size:12px;color:var(--text2);margin:0}
+.rm-card ul{font-size:11.5px;color:var(--text2);margin-top:10px;padding-left:16px}
+.rm-card li{margin-bottom:4px}
+
+/* ── REVEAL ANIMATIONS ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* ── FOOTER ── */
+footer{text-align:center;padding:40px 24px;border-top:1px solid var(--border);color:var(--text3);font-size:12px;position:relative;z-index:2}
+footer a{color:var(--blue);text-decoration:none}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div id="cursor-glow"></div>
+<div class="bar-tooltip" id="tooltip"></div>
+
+<nav id="nav">
+  <div class="brand">SPAR <em>·</em> Overhaul Dashboard</div>
+  <div class="nav-links">
+    <a href="#overview">Overview</a>
+    <a href="#compare">Before / After</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#math">Mathematics</a>
+    <a href="#channels">Channels</a>
+    <a href="#debate">Live Debate</a>
+    <a href="#roadmap">Roadmap</a>
+  </div>
+  <span class="badge-new">JUL 2026 UPDATE</span>
+</nav>
+
+<div class="page">
+
+<!-- HERO -->
+<section class="hero reveal" id="overview">
+  <div class="eyebrow blue">AI in Finance · SP Jain · Group 3 · Architecture Update</div>
+  <h1>From <em>Analogue Anchoring</em><br>to <em>Channel-First Reasoning</em></h1>
+  <p class="lead" style="margin:0 auto">
+    SPAR's Layer 0 overhaul replaces three fixed historical war analogues with twelve reusable
+    financial transmission channels — scored, evidence-backed, and routed to each specialist agent.
+    Round 2 is now a live sequential debate where agents read and respond to each other.
+  </p>
+  <div class="hero-pills">
+    <span class="pill pill-b">Layer 0 · Channel Prioritizer</span>
+    <span class="pill pill-p">Live Sequential Debate</span>
+    <span class="pill pill-g">Offline Ollama Ready</span>
+    <span class="pill pill-a">Quorum-CLI Integration</span>
+  </div>
+  <div class="hero-cta">
+    <a class="btn btn-primary" href="#compare">See what changed</a>
+    <a class="btn" href="SPAR.html">Original architecture</a>
+    <a class="btn" href="../docs/SPAR_Overhaul_And_Updates.pdf" target="_blank">PDF report</a>
+  </div>
+</section>
+
+<!-- KPIs -->
+<div class="kpi-grid reveal">
+  <div class="kpi" data-color="blue" data-tip="Hardcoded financial mechanisms that repeat across shocks — not fixed wars">
+    <span class="kpi-icon">⚡</span>
+    <div class="kpi-val" data-count="13">0</div>
+    <div class="kpi-lbl">Transmission channels in ontology</div>
+    <span class="kpi-delta new">+10 vs 3 analogues</span>
+  </div>
+  <div class="kpi" data-color="purple" data-tip="SPAR now runs Layer 0 → R1 → Live R2 → Moderator">
+    <span class="kpi-icon">🔄</span>
+    <div class="kpi-val" data-count="4">0</div>
+    <div class="kpi-lbl">Debate phases (was 3)</div>
+    <span class="kpi-delta new">Layer 0 added</span>
+  </div>
+  <div class="kpi" data-color="green" data-tip="Each agent in Round 2 sees all prior speakers in the transcript">
+    <span class="kpi-icon">💬</span>
+    <div class="kpi-val" data-count="100" data-suffix="%">0</div>
+    <div class="kpi-lbl">Transcript visibility in live debate</div>
+    <span class="kpi-delta up">was ~0% in R2</span>
+  </div>
+  <div class="kpi" data-color="gold" data-tip="Primary channels activated for Russia-Ukraine pilot shock">
+    <span class="kpi-icon">📊</span>
+    <div class="kpi-val" data-count="6">0</div>
+    <div class="kpi-lbl">Primary channels (Ukraine pilot)</div>
+    <span class="kpi-delta up">scored 75–95</span>
+  </div>
+</div>
+
+<!-- BEFORE / AFTER -->
+<section class="reveal" id="compare">
+  <div class="eyebrow gold">Why this is better</div>
+  <h2>Before vs <em>After</em> the overhaul</h2>
+  <p class="lead">Toggle to compare the old analogue-heavy design with the new channel-first architecture.</p>
+
+  <div class="compare-wrap">
+    <div class="toggle-row">
+      <span class="toggle-label active" id="lbl-old">Old design</span>
+      <div class="toggle-track on" id="toggle" role="button" aria-label="Toggle comparison"></div>
+      <span class="toggle-label" id="lbl-new">New design</span>
+    </div>
+
+    <div class="compare-panel visible" id="panel-old">
+      <div class="compare-cols">
+        <div class="compare-col col-old" style="grid-column:1/-1">
+          <div class="col-tag">Previous approach · event-analogue-heavy</div>
+          <ul>
+            <li>Three fixed historical analogues injected into every agent prompt (Kuwait 1990, Crimea 2014, Iraq 2003)</li>
+            <li>All five agents saw identical anchor events → groupthink risk</li>
+            <li>System asked "which past wars look similar?" not "which channels activate?"</li>
+            <li>Round 2: silent JSON dump of Round 1 — agents could not see each other's live responses</li>
+            <li>analogue_assessment in JSON schema anchored agents to one war story</li>
+            <li>No Layer 0 control node — context was static in master_context.txt</li>
+            <li>Weak for novel scenarios with no close historical match</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="compare-panel" id="panel-new">
+      <div class="compare-cols">
+        <div class="compare-col col-new" style="grid-column:1/-1">
+          <div class="col-tag">New approach · transmission-channel-first</div>
+          <ul>
+            <li>13 hardcoded transmission channels with explainable scoring formula (deterministic Python)</li>
+            <li>Per-channel evidence retrieval — Kuwait data may appear under Energy channel, not as the whole story</li>
+            <li>Agent-specific evidence packets routed by domain (Political gets sanctions + GPR; Economic gets Fed + oil)</li>
+            <li>Round 2: live sequential debate — each agent reads full transcript and responds by name</li>
+            <li>channel_assessment replaces analogue_assessment in JSON schema</li>
+            <li>Layer 0 runs before debate: Regime → Parser → Prioritizer → Evidence → Router</li>
+            <li>Designed for novel shocks — channels repeat even when events are unique</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PIPELINE -->
+<section class="reveal" id="pipeline">
+  <div class="eyebrow blue">Execution flow</div>
+  <h2>The new <em>4-phase</em> SPAR pipeline</h2>
+  <p class="lead">Implemented in <code style="font-family:var(--fm);font-size:12px;color:var(--blue)">spar_layer0.py</code> + <code style="font-family:var(--fm);font-size:12px;color:var(--blue)">spar.py</code> inside Quorum-CLI.</p>
+
+  <div class="pipeline">
+    <div class="pipe-step" data-layer="0">
+      <div class="pipe-num">L0</div>
+      <div class="pipe-body">
+        <div class="pipe-tag">Phase 1 · Layer 0</div>
+        <h3>Channel Prioritization &amp; Evidence Routing</h3>
+        <p>Deterministic Python — no extra LLM calls. Scores 12 channels, retrieves per-channel evidence, builds agent-specific packets. Displayed in terminal before debate starts.</p>
+      </div>
+    </div>
+    <div class="pipe-step" data-layer="1">
+      <div class="pipe-num">R1</div>
+      <div class="pipe-body">
+        <div class="pipe-tag">Phase 2 · Round 1</div>
+        <h3>Independent Domain Analysis (JSON)</h3>
+        <p>Five specialists produce structured forecasts blind to each other. Each receives routed Layer 0 evidence + master regime context. Output: direction, magnitudes, channels, confidence.</p>
+      </div>
+    </div>
+    <div class="pipe-step" data-layer="2">
+      <div class="pipe-num">R2</div>
+      <div class="pipe-body">
+        <div class="pipe-tag">Phase 3 · Round 2 · NEW</div>
+        <h3>Live Sequential Debate (Prose)</h3>
+        <p>Agents speak in turn. Each sees the full growing transcript — Round 1 summaries plus every prior Round 2 speech. Must name another agent, agree/disagree with evidence, speak in prose.</p>
+      </div>
+    </div>
+    <div class="pipe-step" data-layer="3">
+      <div class="pipe-num">MOD</div>
+      <div class="pipe-body">
+        <div class="pipe-tag">Phase 4 · Moderator</div>
+        <h3>Synthesis + Plausibility</h3>
+        <p>Moderator receives Layer 0 state, Round 1 JSON, and full live debate transcript. Produces consensus scenario + minority dissent with channel-based plausibility scoring.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="formula-box">
+    <span class="w">S<sub>c</sub></span> <span class="op">=</span> 100 <span class="op">×</span> (
+    0.30·E + 0.25·M + 0.20·R + 0.15·V + 0.10·Z )
+    <span style="display:block;margin-top:8px;font-size:11px;color:var(--text3)">See <a href="#math" style="color:var(--blue)">Mathematics</a> section for full derivations</span>
+  </div>
+  <div class="weights">
+    <div class="weight-card"><div class="weight-pct">30%</div><div class="weight-name">Event / entity</div></div>
+    <div class="weight-card"><div class="weight-pct">25%</div><div class="weight-name">Mechanism</div></div>
+    <div class="weight-card"><div class="weight-pct">20%</div><div class="weight-name">Regime</div></div>
+    <div class="weight-card"><div class="weight-pct">15%</div><div class="weight-name">Evidence</div></div>
+    <div class="weight-card"><div class="weight-pct">10%</div><div class="weight-name">Sector</div></div>
+  </div>
+</section>
+
+<!-- MATHEMATICS -->
+<section class="reveal" id="math">
+  <div class="eyebrow gold">Layer 0 · Formal model</div>
+  <h2>Mathematical <em>formulations</em></h2>
+  <p class="lead">Every channel activation score is computed deterministically in Python — no LLM involved. Weights sum to 100%. Scores map to priority tiers, which set evidence retrieval budgets.</p>
+
+  <div class="math-grid">
+    <!-- Master formula -->
+    <div class="math-card full">
+      <h3>Master activation score <span>Step 0.4</span></h3>
+      <div class="formula-block">
+        <span class="sym">S<sub>c</sub></span> <span class="op">=</span> 100 <span class="op">×</span> (
+        <span class="num">0.30</span>·<span class="fn">E<sub>c</sub></span> <span class="op">+</span>
+        <span class="num">0.25</span>·<span class="fn">M<sub>c</sub></span> <span class="op">+</span>
+        <span class="num">0.20</span>·<span class="fn">R<sub>c</sub></span> <span class="op">+</span>
+        <span class="num">0.15</span>·<span class="fn">V<sub>c</sub></span> <span class="op">+</span>
+        <span class="num">0.10</span>·<span class="fn">Z<sub>c</sub></span> )
+        <span class="sub">where c ∈ {1…13} channels, each component ∈ [0, 1]</span>
+      </div>
+      <table class="math-table">
+        <thead><tr><th>Symbol</th><th>Component</th><th>Weight</th><th>What it measures</th></tr></thead>
+        <tbody>
+          <tr><td class="fn">E<sub>c</sub></td><td>Event match</td><td class="pct">30%</td><td>Keyword overlap between shock text and channel activation keywords (invasion, oil, sanctions…)</td></tr>
+          <tr><td class="fn">M<sub>c</sub></td><td>Mechanism match</td><td class="pct">25%</td><td>Overlap with economic mechanism keywords (risk premium, supply shock, tightening…)</td></tr>
+          <tr><td class="fn">R<sub>c</sub></td><td>Regime relevance</td><td class="pct">20%</td><td>How current macro regime (inflation, liquidity, VIX) amplifies this channel</td></tr>
+          <tr><td class="fn">V<sub>c</sub></td><td>Evidence availability</td><td class="pct">15%</td><td>1.0 if curated evidence exists in corpus; 0.3 if not</td></tr>
+          <tr><td class="fn">Z<sub>c</sub></td><td>Sector materiality</td><td class="pct">10%</td><td>Keyword overlap with sector ETFs / asset classes (XLE, XLK, XLY…)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Keyword score -->
+    <div class="math-card">
+      <h3>Keyword score function <span>sub-routine</span></h3>
+      <div class="formula-block">
+        <span class="fn">K</span>(<span class="sym">text</span>, <span class="sym">keywords</span>) <span class="op">=</span> min<span class="op">(</span>1, <span class="sym">hits</span> / max<span class="op">(</span>3, |<span class="sym">keywords</span>| × 0.25<span class="op">)</span><span class="op">)</span>
+        <span class="sub">hits = count of keywords found as substrings in text (lowercased)</span>
+      </div>
+      <p style="font-size:12px;color:var(--text2);margin-top:10px">
+        Used for E<sub>c</sub>, M<sub>c</sub>, and Z<sub>c</sub>. Requires at least 3 keyword hits (or 25% of keyword set) to reach full score of 1.0.
+      </p>
+    </div>
+
+    <!-- Regime rules -->
+    <div class="math-card">
+      <h3>Regime relevance R<sub>c</sub> <span>conditional</span></h3>
+      <div class="formula-block" style="line-height:1.7">
+        <span class="fn">R<sub>inflation</sub></span> <span class="op">=</span> 0.95 <span class="sub">if regime.inflation contains "high"</span><br>
+        <span class="fn">R<sub>monetary</sub></span> <span class="op">=</span> 0.90 <span class="sub">if regime.liquidity contains "tight"</span><br>
+        <span class="fn">R<sub>relief</sub></span> <span class="op">=</span> 0.85 <span class="sub">if regime.volatility contains "elevated"</span><br>
+        <span class="fn">R<sub>gpr</sub></span> <span class="op">=</span> 0.80 <span class="sub">for geopolitical_risk_premium (default)</span><br>
+        <span class="fn">R<sub>other</sub></span> <span class="op">=</span> 0.7 × K(regime, mechanism<sub>c</sub>) <span class="sub">else</span>
+      </div>
+    </div>
+
+    <!-- Priority tiers -->
+    <div class="math-card">
+      <h3>Priority tier mapping <span>Step 0.5</span></h3>
+      <table class="math-table">
+        <thead><tr><th>Tier</th><th>Score range</th><th>Retrieval budget</th><th>Agent weight</th></tr></thead>
+        <tbody>
+          <tr><td class="tier-p">PRIMARY</td><td>S<sub>c</sub> ≥ 75</td><td class="pct">6 evidence items</td><td>Heavy — drives forecast</td></tr>
+          <tr><td class="tier-s">SECONDARY</td><td>50 ≤ S<sub>c</sub> &lt; 75</td><td class="pct">3 evidence items</td><td>Modifier — adjusts magnitude</td></tr>
+          <tr><td class="tier-w">WATCHLIST</td><td>30 ≤ S<sub>c</sub> &lt; 50</td><td class="pct">1 evidence item</td><td>Tail risk — Devil's Advocate</td></tr>
+          <tr><td class="tier-i">INACTIVE</td><td>S<sub>c</sub> &lt; 30</td><td class="pct">0 items</td><td>Excluded from packets</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Ukraine calibration -->
+    <div class="math-card">
+      <h3>Pilot calibration floor <span>Ukraine only</span></h3>
+      <div class="formula-block">
+        <span class="sym">S<sub>c</sub></span> <span class="op">=</span> max<span class="op">(</span><span class="sym">S<sub>c</sub><sup>raw</sup></span>, <span class="sym">B<sub>c</sub></span><span class="op">)</span>
+        <span class="sub">if "invasion" ∈ shock ∨ "ukraine" ∈ shock, apply floor B<sub>c</sub> from pilot table</span>
+      </div>
+      <p style="font-size:12px;color:var(--text2);margin-top:10px">
+        <strong style="color:var(--gold)">Temporary pilot hack</strong> — ensures known-primary channels for the Ukraine benchmark. For new events (cyber, OPEC cut, Fed crisis), only the raw formula runs — scores change completely.
+      </p>
+    </div>
+
+    <!-- Worked example -->
+    <div class="math-card full">
+      <h3>Worked example — Energy / Commodity channel <span>Ukraine shock</span></h3>
+      <div class="worked-example">
+        <h4>Shock: "Russia full-scale invasion of Ukraine" · Regime: CPI 7.5%, VIX 31, tightening</h4>
+        <div class="worked-step"><span class="ws-num">1</span><span>E<sub>c</sub> = K(shock, {oil, gas, russia, invasion…}) — hits: invasion, russia, military → high match</span><span class="ws-val">≈ 0.67</span></div>
+        <div class="worked-step"><span class="ws-num">2</span><span>M<sub>c</sub> = K(shock, {supply shock, commodity, oil…})</span><span class="ws-val">≈ 0.50</span></div>
+        <div class="worked-step"><span class="ws-num">3</span><span>R<sub>c</sub> = 0.7 × K(regime, mechanisms) — high inflation regime amplifies energy→inflation link</span><span class="ws-val">≈ 0.35</span></div>
+        <div class="worked-step"><span class="ws-num">4</span><span>V<sub>c</sub> = 1.0 (CHANNEL_EVIDENCE has 4 items for this channel)</span><span class="ws-val">1.00</span></div>
+        <div class="worked-step"><span class="ws-num">5</span><span>Z<sub>c</sub> = K(shock+regime, {xle, energy, oil…})</span><span class="ws-val">≈ 0.33</span></div>
+        <div class="worked-step"><span class="ws-num">6</span><span>S<sup>raw</sup> = 100 × (0.30×0.67 + 0.25×0.50 + 0.20×0.35 + 0.15×1.0 + 0.10×0.33)</span><span class="ws-val">≈ 58.3</span></div>
+        <div class="worked-step"><span class="ws-num">7</span><span>Ukraine floor B<sub>energy</sub> = max(58.3, 92.0) → PRIMARY tier, 6 evidence items retrieved</span><span class="ws-val" style="color:var(--blue)">92.0</span></div>
+      </div>
+      <div class="component-bars" id="component-bars">
+        <div class="comp-row"><span class="comp-label">E — Event (30%)</span><div class="comp-track"><div class="comp-fill" data-w="67"></div></div><span class="comp-val">0.67</span></div>
+        <div class="comp-row"><span class="comp-label">M — Mechanism (25%)</span><div class="comp-track"><div class="comp-fill" data-w="50"></div></div><span class="comp-val">0.50</span></div>
+        <div class="comp-row"><span class="comp-label">R — Regime (20%)</span><div class="comp-track"><div class="comp-fill" data-w="35"></div></div><span class="comp-val">0.35</span></div>
+        <div class="comp-row"><span class="comp-label">V — Evidence (15%)</span><div class="comp-track"><div class="comp-fill" data-w="100"></div></div><span class="comp-val">1.00</span></div>
+        <div class="comp-row"><span class="comp-label">Z — Sector (10%)</span><div class="comp-track"><div class="comp-fill" data-w="33"></div></div><span class="comp-val">0.33</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONTOLOGY vs ACTIVATION -->
+  <div class="ontology-box reveal">
+    <div class="eyebrow blue" style="margin-bottom:8px">Design philosophy</div>
+    <h2>Hardcoded channels vs <em>event-based</em> activation</h2>
+    <p class="lead">This is the most important distinction. The channel <em>list</em> is fixed; which channels <em>activate</em> is fully event-driven.</p>
+    <div class="ontology-cols">
+      <div class="ont-col ont-fixed">
+        <h4>✦ Fixed ontology (intentional)</h4>
+        <p>The 13 transmission channels are hardcoded because they represent <strong>reusable financial mechanisms</strong> — the same pathways appear across different geopolitical events:</p>
+        <ul>
+          <li>Kuwait 1990 and Russia 2022 both activate <em>Energy Shock</em></li>
+          <li>Cyber attacks activate <em>Cyber/Operational</em> — wars do not</li>
+          <li>OPEC cuts activate <em>Energy</em> without activating <em>Geopolitical Risk Premium</em></li>
+        </ul>
+        <p style="margin-top:10px">This mirrors macro finance: factor models use fixed factors (value, momentum, size) — you don't invent new factors per stock. Events select which factors load.</p>
+      </div>
+      <div class="ont-col ont-dynamic">
+        <h4>✦ Event-driven activation (dynamic)</h4>
+        <p>What <em>changes per event</em> is computed, not hardcoded:</p>
+        <ul>
+          <li><strong>Scores S<sub>c</sub></strong> — from shock text + regime via keyword matching</li>
+          <li><strong>Priority tiers</strong> — PRIMARY/SECONDARY/WATCHLIST/INACTIVE per event</li>
+          <li><strong>Evidence retrieved</strong> — budget 0/1/3/6 based on score</li>
+          <li><strong>Agent packets</strong> — different specialists get different channel subsets</li>
+        </ul>
+        <p style="margin-top:10px">Switch shock type below — watch scores reorder completely. Cyber attack → Cyber channel leads. OPEC cut → Energy leads. Fed crisis → Monetary leads.</p>
+      </div>
+    </div>
+    <div class="shock-tabs" id="shock-tabs">
+      <button class="shock-tab active" data-shock="ukraine">🇺🇦 Ukraine invasion</button>
+      <button class="shock-tab" data-shock="cyber">🔒 Cyber on SWIFT</button>
+      <button class="shock-tab" data-shock="opec">🛢 OPEC production cut</button>
+      <button class="shock-tab" data-shock="fed">🏦 Fed emergency hike</button>
+    </div>
+    <div class="chart-card" style="margin-top:0">
+      <div class="chart-header">
+        <h3 style="margin:0" id="shock-title">Ukraine invasion — channel scores (formula output)</h3>
+      </div>
+      <div class="bars" id="shock-bars"></div>
+    </div>
+    <p style="font-size:12px;color:var(--text3);margin-top:14px">
+      <strong style="color:var(--text2)">What should NOT stay hardcoded long-term:</strong> Ukraine calibration floors (B<sub>c</sub>), curated evidence corpus (→ live FRED/GPR RAG), and possibly LLM-assisted channel discovery for novel shock types. The ontology itself should grow slowly via research, not per-event.
+    </p>
+  </div>
+</section>
+
+<!-- CHANNEL CHART -->
+<section class="reveal" id="channels">
+  <div class="eyebrow green">Layer 0 output</div>
+  <h2>Ukraine pilot — <em>channel activation</em></h2>
+  <p class="lead">Hover bars for activation reasons. Scores from <code style="font-family:var(--fm);font-size:12px;color:var(--green)">spar_layer0.py</code> for Russia invasion shock.</p>
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <h3 style="margin:0">Activated transmission channels</h3>
+      <div class="chart-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--blue)"></div>Primary (75–100)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>Secondary (50–74)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div>Watchlist (30–49)</div>
+      </div>
+    </div>
+    <div class="bars" id="channel-bars"></div>
+  </div>
+</section>
+
+<!-- LIVE DEBATE -->
+<section class="reveal" id="debate">
+  <div class="eyebrow purple">Round 2 · Live debate</div>
+  <h2>Agents <em>talk to each other</em> now</h2>
+  <p class="lead">Click Play to simulate the sequential debate flow. Each agent sees everything said before them.</p>
+
+  <div class="debate-sim">
+    <div class="debate-controls">
+      <button class="debate-btn active" id="btn-play">▶ Play simulation</button>
+      <button class="debate-btn" id="btn-reset">↺ Reset</button>
+    </div>
+    <div class="debate-feed" id="debate-feed"></div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="reveal" id="roadmap">
+  <div class="eyebrow blue">Implementation status</div>
+  <h2>What's done, partial, and <em>next</em></h2>
+
+  <div class="roadmap">
+    <div class="rm-card done">
+      <div class="rm-status">✓ Complete</div>
+      <h3>Layer 0 Channel Pipeline</h3>
+      <p>Deterministic scoring, evidence corpus, agent routing</p>
+      <ul><li>spar_layer0.py</li><li>12 channels + formula</li><li>Ukraine calibration</li></ul>
+    </div>
+    <div class="rm-card done">
+      <div class="rm-status">✓ Complete</div>
+      <h3>Live Sequential Debate</h3>
+      <p>Round 2 transcript-based cross-examination</p>
+      <ul><li>Prose responses</li><li>Full transcript visibility</li><li>Moderator gets live feed</li></ul>
+    </div>
+    <div class="rm-card done">
+      <div class="rm-status">✓ Complete</div>
+      <h3>Quorum Integration</h3>
+      <p>Terminal UI, Ollama offline, 4 phases</p>
+      <ul><li>/method spar</li><li>Ollama validation fix</li><li>i18n phase labels</li></ul>
+    </div>
+    <div class="rm-card partial">
+      <div class="rm-status">◐ Partial</div>
+      <h3>RAG &amp; Evidence</h3>
+      <p>Curated corpus — not live APIs yet</p>
+      <ul><li>CHANNEL_EVIDENCE dict</li><li>Queries defined</li><li>FRED/GPR pending</li></ul>
+    </div>
+    <div class="rm-card future">
+      <div class="rm-status">○ Planned</div>
+      <h3>Explore / Exploit Loop</h3>
+      <p>Adaptive debate stopping from HTML vision</p>
+      <ul><li>Continuation Controller</li><li>Disagreement score</li><li>Max 5 rounds</li></ul>
+    </div>
+    <div class="rm-card future">
+      <div class="rm-status">○ Planned</div>
+      <h3>Layer 3 Quantification</h3>
+      <p>Factor model → VaR → sector heatmap</p>
+      <ul><li>Fama-French factors</li><li>Report builder</li><li>Plausibility gate</li></ul>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  SPAR Overhaul Dashboard · AI in Finance · SP Jain School of Global Management · Group 3 · 2026<br>
+  <a href="https://github.com/GoldnDarkns/quorum-cli">github.com/GoldnDarkns/quorum-cli</a> ·
+  <a href="spar-prompts.html">Agent prompts</a> ·
+  <a href="SPAR.html">Full architecture</a>
+</footer>
+
+<script>
+// ── CHANNEL DATA (Ukraine default shock — from spar_layer0.py) ──
+const CHANNELS = [
+  {name:"Geopolitical Risk Premium",score:95,tier:"primary",reason:"event/entity match; macro-regime relevance"},
+  {name:"Energy / Commodity Price Shock",score:92,tier:"primary",reason:"event/entity match; economic mechanism match"},
+  {name:"Inflation Shock",score:88,tier:"primary",reason:"macro-regime relevance (CPI 7.5%)"},
+  {name:"Monetary Policy Constraint",score:84,tier:"primary",reason:"macro-regime relevance (tightening)"},
+  {name:"Sanctions / Trade / Policy Shock",score:80,tier:"primary",reason:"event/entity match; mechanism match"},
+  {name:"Safe-Haven / FX Flow",score:76,tier:"primary",reason:"event/entity match; risk-off mechanism"},
+  {name:"Defence Spending Repricing",score:72,tier:"secondary",reason:"invasion + NATO keywords"},
+  {name:"Supply Chain Disruption",score:66,tier:"secondary",reason:"neon, wheat, shipping exposure"},
+  {name:"Consumer Sentiment / Behavioural",score:58,tier:"secondary",reason:"gasoline + inflation squeeze"},
+  {name:"Relief Rally / Priced-In",score:55,tier:"secondary",reason:"VIX 31, S&P YTD -8.8% pre-event"},
+  {name:"Cyber / Operational Disruption",score:42,tier:"watchlist",reason:"low direct match — tail risk only"},
+  {name:"Sector Earnings Exposure",score:18,tier:"inactive",reason:"low keyword match for invasion text"},
+  {name:"Credit / Financial Conditions",score:15,tier:"inactive",reason:"no direct credit/bank keywords in shock"},
+];
+
+// ── SHOCK COMPARISON DATA (proves event-driven activation) ──
+const SHOCK_DATA = {
+  ukraine: {
+    title: "Ukraine invasion — channel scores (formula + pilot floors)",
+    channels: [
+      {name:"Geopolitical Risk Premium",score:95,tier:"primary"},
+      {name:"Energy / Commodity Price Shock",score:92,tier:"primary"},
+      {name:"Inflation Shock",score:88,tier:"primary"},
+      {name:"Monetary Policy Constraint",score:84,tier:"primary"},
+      {name:"Sanctions / Trade / Policy Shock",score:80,tier:"primary"},
+      {name:"Safe-Haven / FX Flow",score:76,tier:"primary"},
+      {name:"Defence Spending Repricing",score:72,tier:"secondary"},
+      {name:"Supply Chain Disruption",score:66,tier:"secondary"},
+      {name:"Consumer Sentiment / Behavioural",score:58,tier:"secondary"},
+      {name:"Relief Rally / Priced-In",score:55,tier:"secondary"},
+      {name:"Cyber / Operational Disruption",score:42,tier:"watchlist"},
+      {name:"Sector Earnings Exposure",score:18,tier:"inactive"},
+      {name:"Credit / Financial Conditions",score:15,tier:"inactive"},
+    ]
+  },
+  cyber: {
+    title: "Cyber attack on SWIFT — raw formula only (no Ukraine floors)",
+    channels: [
+      {name:"Cyber / Operational Disruption",score:62,tier:"secondary"},
+      {name:"Relief Rally / Priced-In",score:39,tier:"watchlist"},
+      {name:"Geopolitical Risk Premium",score:34,tier:"watchlist"},
+      {name:"Sanctions / Trade / Policy Shock",score:33,tier:"watchlist"},
+      {name:"Inflation Shock",score:34,tier:"watchlist"},
+      {name:"Monetary Policy Constraint",score:33,tier:"watchlist"},
+      {name:"Energy / Commodity Price Shock",score:25,tier:"inactive"},
+      {name:"Safe-Haven / FX Flow",score:22,tier:"inactive"},
+    ]
+  },
+  opec: {
+    title: "OPEC production cut — Energy channel leads, GPR inactive",
+    channels: [
+      {name:"Energy / Commodity Price Shock",score:47,tier:"watchlist"},
+      {name:"Inflation Shock",score:38,tier:"watchlist"},
+      {name:"Relief Rally / Priced-In",score:39,tier:"watchlist"},
+      {name:"Geopolitical Risk Premium",score:34,tier:"watchlist"},
+      {name:"Monetary Policy Constraint",score:33,tier:"watchlist"},
+      {name:"Consumer Sentiment / Behavioural",score:28,tier:"inactive"},
+      {name:"Cyber / Operational Disruption",score:12,tier:"inactive"},
+      {name:"Defence Spending Repricing",score:10,tier:"inactive"},
+    ]
+  },
+  fed: {
+    title: "Fed emergency rate hike — Monetary + Credit channels lead",
+    channels: [
+      {name:"Monetary Policy Constraint",score:61,tier:"secondary"},
+      {name:"Credit / Financial Conditions",score:43,tier:"watchlist"},
+      {name:"Relief Rally / Priced-In",score:39,tier:"watchlist"},
+      {name:"Inflation Shock",score:34,tier:"watchlist"},
+      {name:"Geopolitical Risk Premium",score:34,tier:"watchlist"},
+      {name:"Safe-Haven / FX Flow",score:30,tier:"watchlist"},
+      {name:"Energy / Commodity Price Shock",score:18,tier:"inactive"},
+      {name:"Cyber / Operational Disruption",score:12,tier:"inactive"},
+    ]
+  }
+};
+
+// ── BUILD CHANNEL BARS ──
+function buildBars(container, channels, animate) {
+  container.innerHTML = '';
+  channels.filter(ch => ch.tier !== 'inactive').forEach(ch => {
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <div class="bar-label">${ch.name}</div>
+      <div class="bar-track"><div class="bar-fill ${ch.tier}" data-w="${ch.score}"></div></div>
+      <div class="bar-score">${ch.score}</div>`;
+    if (ch.reason) {
+      row.addEventListener('mouseenter', () => {
+        tooltip.innerHTML = `<strong>${ch.name}</strong>${ch.reason}<br><span style="color:var(--text3);font-size:10px">${ch.tier.toUpperCase()} · score ${ch.score}</span>`;
+        tooltip.classList.add('visible');
+      });
+      row.addEventListener('mousemove', e => {
+        tooltip.style.left = (e.clientX + 16) + 'px';
+        tooltip.style.top = (e.clientY - 10) + 'px';
+      });
+      row.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+    }
+    container.appendChild(row);
+  });
+  if (animate) {
+    setTimeout(() => {
+      container.querySelectorAll('.bar-fill').forEach((bar, i) => {
+        setTimeout(() => { bar.style.width = bar.dataset.w + '%'; }, i * 60);
+      });
+    }, 50);
+  }
+}
+
+const barsEl = document.getElementById('channel-bars');
+buildBars(barsEl, CHANNELS, false);
+
+// Animate bars on scroll
+const barObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.bar-fill').forEach((bar, i) => {
+        setTimeout(() => { bar.style.width = bar.dataset.w + '%'; }, i * 80);
+      });
+      barObserver.unobserve(e.target);
+    }
+  });
+}, {threshold: 0.2});
+barObserver.observe(barsEl);
+
+// ── SHOCK TAB SWITCHER ──
+const shockBarsEl = document.getElementById('shock-bars');
+const shockTitle = document.getElementById('shock-title');
+document.querySelectorAll('.shock-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.shock-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const data = SHOCK_DATA[tab.dataset.shock];
+    shockTitle.textContent = data.title;
+    buildBars(shockBarsEl, data.channels, true);
+  });
+});
+buildBars(shockBarsEl, SHOCK_DATA.ukraine.channels, false);
+
+// ── COMPONENT BAR ANIMATION ──
+const compObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.comp-fill').forEach((bar, i) => {
+        setTimeout(() => { bar.style.width = bar.dataset.w + '%'; }, i * 100);
+      });
+      compObs.unobserve(e.target);
+    }
+  });
+}, {threshold: 0.3});
+compObs.observe(document.getElementById('component-bars'));
+
+const tooltip = document.getElementById('tooltip');
+
+// ── TOGGLE ──
+const toggle = document.getElementById('toggle');
+const panelOld = document.getElementById('panel-old');
+const panelNew = document.getElementById('panel-new');
+const lblOld = document.getElementById('lbl-old');
+const lblNew = document.getElementById('lbl-new');
+let showingNew = false;
+toggle.addEventListener('click', () => {
+  showingNew = !showingNew;
+  toggle.classList.toggle('on', !showingNew);
+  panelOld.classList.toggle('visible', !showingNew);
+  panelNew.classList.toggle('visible', showingNew);
+  lblOld.classList.toggle('active', !showingNew);
+  lblNew.classList.toggle('active', showingNew);
+});
+
+// ── KPI COUNTERS ──
+function animateCounters() {
+  document.querySelectorAll('.kpi-val[data-count]').forEach(el => {
+    const target = +el.dataset.count;
+    const suffix = el.dataset.suffix || '';
+    let cur = 0;
+    const step = target / 40;
+    const t = setInterval(() => {
+      cur = Math.min(cur + step, target);
+      el.textContent = Math.round(cur) + suffix;
+      if (cur >= target) clearInterval(t);
+    }, 30);
+  });
+}
+const kpiObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { animateCounters(); kpiObs.disconnect(); }});
+}, {threshold: 0.3});
+kpiObs.observe(document.querySelector('.kpi-grid'));
+
+// ── DEBATE SIMULATOR ──
+const DEBATE_MSGS = [
+  {type:'system', role:'SYSTEM', text:'═══ ROUND 1 complete — all independent analyses received ═══'},
+  {type:'system', role:'SYSTEM', text:'═══ ROUND 2 — Live cross-examination begins ═══'},
+  {type:'political', role:'POLITICAL', text:'Economic agent, your +8% XLE estimate assumes oil sustains above $100. But the relief-rally channel is live — VIX was already at 31 and S&P down 8.8% YTD. I believe the geopolitical risk premium is partially priced. I revise SP500 to -4%, not -6%.'},
+  {type:'economic', role:'ECONOMIC', text:'Political agent, I hear your priced-in argument, but the inflation channel overrides it. CPI is 7.5% and the Fed is boxed in — an oil spike to $110+ forces faster hikes, compressing duration equities. XLK at -6% stands. I disagree with your SP500 revision.'},
+  {type:'environmental', role:'ENVIRONMENTAL', text:'Both of you are underweighting supply chain disruption. Ukraine produces 70% of semiconductor-grade neon. Even a short disruption hits XLK harder than your estimates suggest. I maintain XLK at -5% and add a new data point: neon supply risk was not in my Round 1 evidence.'},
+  {type:'social', role:'SOCIAL', text:'Economic agent, your oil channel is right for inflation, but consumer sentiment was already fragile — XLY YTD -12.6%. A gasoline spike on invasion morning could trigger behavioural overshoot. I agree with magnitude direction but think XLY could hit -8% in 5 days.'},
+  {type:'da', role:"DEVIL'S ADVOCATE", text:'Everyone is assuming negative. The Iraq War 2003 analogue in our Energy channel data shows +2.5% in 5 days when uncertainty resolved. Three of five agents have VIX-priced-in evidence but none gave it more than 20% weight. I maintain SP500 positive +3% — the consensus is anchoring on Kuwait 1990, not the relief-rally channel.'},
+];
+
+let debateIdx = 0, debateTimer = null;
+const feed = document.getElementById('debate-feed');
+
+function addMsg(msg) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + msg.type;
+  div.style.animationDelay = '0s';
+  div.innerHTML = `<div class="msg-role">${msg.role}</div><div class="msg-text">${msg.text}</div>`;
+  feed.appendChild(div);
+  feed.scrollTop = feed.scrollHeight;
+}
+
+function playDebate() {
+  if (debateTimer) return;
+  if (debateIdx >= DEBATE_MSGS.length) debateIdx = 0;
+  debateTimer = setInterval(() => {
+    if (debateIdx >= DEBATE_MSGS.length) { clearInterval(debateTimer); debateTimer = null; return; }
+    addMsg(DEBATE_MSGS[debateIdx++]);
+  }, 1400);
+}
+
+document.getElementById('btn-play').addEventListener('click', playDebate);
+document.getElementById('btn-reset').addEventListener('click', () => {
+  clearInterval(debateTimer); debateTimer = null; debateIdx = 0;
+  feed.innerHTML = '';
+});
+
+// ── SCROLL REVEAL ──
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold: 0.08, rootMargin: '0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// ── NAV SCROLL + ACTIVE ──
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 20));
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const sectObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+    }
+  });
+}, {threshold: 0.3});
+sections.forEach(s => sectObs.observe(s));
+
+// ── CURSOR GLOW ──
+const glow = document.getElementById('cursor-glow');
+document.addEventListener('mousemove', e => {
+  glow.style.left = e.clientX + 'px';
+  glow.style.top = e.clientY + 'px';
+});
+
+// ── PARTICLE CANVAS ──
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], mouse = {x: -999, y: -999};
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+const COLORS = ['rgba(77,146,255,', 'rgba(144,128,245,', 'rgba(53,196,156,', 'rgba(212,152,56,'];
+
+for (let i = 0; i < 90; i++) {
+  particles.push({
+    x: Math.random() * innerWidth, y: Math.random() * innerHeight,
+    vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
+    r: Math.random() * 2 + 0.5,
+    c: COLORS[Math.floor(Math.random() * COLORS.length)],
+    a: Math.random() * 0.45 + 0.1
+  });
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+    if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+
+    const dx = mouse.x - p.x, dy = mouse.y - p.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 180) {
+      p.x -= dx * 0.012; p.y -= dy * 0.012;
+    }
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.c + p.a + ')';
+    ctx.fill();
+
+    for (let j = i + 1; j < particles.length; j++) {
+      const q = particles[j];
+      const d = Math.hypot(p.x - q.x, p.y - q.y);
+      if (d < 110) {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(q.x, q.y);
+        ctx.strokeStyle = p.c + (0.06 * (1 - d/110)) + ')';
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+    }
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// KPI tooltips
+document.querySelectorAll('.kpi').forEach(kpi => {
+  kpi.addEventListener('mouseenter', e => {
+    const tip = kpi.dataset.tip;
+    if (!tip) return;
+    tooltip.innerHTML = `<strong>${kpi.querySelector('.kpi-lbl').textContent}</strong>${tip}`;
+    tooltip.classList.add('visible');
+  });
+  kpi.addEventListener('mousemove', e => {
+    tooltip.style.left = (e.clientX + 16) + 'px';
+    tooltip.style.top = (e.clientY - 10) + 'px';
+  });
+  kpi.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+});
+</script>
+</body>
+</html>

@@ -50,9 +50,11 @@ def _get_http_client():
             max_connections=HTTP_POOL_MAX_CONNECTIONS,
             max_keepalive_connections=HTTP_POOL_MAX_KEEPALIVE,
         )
+        settings = get_settings()
+        read_timeout = float(max(HTTP_READ_TIMEOUT, settings.model_timeout))
         timeout = httpx.Timeout(
             connect=HTTP_CONNECT_TIMEOUT,
-            read=HTTP_READ_TIMEOUT,
+            read=read_timeout,
             write=30.0,
             pool=5.0,
         )

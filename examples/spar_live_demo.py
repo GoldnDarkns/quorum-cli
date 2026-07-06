@@ -16,7 +16,11 @@ from quorum.methods.spar import SparMethod
 from quorum.providers import format_display_name
 
 MODEL = "ollama:qwen2.5:7b"
-TASK = "Analyze the Russia-Ukraine invasion shock per Master Context. Produce Round 1 JSON."
+TASK = (
+    "Russia has launched a full-scale military invasion of Ukraine across multiple fronts. "
+    "Ground forces entered from Belarus, Donbas, and Crimea. Missile strikes hit Kyiv. "
+    "Knowledge cutoff: February 23, 2022 market close."
+)
 
 
 def banner(text: str, char: str = "=") -> None:

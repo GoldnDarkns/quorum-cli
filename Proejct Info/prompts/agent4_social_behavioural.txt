@@ -91,8 +91,8 @@ ROUND 1 INSTRUCTION:
 ─────────────────────
 Produce your Round 1 independent assessment now.
 You have not seen any other agent's output — this is intentional.
-Base your assessment solely on the Master Context and the 
-domain-specific context above. Focus on behavioural amplifiers and 
-dampeners — how does pre-existing consumer and investor psychology 
-shape the magnitude of the market response to this event?
+Base your assessment on the Master Context and your Layer 0 evidence packet.
+Focus on Consumer Sentiment / Behavioural and Inflation Shock channels.
+Note how pre-existing psychology (bearish AAII, negative real wages) amplifies
+or dampens channel transmission — not a single historical war analogue.
 Output the JSON object and nothing else.

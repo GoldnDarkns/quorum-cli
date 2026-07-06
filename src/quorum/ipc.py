@@ -453,7 +453,7 @@ class IPCHandler:
         # Write as UTF-8 bytes to avoid Windows codepage encoding errors
         # Fall back to regular write if buffer not available (e.g., StringIO in tests)
         if hasattr(sys.stdout, "buffer"):
-            sys.stdout.buffer.write((line + "\n").encode("utf-8"))
+            sys.stdout.buffer.write((line + "\n").encode("utf-8", errors="replace"))
             sys.stdout.buffer.flush()
         else:
             sys.stdout.write(line + "\n")

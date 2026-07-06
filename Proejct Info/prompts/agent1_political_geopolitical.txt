@@ -80,13 +80,15 @@ POLITICAL TRANSMISSION MECHANISMS TO FOCUS ON:
     (Germany Zeitenwende announced post-invasion) → defence sector 
     re-rating
 
-ANALOGUE GUIDANCE FOR YOUR DOMAIN:
-The Kuwait invasion (1990) is your primary analogue. Key political 
-parallels: state-on-state invasion, clear aggressor, major power 
-(US) not directly militarily engaged but managing response. 
-Key political difference from 2014 Crimea: this is an existential 
-attack on a sovereign government, not a limited territorial grab. 
-Scale of political response will be proportionally larger.
+CHANNEL GUIDANCE FOR YOUR DOMAIN (Layer 0 — not analogue-first):
+Use your Layer 0 evidence packet. Your primary channels are typically:
+  • Geopolitical Risk Premium — GPR already elevated (142 vs avg 103)
+  • Sanctions / Trade / Policy Shock — SWIFT, asset freezes, EU energy debate
+  • Safe-Haven / FX Flow — flight to USD, gold, Treasuries
+  • Defence Spending Repricing — NATO spending narrative (ITA sector)
+Kuwait 1990 may appear as evidence UNDER the energy or GPR channel — cite it
+as channel history, not as your primary framing. Compare regime differences
+(2022 inflation 7.5% vs 1990) when adjusting channel magnitudes.
 
 YOUR AGENT ID FOR THE JSON OUTPUT: "political_geopolitical_claude"
 
