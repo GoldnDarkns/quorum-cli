@@ -13,7 +13,52 @@ from .base import (
     SynthesisResult,
     ThinkingIndicator,
 )
-from .spar_layer0 import Layer0State, build_agent_system_prompt, run_layer0_pipeline
+from .spar_layer0 import (
+    Layer0State,
+    build_agent_system_prompt,
+    resolve_master_context,
+    run_layer0_pipeline,
+)
+
+MODERATOR_USER_INSTRUCTION = """Synthesise the SPAR debate below. You did NOT participate in the debate.
+
+Shock scenario:
+{shock}
+
+=== LAYER 0 ACTIVATED TRANSMISSION CHANNELS ===
+{layer0_channels}
+
+=== ROUND 1 — Independent forecasts ===
+{round1}
+
+=== ROUND 2 — Live cross-examination ===
+{round2}
+
+INSTRUCTIONS:
+Produce exactly TWO JSON objects separated by ONE blank line. No markdown fences. No prose before or after.
+
+Object 1 — consensus_scenario:
+{{
+  "type": "consensus_scenario",
+  "direction": "negative|positive|neutral",
+  "magnitude_pct": {{"SP500": float, "XLE": float, "XLF": float, "XLK": float, "ITA": float, "XLY": float}},
+  "confidence": float,
+  "primary_transmission_channels": ["channel names from Layer 0"],
+  "plausibility_score": 0-100,
+  "consensus_summary": "2-4 sentences"
+}}
+
+Object 2 — minority_dissent:
+{{
+  "type": "minority_dissent",
+  "dissenting_agents": ["roles"],
+  "dissent_direction": "negative|positive|neutral",
+  "magnitude_pct": {{"SP500": float, ...}},
+  "preserved_dissent_summary": "one paragraph on tail risk the majority overruled",
+  "plausibility_score": 0-100
+}}
+
+Base plausibility on channel consistency, internal logic, and fit with the Apr 2025 / event regime. Score honestly if the debate was weak."""
 
 ROUND2_LIVE_DEBATE_INSTRUCTION = """LIVE DEBATE — Round 2 (sequential panel).
 
@@ -127,7 +172,35 @@ def _format_agent_response(raw: str, parsed: dict[str, Any] | None) -> str:
     if response_to:
         parts.append(f"\n**Response to peers:**\n{json.dumps(response_to, indent=2)}")
 
-    return "\n".join(parts) if parts else raw
+    conclusion = parsed.get("conclusion")
+    if isinstance(conclusion, dict):
+        overall = conclusion.get("overall_impact")
+        if overall and not direction:
+            parts.append(f"**Direction:** {overall}")
+        reasoning = conclusion.get("reasoning")
+        if reasoning:
+            parts.append(f"**Reasoning:** {reasoning}")
+
+    assessment = parsed.get("round_1_assessment")
+    if isinstance(assessment, dict) and len(parts) < 3:
+        parts.append("**Domain assessment:**")
+        parts.append(json.dumps(assessment, indent=2)[:2500])
+
+    assessment = parsed.get("assessment")
+    if isinstance(assessment, dict) and len(parts) < 3:
+        parts.append("**Domain assessment:**")
+        parts.append(json.dumps(assessment, indent=2)[:2500])
+
+    analysis = parsed.get("analysis")
+    if isinstance(analysis, dict) and len(parts) < 3:
+        parts.append("**Domain analysis:**")
+        parts.append(json.dumps(analysis, indent=2)[:2500])
+
+    if not parts:
+        compact = json.dumps(parsed, indent=2)
+        return compact[:4000] if len(compact) > 4000 else compact
+
+    return "\n".join(parts)
 
 
 def _build_round1_transcript(round1_displays: dict[str, str]) -> str:
@@ -141,6 +214,31 @@ def _build_round1_transcript(round1_displays: dict[str, str]) -> str:
 
 def _role_label(ipc_role: str) -> str:
     return ipc_role.replace("_", " ").title()
+
+
+def build_moderator_user_message(
+    task: str,
+    layer0: Layer0State,
+    round1_displays: dict[str, str],
+    round2_results: dict[str, Any],
+) -> str:
+    """Readable moderator input — avoids dumping huge nested JSON blobs."""
+    channel_lines = [
+        f"- {ch['name']} [{ch['priority']}, score {ch['score']}]"
+        for ch in layer0.to_dict().get("activated_channels", [])
+    ]
+    round2_sections: list[str] = []
+    for _role_key, agent_id, _prompt_file, ipc_role in SPAR_AGENT_SPECS:
+        entry = round2_results.get(agent_id, {})
+        body = entry.get("live_response", "(no round 2 output)") if isinstance(entry, dict) else str(entry)
+        round2_sections.append(f"--- {ipc_role} ---\n{body}\n")
+
+    return MODERATOR_USER_INSTRUCTION.format(
+        shock=task.strip()[:800],
+        layer0_channels="\n".join(channel_lines) or layer0.summary_text[:2000],
+        round1=_build_round1_transcript(round1_displays)[:12000],
+        round2="\n".join(round2_sections)[:12000],
+    )
 
 
 class SparMethod(BaseMethodOrchestrator):
@@ -169,8 +267,8 @@ class SparMethod(BaseMethodOrchestrator):
             return self.model_ids[idx % len(self.model_ids)]
         return self.model_ids[0]
 
-    def _system_for_agent(self, layer0: Layer0State, role_key: str, prompt_file: str) -> str:
-        master = _load_prompt("master_context.txt")
+    def _system_for_agent(self, layer0: Layer0State, role_key: str, prompt_file: str, task: str) -> str:
+        master = resolve_master_context(task or layer0.shock_text, _prompts_dir())
         agent_prompt = _load_prompt(prompt_file)
         return build_agent_system_prompt(master, layer0, role_key, agent_prompt)
 
@@ -200,7 +298,7 @@ class SparMethod(BaseMethodOrchestrator):
             model_id = self._model_for_role(role_key)
             yield ThinkingIndicator(model=model_id)
 
-            system = self._system_for_agent(layer0, role_key, prompt_file)
+            system = self._system_for_agent(layer0, role_key, prompt_file, task)
             user_msg = task.strip() or layer0.shock_text
             user_msg = f"{user_msg}\n\nProduce your Round 1 JSON output now. JSON only."
             if "json" not in user_msg.lower():
@@ -229,7 +327,7 @@ class SparMethod(BaseMethodOrchestrator):
             model_id = self._model_for_role(role_key)
             yield ThinkingIndicator(model=model_id)
 
-            system = self._system_for_agent(layer0, role_key, prompt_file)
+            system = self._system_for_agent(layer0, role_key, prompt_file, task)
             transcript_so_far = "\n".join(debate_transcript)
             round2_user = ROUND2_LIVE_DEBATE_INSTRUCTION.format(
                 role_label=_role_label(ipc_role),
@@ -249,16 +347,10 @@ class SparMethod(BaseMethodOrchestrator):
         moderator_model = self._model_for_role("Moderator")
         yield ThinkingIndicator(model=moderator_model)
 
-        master = _load_prompt("master_context.txt")
+        master = resolve_master_context(task or layer0.shock_text, _prompts_dir())
         mod = _load_prompt("moderator.txt")
         shared = build_agent_system_prompt(master, layer0, "Moderator", mod)
-        transcript = {
-            "layer0": layer0.to_dict(),
-            "round1": round1_results,
-            "round2": round2_results,
-            "live_debate_transcript": "\n".join(debate_transcript),
-        }
-        user_msg = f"Full debate transcript:\n{json.dumps(transcript, indent=2)}"
+        user_msg = build_moderator_user_message(task, layer0, round1_displays, round2_results)
         synthesis = await self._get_model_response(moderator_model, shared, user_msg)
         self._message_count += 1
 

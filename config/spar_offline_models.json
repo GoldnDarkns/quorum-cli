@@ -1,0 +1,46 @@
+{
+  "ollama_options": {
+    "temperature": 0,
+    "num_ctx": 8192
+  },
+  "ollama_options_long": {
+    "temperature": 0,
+    "num_ctx": 12288
+  },
+  "presets": {
+    "uniform": {
+      "description": "Baseline A — one model, five personas (Ukraine pilot replication)",
+      "default": "qwen2.5:7b",
+      "roles": {}
+    },
+    "fast-thesis": {
+      "description": "Quick thesis test — 3 model families (~35 min on RTX 4060 Ti 8GB)",
+      "default": "qwen2.5:7b",
+      "roles": {
+        "Political": "llama3.1:8b",
+        "Economic": "qwen2.5:7b",
+        "Environmental": "qwen2.5:7b",
+        "Social": "llama3.1:8b",
+        "DevilsAdvocate": "deepseek-r1:7b",
+        "Moderator": "qwen2.5:7b"
+      }
+    },
+    "thesis": {
+      "description": "Full Approach B-offline — five distinct 7B families (default for paper runs)",
+      "default": "qwen2.5:7b",
+      "roles": {
+        "Political": "llama3.1:8b",
+        "Economic": "qwen2.5:7b",
+        "Environmental": "mistral:7b",
+        "Social": "internlm2:7b",
+        "DevilsAdvocate": "deepseek-r1:7b",
+        "Moderator": "qwen2.5:7b"
+      }
+    }
+  },
+  "pull_order": {
+    "fast-thesis": ["qwen2.5:7b", "llama3.1:8b", "deepseek-r1:7b"],
+    "thesis": ["qwen2.5:7b", "llama3.1:8b", "mistral:7b", "internlm2:7b", "deepseek-r1:7b"],
+    "uniform": ["qwen2.5:7b"]
+  }
+}

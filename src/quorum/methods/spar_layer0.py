@@ -9,6 +9,7 @@ Replaces top-3 event analogue stuffing with per-channel evidence retrieval.
 from __future__ import annotations
 
 import re
+from pathlib import Path
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
@@ -364,6 +365,109 @@ DEFAULT_REGIME_FEB2022: dict[str, str] = {
     "volatility": "ELEVATED (VIX 31.0)",
 }
 
+DEFAULT_REGIME_APR2025: dict[str, str] = {
+    "growth": "MODERATE — Q1 2025 GDP tracking ~2.3% annualised",
+    "inflation": "MODERATING BUT STICKY — CPI ~3.1% YoY (Mar 2025)",
+    "liquidity": "NEUTRAL — Fed funds 4.25-4.50%; QT continuing at reduced pace",
+    "rates": "PATIENT — FOMC on hold; cuts priced H2 2025 if growth softens",
+    "valuation": "FULL — S&P 500 near YTD highs; forward P/E ~21x",
+    "volatility": "ELEVATED ON POLICY RISK — VIX ~22 pre-announcement; trade headlines dominant",
+    "trade": "UNCERTAIN — reciprocal tariff framework debated for weeks; positioning cautious",
+}
+
+DEFAULT_REGIME_GENERIC: dict[str, str] = {
+    "growth": "MODERATE",
+    "inflation": "MODERATING",
+    "liquidity": "NEUTRAL",
+    "rates": "DATA-DEPENDENT",
+    "valuation": "FAIR TO FULL",
+    "volatility": "NORMAL TO ELEVATED",
+}
+
+SCENARIO_REGIMES: dict[str, dict[str, str]] = {
+    "ukraine_2022": DEFAULT_REGIME_FEB2022,
+    "liberation_day_2025": DEFAULT_REGIME_APR2025,
+    "generic": DEFAULT_REGIME_GENERIC,
+}
+
+# Scenario-specific channel score floors (applied after base scoring).
+SCENARIO_CHANNEL_BOOSTS: dict[str, dict[str, float]] = {
+    "ukraine_2022": {
+        "geopolitical_risk_premium": 95.0,
+        "energy_commodity_shock": 92.0,
+        "inflation_shock": 88.0,
+        "monetary_policy_constraint": 84.0,
+        "sanctions_trade_policy": 80.0,
+        "safe_haven_fx_flow": 76.0,
+        "defence_spending_repricing": 72.0,
+        "supply_chain_disruption": 66.0,
+        "consumer_sentiment_behavioural": 58.0,
+        "relief_rally_priced_in": 55.0,
+        "cyber_operational_disruption": 42.0,
+    },
+    "liberation_day_2025": {
+        "sanctions_trade_policy": 96.0,
+        "sector_earnings_exposure": 90.0,
+        "inflation_shock": 88.0,
+        "supply_chain_disruption": 86.0,
+        "consumer_sentiment_behavioural": 82.0,
+        "safe_haven_fx_flow": 80.0,
+        "credit_financial_conditions": 78.0,
+        "monetary_policy_constraint": 74.0,
+        "geopolitical_risk_premium": 68.0,
+        "energy_commodity_shock": 62.0,
+        "relief_rally_priced_in": 58.0,
+        "defence_spending_repricing": 45.0,
+        "cyber_operational_disruption": 35.0,
+    },
+}
+
+# Scenario-specific evidence prepended to base channel corpus (most relevant first).
+SCENARIO_CHANNEL_EVIDENCE: dict[str, dict[str, list[str]]] = {
+    "liberation_day_2025": {
+        "sanctions_trade_policy": [
+            "Liberation Day Apr 2025: broad reciprocal tariffs on major trading partners; sector-specific rates; immediate implementation timeline.",
+            "2018-19 US-China tariff rounds: S&P 500 -6.8% peak-to-trough over tariff escalation window; XLF and XLK underperformed.",
+            "Smoot-Hawley analogue: trade-war escalation compresses multinationals' earnings via input costs and retaliation risk.",
+            "US direct import exposure concentrated in consumer (XLY), tech supply chain (XLK), and industrials — tariff pass-through risk high.",
+        ],
+        "inflation_shock": [
+            "Tariff shock = negative supply shock: import prices rise → goods CPI pressure even when headline inflation moderating.",
+            "Apr 2025 CPI ~3.1% YoY — less buffer than 2022; Fed may face stagflation-lite trade-off if growth slows AND prices re-accelerate.",
+            "Breakevens typically rise on tariff headlines unless growth scare dominates (yields fell Apr 2 on growth concern).",
+        ],
+        "supply_chain_disruption": [
+            "Reciprocal tariffs disrupt just-in-time inventory and semiconductor/industrial input chains (XLK, ITA supply links).",
+            "2018 tariff episode: supply-chain re-routing costs hit margins before consumer pass-through fully visible.",
+        ],
+        "sector_earnings_exposure": [
+            "Pre-event sector sensitivity: XLK (import inputs + China revenue), XLY (consumer pass-through), XLF (credit + trade finance), XLE (less direct unless energy retaliation).",
+            "Equity futures fell sharply overnight Apr 2 2025 — broad beta risk-off across sectors except potential short-term defensives.",
+        ],
+        "consumer_sentiment_behavioural": [
+            "Trade-policy uncertainty elevates AAII bearish readings and retail risk-off; discretionary (XLY) most sentiment-sensitive.",
+            "Media amplification of tariff rates → faster behavioural overshoot vs fundamentals (social channel).",
+        ],
+        "safe_haven_fx_flow": [
+            "Apr 2 2025: USD strengthened overnight; classic risk-off FX pattern alongside falling equity futures.",
+            "Bond yields moved lower on growth concerns — flight-to-quality in Treasuries despite inflation fears.",
+        ],
+        "relief_rally_priced_in": [
+            "Weeks of tariff headline risk pre-Apr 2 — partial positioning for policy shock; VIX ~22 not crisis-level.",
+            "Devil's Advocate channel: if retaliation muted or exemptions broad, relief rally possible after initial gap-down.",
+        ],
+        "monetary_policy_constraint": [
+            "Fed on hold Apr 2025 but cannot ease if tariff inflation re-accelerates; limits put under risk assets.",
+        ],
+    },
+}
+
+MASTER_CONTEXT_FILES: dict[str, str] = {
+    "ukraine_2022": "master_context.txt",
+    "liberation_day_2025": "master_context_liberation_day_2025.txt",
+    "generic": "master_context.txt",
+}
+
 DEFAULT_SHOCK_UKRAINE = (
     "Russia has launched a full-scale military invasion of Ukraine across multiple fronts. "
     "Ground forces entered from Belarus, Donbas, and Crimea. Missile strikes hit Kyiv and "
@@ -390,42 +494,116 @@ def _retrieval_budget(priority: ChannelPriority) -> int:
     }[priority]
 
 
+def detect_scenario_id(shock_text: str) -> str:
+    """Classify shock into a scenario profile for regime, evidence, and boosts."""
+    text = shock_text.lower()
+    if any(
+        k in text
+        for k in ("liberation day", "reciprocal tariff", "tariff", "trade policy", "trade war")
+    ) and ("2025" in text or "april" in text):
+        return "liberation_day_2025"
+    if any(k in text for k in ("ukraine", "invasion", "russia", "belarus", "crimea", "donbas")):
+        return "ukraine_2022"
+    return "generic"
+
+
+def get_regime_for_shock(shock_text: str) -> dict[str, str]:
+    return dict(SCENARIO_REGIMES.get(detect_scenario_id(shock_text), DEFAULT_REGIME_GENERIC))
+
+
+def _merged_channel_evidence(scenario_id: str) -> dict[str, list[str]]:
+    merged: dict[str, list[str]] = {k: list(v) for k, v in CHANNEL_EVIDENCE.items()}
+    for channel_id, items in SCENARIO_CHANNEL_EVIDENCE.get(scenario_id, {}).items():
+        merged[channel_id] = items + merged.get(channel_id, [])
+    return merged
+
+
+def resolve_master_context(shock_text: str, prompts_dir: Path) -> str:
+    """Load scenario-appropriate master context (event + regime + JSON schema)."""
+    scenario_id = detect_scenario_id(shock_text)
+    fname = MASTER_CONTEXT_FILES.get(scenario_id, "master_context.txt")
+    path = prompts_dir / fname
+    if not path.exists():
+        path = prompts_dir / "master_context.txt"
+    return path.read_text(encoding="utf-8")
+
+
 def parse_shock(shock_text: str) -> dict[str, Any]:
     """Step 0.2 — extract entities, event type, affected systems, horizon."""
     text = shock_text.lower()
+    scenario_id = detect_scenario_id(shock_text)
     entities: list[str] = []
-    for token, label in (
+
+    entity_map = (
+        ("united states", "United States"),
+        ("u.s.", "United States"),
+        ("us ", "United States"),
+        ("china", "China"),
+        ("european union", "European Union"),
+        ("eu ", "European Union"),
+        ("mexico", "Mexico"),
+        ("canada", "Canada"),
         ("russia", "Russia"),
         ("ukraine", "Ukraine"),
         ("nato", "NATO"),
-        ("eu", "European Union"),
         ("belarus", "Belarus"),
         ("fed", "Federal Reserve"),
         ("opec", "OPEC"),
-    ):
-        if token in text:
+    )
+    for token, label in entity_map:
+        if token in text and label not in entities:
             entities.append(label)
 
     event_types: list[str] = []
+    if any(w in text for w in ("tariff", "trade policy", "trade war", "reciprocal", "liberation day")):
+        event_types.append("trade_policy_shock")
     if any(w in text for w in ("invasion", "war", "military", "missile", "conflict")):
         event_types.append("military_escalation")
-    if any(w in text for w in ("sanction", "embargo", "swift")):
-        event_types.append("policy_shock")
+    if any(w in text for w in ("sanction", "embargo", "swift", "export control")):
+        event_types.append("sanctions_shock")
     if any(w in text for w in ("oil", "gas", "energy", "commodity")):
         event_types.append("commodity_shock")
     if not event_types:
-        event_types.append("geopolitical_shock")
+        if scenario_id == "liberation_day_2025":
+            event_types.append("trade_policy_shock")
+        elif scenario_id == "ukraine_2022":
+            event_types.append("military_escalation")
+        else:
+            event_types.append("macro_policy_shock")
 
     affected: list[str] = []
-    for sector in ("energy", "financials", "technology", "defence", "consumer", "agriculture"):
-        if sector in text or (sector == "energy" and "oil" in text):
+    sector_keywords = (
+        ("energy", ("energy", "oil", "gas", "xle")),
+        ("financials", ("financial", "bank", "xlf", "credit")),
+        ("technology", ("technology", "semiconductor", "xlk", "chip")),
+        ("defence", ("defence", "defense", "ita", "military spending")),
+        ("consumer", ("consumer", "retail", "xly", "discretionary")),
+        ("industrials", ("industrial", "manufacturing", "supply chain")),
+        ("agriculture", ("agriculture", "wheat", "food")),
+    )
+    for sector, keywords in sector_keywords:
+        if any(kw in text for kw in keywords):
             affected.append(sector)
 
     if not affected:
-        affected = ["energy", "financials", "equities_broad", "defence"]
+        if scenario_id == "liberation_day_2025":
+            affected = ["technology", "consumer", "financials", "industrials", "equities_broad"]
+        elif scenario_id == "ukraine_2022":
+            affected = ["energy", "financials", "equities_broad", "defence"]
+        else:
+            affected = ["equities_broad", "financials"]
+
+    if not entities:
+        if scenario_id == "liberation_day_2025":
+            entities = ["United States", "Trading partners"]
+        elif scenario_id == "ukraine_2022":
+            entities = ["Russia", "Ukraine"]
+        else:
+            entities = ["United States"]
 
     return {
-        "entities": entities or ["Russia", "Ukraine"],
+        "scenario_id": scenario_id,
+        "entities": entities,
         "event_type": event_types,
         "affected_systems": affected,
         "time_horizon": "5_trading_days",
@@ -458,7 +636,9 @@ def score_channel(
         regime_match = 0.9
     elif channel.channel_id == "relief_rally_priced_in" and "elevated" in regime.get("volatility", "").lower():
         regime_match = 0.85
-    elif channel.channel_id == "geopolitical_risk_premium":
+    elif channel.channel_id == "sanctions_trade_policy" and "trade" in regime.get("trade", "").lower():
+        regime_match = 0.92
+    elif channel.channel_id == "geopolitical_risk_premium" and detect_scenario_id(shock_text) == "ukraine_2022":
         regime_match = 0.8
     else:
         regime_match = _keyword_score(regime_blob, channel.mechanism_keywords) * 0.7
@@ -475,23 +655,10 @@ def score_channel(
     )
     score = round(raw * 100, 1)
 
-    # Ukraine pilot calibration — boost known-primary channels when invasion keywords present
-    if "invasion" in text or "ukraine" in text:
-        ukraine_boosts = {
-            "geopolitical_risk_premium": 95.0,
-            "energy_commodity_shock": 92.0,
-            "inflation_shock": 88.0,
-            "monetary_policy_constraint": 84.0,
-            "sanctions_trade_policy": 80.0,
-            "safe_haven_fx_flow": 76.0,
-            "defence_spending_repricing": 72.0,
-            "supply_chain_disruption": 66.0,
-            "consumer_sentiment_behavioural": 58.0,
-            "relief_rally_priced_in": 55.0,
-            "cyber_operational_disruption": 42.0,
-        }
-        if channel.channel_id in ukraine_boosts:
-            score = max(score, ukraine_boosts[channel.channel_id])
+    scenario_id = detect_scenario_id(shock_text)
+    boosts = SCENARIO_CHANNEL_BOOSTS.get(scenario_id, {})
+    if channel.channel_id in boosts:
+        score = max(score, boosts[channel.channel_id])
 
     reasons: list[str] = []
     if event_match > 0.3:
@@ -506,14 +673,22 @@ def score_channel(
     return score, "; ".join(reasons)
 
 
-def prioritize_channels(shock_text: str, shock_parsed: dict[str, Any], regime: dict[str, str]) -> list[ChannelActivation]:
+def prioritize_channels(
+    shock_text: str,
+    shock_parsed: dict[str, Any],
+    regime: dict[str, str],
+    channel_evidence: dict[str, list[str]] | None = None,
+) -> list[ChannelActivation]:
     """Steps 0.3–0.7 — score channels, retrieve evidence, check sufficiency."""
+    evidence_corpus = channel_evidence or _merged_channel_evidence(
+        shock_parsed.get("scenario_id", detect_scenario_id(shock_text))
+    )
     activations: list[ChannelActivation] = []
     for channel in TRANSMISSION_CHANNELS:
         score, reason = score_channel(channel, shock_text, shock_parsed, regime)
         priority = _priority_for_score(score)
         budget = _retrieval_budget(priority)
-        evidence = CHANNEL_EVIDENCE.get(channel.channel_id, [])[:budget]
+        evidence = evidence_corpus.get(channel.channel_id, [])[:budget]
         queries = CHANNEL_QUERIES.get(channel.channel_id, [])[: max(1, budget // 2)]
 
         activations.append(
@@ -571,8 +746,10 @@ def format_layer0_summary(activations: list[ChannelActivation], shock_parsed: di
     lines = [
         "**Layer 0 — Transmission Channel Prioritization**",
         "",
+        f"Scenario: {shock_parsed.get('scenario_id', 'generic')}",
         f"Event type: {', '.join(shock_parsed.get('event_type', []))}",
         f"Entities: {', '.join(shock_parsed.get('entities', []))}",
+        f"Affected systems: {', '.join(shock_parsed.get('affected_systems', []))}",
         "",
         "**Activated channels:**",
     ]
@@ -614,9 +791,11 @@ def run_layer0_pipeline(
 ) -> Layer0State:
     """Run full Layer 0 pipeline before Layer 1 debate."""
     shock = shock_text.strip() or DEFAULT_SHOCK_UKRAINE
-    regime_data = regime or DEFAULT_REGIME_FEB2022
     shock_parsed = parse_shock(shock)
-    activations = prioritize_channels(shock, shock_parsed, regime_data)
+    scenario_id = shock_parsed.get("scenario_id", "generic")
+    regime_data = regime or get_regime_for_shock(shock)
+    evidence_corpus = _merged_channel_evidence(scenario_id)
+    activations = prioritize_channels(shock, shock_parsed, regime_data, evidence_corpus)
     agent_packets = build_agent_packets(activations)
     summary = format_layer0_summary(activations, shock_parsed)
 
