@@ -81,6 +81,7 @@ export function App() {
     setTotalPhases,
     setPhaseTransition,
     pauseDiscussion,
+    setHumanReview,
     setThinkingModel,
     addCompletedThinking,
     clearCompletedThinking,
@@ -253,6 +254,17 @@ export function App() {
       pauseDiscussion();
     };
 
+    const handleHumanReviewRequired = (params: {
+      discussion_id?: string;
+      reason: string;
+      consensus_score?: number | null;
+      dissent_score?: number | null;
+      threshold: number;
+    }) => {
+      if (isStaleEvent(params.discussion_id)) return;
+      setHumanReview(params.reason);
+    };
+
     const handlePhaseStart = (params: {
       discussion_id?: string;
       phase: number;
@@ -380,6 +392,7 @@ export function App() {
 
     // Register handlers
     backend.onEvent("phase_complete", handlePhaseComplete);
+    backend.onEvent("human_review_required", handleHumanReviewRequired);
     backend.onEvent("phase_start", handlePhaseStart);
     backend.onEvent("thinking", handleThinking);
     backend.onEvent("thinking_complete", handleThinkingComplete);
@@ -397,6 +410,7 @@ export function App() {
     return () => {
       // Cleanup event listeners
       backend.offEvent("phase_complete", handlePhaseComplete);
+      backend.offEvent("human_review_required", handleHumanReviewRequired);
       backend.offEvent("phase_start", handlePhaseStart);
       backend.offEvent("thinking", handleThinking);
       backend.offEvent("thinking_complete", handleThinkingComplete);

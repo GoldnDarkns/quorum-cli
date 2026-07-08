@@ -1,0 +1,29 @@
+{
+  "agent_id": "political_geopolitical_claude",
+  "round": 1,
+  "event": "liberation_day_tariffs_20250402",
+  "direction": "negative",
+  "magnitude_pct": {
+    "SP500": -5.0,
+    "XLE": -3.0,
+    "XLF": -4.0,
+    "XLK": -6.0,
+    "ITA": 1.0,
+    "XLY": -2.5
+  },
+  "confidence": 0.85,
+  "key_assumption": "The tariff shock will escalate geopolitical tensions and trigger a significant risk-off sentiment in markets.",
+  "supporting_evidence": [
+    "Geopolitical Risk Premium (score 68.0): Elevated pre-event GPR index (142 vs avg 103) suggests heightened sensitivity to geopolitical shocks.",
+    "Sanctions / Trade / Policy Shock (score 96.0): Event directly matches the channel, with sector-specific rates and immediate implementation timeline."
+  ],
+  "transmission_channels": [
+    "Geopolitical Risk Premium → risk-off sentiment → broad market decline",
+    "Sanctions / Trade / Policy Shock → policy uncertainty → sector-specific underperformance (XLF, XLK)",
+    "Safe-Haven / FX Flow → USD appreciation → further pressure on equities"
+  ],
+  "channel_assessment": {
+    "primary_channel": "Geopolitical Risk Premium",
+    "channel_adjustments": "The April 2025 regime, with elevated GPR (142), indicates a heightened sensitivity to geopolitical shocks compared to historical analogues."
+  }
+}

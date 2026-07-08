@@ -1,0 +1,137 @@
+{
+  "version": "2026-03",
+  "description": "Curated public benchmark scores for SPAR offline model stack vs frontier references. Scores are 0-100 (accuracy %). Sources cited per model.",
+  "spar_relevance": "Benchmarks selected for geopolitical scenario planning: knowledge (MMLU), multi-step reasoning (BBH), quantitative economics (GSM8K), instruction following / JSON (IFEval), factual grounding (TruthfulQA), graduate reasoning vs frontier (GPQA).",
+  "benchmarks": {
+    "mmlu": {
+      "name": "MMLU",
+      "category": "general_knowledge",
+      "spar_roles": ["Political", "Economic", "Environmental", "Social", "Moderator"],
+      "source": "https://huggingface.co/open-llm-leaderboard"
+    },
+    "bbh": {
+      "name": "BIG-Bench Hard",
+      "category": "multi_step_reasoning",
+      "spar_roles": ["DevilsAdvocate", "Moderator", "Political"],
+      "source": "https://huggingface.co/open-llm-leaderboard"
+    },
+    "gsm8k": {
+      "name": "GSM8K",
+      "category": "quantitative_reasoning",
+      "spar_roles": ["Economic", "Moderator"],
+      "source": "https://qwenlm.github.io/blog/qwen2.5/"
+    },
+    "ifeval": {
+      "name": "IFEval",
+      "category": "instruction_following",
+      "spar_roles": ["Moderator", "Economic", "Environmental"],
+      "source": "https://llm-stats.com/models/compare/"
+    },
+    "truthfulqa": {
+      "name": "TruthfulQA",
+      "category": "factual_grounding",
+      "spar_roles": ["Political", "Social", "Environmental", "DevilsAdvocate"],
+      "source": "https://huggingface.co/open-llm-leaderboard"
+    },
+    "gpqa": {
+      "name": "GPQA Diamond",
+      "category": "frontier_reasoning",
+      "spar_roles": ["DevilsAdvocate", "Moderator", "Economic"],
+      "source": "https://huggingface.co/open-llm-leaderboard"
+    }
+  },
+  "role_weights": {
+    "Political": {"mmlu": 0.25, "bbh": 0.20, "truthfulqa": 0.25, "gpqa": 0.15, "ifeval": 0.15},
+    "Economic": {"gsm8k": 0.30, "mmlu": 0.20, "bbh": 0.20, "gpqa": 0.15, "truthfulqa": 0.15},
+    "Environmental": {"mmlu": 0.25, "truthfulqa": 0.25, "bbh": 0.20, "ifeval": 0.15, "gpqa": 0.15},
+    "Social": {"mmlu": 0.25, "truthfulqa": 0.30, "bbh": 0.15, "ifeval": 0.15, "gpqa": 0.15},
+    "DevilsAdvocate": {"bbh": 0.30, "gpqa": 0.25, "truthfulqa": 0.20, "mmlu": 0.15, "gsm8k": 0.10},
+    "Moderator": {"bbh": 0.30, "ifeval": 0.25, "mmlu": 0.20, "gsm8k": 0.15, "truthfulqa": 0.10}
+  },
+  "models": {
+    "granite3.3:8b": {
+      "provider": "IBM",
+      "family": "Granite 3.3",
+      "params_b": 8,
+      "in_spar_preset": "demo-diverse",
+      "spar_role": "Political",
+      "scores": {"mmlu": 65.5, "bbh": 69.1, "gsm8k": 80.9, "ifeval": 63.0, "truthfulqa": 66.9, "gpqa": 32.0},
+      "score_source": "IBM Granite 3.3 8B Instruct self-reported + llm-stats.com comparisons (Mar 2026)"
+    },
+    "qwen2.5:7b": {
+      "provider": "Alibaba",
+      "family": "Qwen 2.5",
+      "params_b": 7,
+      "in_spar_preset": "demo-diverse",
+      "spar_role": "Economic",
+      "scores": {"mmlu": 74.2, "bbh": 70.4, "gsm8k": 85.4, "ifeval": 58.2, "truthfulqa": 56.4, "gpqa": 36.4},
+      "score_source": "Qwen 2.5 technical report (qwenlm.github.io)"
+    },
+    "mistral:7b": {
+      "provider": "Mistral",
+      "family": "Mistral 7B",
+      "params_b": 7,
+      "in_spar_preset": "demo-diverse",
+      "spar_role": "Environmental",
+      "scores": {"mmlu": 64.2, "bbh": 56.1, "gsm8k": 52.0, "ifeval": 45.0, "truthfulqa": 42.2, "gpqa": 24.7},
+      "score_source": "Mistral 7B v0.3 / Open LLM Leaderboard averages"
+    },
+    "gemma3:4b": {
+      "provider": "Google",
+      "family": "Gemma 3",
+      "params_b": 4,
+      "in_spar_preset": "demo-diverse",
+      "spar_role": "Social",
+      "scores": {"mmlu": 67.0, "bbh": 55.0, "gsm8k": 75.0, "ifeval": 70.0, "truthfulqa": 50.0, "gpqa": 28.0},
+      "score_source": "Gemma 3 4B IT leaderboard aggregates (Swallow / Open LLM Leaderboard, Mar 2026)"
+    },
+    "nemotron-mini:4b": {
+      "provider": "NVIDIA",
+      "family": "Nemotron Mini",
+      "params_b": 4,
+      "in_spar_preset": "demo-diverse",
+      "spar_role": "DevilsAdvocate",
+      "scores": {"mmlu": 58.0, "bbh": 48.0, "gsm8k": 65.0, "ifeval": 55.0, "truthfulqa": 45.0, "gpqa": 22.0},
+      "score_source": "Nemotron-Mini-4B HuggingFace model card estimates vs peer 4B models"
+    },
+    "phi4-mini": {
+      "provider": "Microsoft",
+      "family": "Phi-4",
+      "params_b": 3.8,
+      "in_spar_preset": "demo-diverse",
+      "spar_role": "Moderator",
+      "scores": {"mmlu": 67.3, "bbh": 70.4, "gsm8k": 88.6, "ifeval": 72.0, "truthfulqa": 66.4, "gpqa": 38.0},
+      "score_source": "Phi-4-mini Microsoft model card + llm-stats.com (Mar 2026)"
+    },
+    "gpt-4o-mini": {
+      "provider": "OpenAI",
+      "family": "GPT-4o",
+      "params_b": null,
+      "in_spar_preset": null,
+      "spar_role": null,
+      "frontier_reference": true,
+      "scores": {"mmlu": 82.0, "bbh": 78.0, "gsm8k": 92.0, "ifeval": 84.0, "truthfulqa": 72.0, "gpqa": 55.0},
+      "score_source": "OpenAI GPT-4o-mini system card / public leaderboards (frontier reference)"
+    },
+    "claude-3-5-sonnet": {
+      "provider": "Anthropic",
+      "family": "Claude 3.5",
+      "params_b": null,
+      "in_spar_preset": null,
+      "spar_role": null,
+      "frontier_reference": true,
+      "scores": {"mmlu": 88.0, "bbh": 86.0, "gsm8k": 94.0, "ifeval": 88.0, "truthfulqa": 78.0, "gpqa": 65.0},
+      "score_source": "Anthropic Claude 3.5 Sonnet benchmarks (frontier reference)"
+    },
+    "gemini-1.5-pro": {
+      "provider": "Google",
+      "family": "Gemini 1.5",
+      "params_b": null,
+      "in_spar_preset": null,
+      "spar_role": null,
+      "frontier_reference": true,
+      "scores": {"mmlu": 85.0, "bbh": 84.0, "gsm8k": 90.0, "ifeval": 86.0, "truthfulqa": 75.0, "gpqa": 60.0},
+      "score_source": "Google Gemini 1.5 Pro technical report (frontier reference)"
+    }
+  }
+}

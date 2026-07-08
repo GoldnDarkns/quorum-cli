@@ -110,6 +110,18 @@ function getRoleBadge(role: string | null | undefined): string | null {
       return `[${t("role.devilsAdvocate")}]`;
     case "MODERATOR":
       return `[${t("role.moderator")}]`;
+    case "DCS":
+      return `[${t("role.dcs")}]`;
+    case "PLAUSIBILITY_GATE":
+      return `[${t("role.plausibilityGate")}]`;
+    case "BENCHMARKS":
+      return `[${t("role.benchmarks")}]`;
+    case "LAYER3":
+      return `[${t("role.layer3")}]`;
+    case "ARTIFACTS":
+      return `[${t("role.artifacts")}]`;
+    case "PORTFOLIO":
+      return `[${t("role.portfolio")}]`;
     default:
       return null;
   }
@@ -132,6 +144,18 @@ function getRoundLabel(roundType: string | null | undefined): string | null {
       return `(${t("round.round1")})`;
     case "round2":
       return `(${t("round.round2")})`;
+    case "dcs":
+      return `(${t("round.dcs")})`;
+    case "plausibility_gate":
+      return `(${t("round.plausibilityGate")})`;
+    case "model_benchmarks":
+      return `(${t("round.modelBenchmarks")})`;
+    case "layer3":
+      return `(${t("round.layer3")})`;
+    case "moderator":
+      return `(${t("round.moderator")})`;
+    case "portfolio_recommendation":
+      return `(${t("round.portfolioRecommendation")})`;
     default:
       return null;
   }
@@ -413,6 +437,11 @@ export function Synthesis({
   // Tradeoff: Agreement YES/NO
   // Standard/Socratic: YES (green), NO (red), PARTIAL (yellow)
   const getResultColor = () => {
+    if (isSpar) {
+      return consensus === "CLEARED" ? "green"
+        : consensus === "HUMAN_REVIEW" ? "red"
+        : "yellow";
+    }
     if (isOxford) {
       return consensus === "FOR" ? "green"
         : consensus === "AGAINST" ? "red"
@@ -430,6 +459,11 @@ export function Synthesis({
   };
 
   const getResultIcon = () => {
+    if (isSpar) {
+      return consensus === "CLEARED" ? "✓"
+        : consensus === "HUMAN_REVIEW" ? "⚠"
+        : "◐";
+    }
     if (isOxford) {
       return consensus === "FOR" ? "✓ FOR"
         : consensus === "AGAINST" ? "✗ AGAINST"
@@ -459,26 +493,32 @@ export function Synthesis({
   const resultColor = getResultColor();
 
   // Method-specific terminology for authentic presentation
-  const resultLabel = isSocratic ? t("synthesis.aporia")
+  const resultLabel = isSpar ? t("terminology.consensus.spar")
+    : isSocratic ? t("synthesis.aporia")
     : isOxford ? t("synthesis.decision")
     : isDelphi ? t("synthesis.convergence")
     : isBrainstorm ? t("synthesis.selectedIdeas")
     : isTradeoff ? t("synthesis.agreement")
     : t("synthesis.consensus");
-  const differencesLabel = isSocratic ? t("synthesis.openQuestions")
+  const differencesLabel = isSpar ? t("terminology.differences.spar")
+    : isSocratic ? t("synthesis.openQuestions")
     : isAdvocate ? t("synthesis.unresolvedQuestions")
     : isOxford ? t("synthesis.keyContentions")
     : isDelphi ? t("synthesis.outlierPerspectives")
     : isBrainstorm ? t("synthesis.alternativeDirections")
     : isTradeoff ? t("synthesis.keyTradeoffs")
     : t("synthesis.notableDifferences");
-  const synthesisLabel = isSocratic ? t("synthesis.reflection")
+  const synthesisLabel = isSpar ? t("terminology.synthesis.spar")
+    : isSocratic ? t("synthesis.reflection")
     : isAdvocate ? t("synthesis.ruling")
     : isOxford ? t("synthesis.adjudication")
     : isDelphi ? t("synthesis.aggregatedEstimate")
     : isBrainstorm ? t("synthesis.finalIdeas")
     : isTradeoff ? t("synthesis.recommendation")
     : t("synthesis.synthesisLabel");
+  const sparConsensusLabel = consensus === "CLEARED" ? t("consensus.cleared")
+    : consensus === "HUMAN_REVIEW" ? t("consensus.humanReview")
+    : consensus;
 
   return (
     <Box
@@ -494,10 +534,10 @@ export function Synthesis({
       {!isAdvocate && (
         <Box marginBottom={1}>
           <Text bold color={resultColor}>
-            {isOxford ? getResultIcon() : `${getResultIcon()} ${resultLabel}: ${consensus}`}
+            {isOxford ? getResultIcon() : `${getResultIcon()} ${resultLabel}: ${isSpar ? sparConsensusLabel : consensus}`}
           </Text>
           <Text dimColor>
-            {" "}({isSocratic ? t("synthesis.reflected") : isOxford ? t("synthesis.adjudicated") : t("synthesis.synthesized")} by {synthesizerModel})
+            {" "}({isSpar ? t("terminology.by.spar") : isSocratic ? t("synthesis.reflected") : isOxford ? t("synthesis.adjudicated") : t("synthesis.synthesized")} {synthesizerModel})
           </Text>
         </Box>
       )}

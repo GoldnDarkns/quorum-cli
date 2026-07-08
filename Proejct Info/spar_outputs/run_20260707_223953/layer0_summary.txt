@@ -1,0 +1,23 @@
+**Layer 0 — Transmission Channel Prioritization**
+
+Scenario: liberation_day_2025
+Event type: trade_policy_shock
+Entities: United States
+Affected systems: technology, consumer, financials, industrials, equities_broad
+
+**Activated channels:**
+- [PRIMARY] Sanctions / Trade / Policy Shock: **96.0** — event/entity match; economic mechanism match (2 evidence items)
+- [PRIMARY] Sector Earnings Exposure: **90.0** — event/entity match; economic mechanism match (2 evidence items)
+- [PRIMARY] Inflation Shock: **88.0** — low direct match (2 evidence items)
+- [PRIMARY] Supply Chain Disruption: **86.0** — event/entity match (2 evidence items)
+- [PRIMARY] Consumer Sentiment / Behavioural Shock: **82.0** — event/entity match (2 evidence items)
+- [PRIMARY] Safe-Haven / FX Flow: **80.0** — event/entity match (2 evidence items)
+- [PRIMARY] Credit / Financial Conditions: **78.0** — low direct match (2 evidence items)
+- [SECONDARY] Monetary Policy Constraint: **74.0** — event/entity match; economic mechanism match (1 evidence items)
+- [SECONDARY] Geopolitical Risk Premium: **68.0** — low direct match (1 evidence items)
+- [SECONDARY] Energy / Commodity Price Shock: **62.0** — low direct match (1 evidence items)
+- [SECONDARY] Relief Rally / Priced-In Shock Dampener: **58.0** — macro-regime relevance (1 evidence items)
+- [WATCHLIST] Defence Spending Repricing: **45.0** — low direct match (0 evidence items)
+- [WATCHLIST] Cyber / Operational Disruption: **35.0** — low direct match (0 evidence items)
+
+_Evidence retrieved per channel (not top-3 event analogues)._

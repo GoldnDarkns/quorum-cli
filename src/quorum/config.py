@@ -326,6 +326,27 @@ class Settings(BaseSettings):
     # Defaults to ~/reports, supports ~ for home directory expansion
     report_dir: str = Field(default="~/reports", alias="QUORUM_REPORT_DIR")
 
+    # SPAR research runs: write layer0/round1/round2/moderator JSON to disk (quorum.bat + pilot)
+    spar_save_artifacts: bool = Field(default=True, alias="SPAR_SAVE_ARTIFACTS")
+
+    # SPAR DCS explore/exploit (Layer 1 continuation controller)
+    spar_dcs_enabled: bool = Field(default=True, alias="SPAR_DCS_ENABLED")
+    spar_dcs_threshold: float = Field(default=0.35, alias="SPAR_DCS_THRESHOLD")
+    spar_max_debate_rounds: int = Field(default=5, ge=2, le=5, alias="SPAR_MAX_DEBATE_ROUNDS")
+
+    # SPAR Layer 2 plausibility gate + human review
+    spar_plausibility_gate_enabled: bool = Field(default=True, alias="SPAR_PLAUSIBILITY_GATE_ENABLED")
+    spar_plausibility_threshold: float = Field(default=60.0, ge=0, le=100, alias="SPAR_PLAUSIBILITY_THRESHOLD")
+    spar_human_review_block: bool = Field(default=True, alias="SPAR_HUMAN_REVIEW_BLOCK")
+
+    # SPAR FSR benchmark (Fed Financial Stability Report stress-language alignment)
+    spar_fsr_benchmark_enabled: bool = Field(default=True, alias="SPAR_FSR_BENCHMARK_ENABLED")
+    spar_fsr_moderator_weight: float = Field(default=0.55, ge=0, le=1, alias="SPAR_FSR_MODERATOR_WEIGHT")
+    spar_fsr_weight: float = Field(default=0.45, ge=0, le=1, alias="SPAR_FSR_WEIGHT")
+
+    # SPAR Layer 3 quantification (VaR / hedge) after plausibility gate passes
+    spar_layer3_enabled: bool = Field(default=True, alias="SPAR_LAYER3_ENABLED")
+
     # Export settings for manual /export command
     export_dir: str | None = Field(default=None, alias="QUORUM_EXPORT_DIR")
     export_format: str = Field(default="md", alias="QUORUM_EXPORT_FORMAT")

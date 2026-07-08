@@ -43,6 +43,7 @@ class ChannelActivation:
     retrieval_budget: int
     evidence: list[str] = field(default_factory=list)
     queries: list[str] = field(default_factory=list)
+    score_components: dict[str, float] = field(default_factory=dict)
 
 
 @dataclass
@@ -60,6 +61,19 @@ class Layer0State:
         return {
             "regime": self.regime,
             "shock_parsed": self.shock_parsed,
+            "channel_rankings": [
+                {
+                    "channel_id": a.channel_id,
+                    "name": a.name,
+                    "score": round(a.score, 1),
+                    "priority": a.priority.value,
+                    "reason": a.reason,
+                    "retrieval_budget": a.retrieval_budget,
+                    "evidence_count": len(a.evidence),
+                    "score_components": a.score_components,
+                }
+                for a in self.activations
+            ],
             "activated_channels": [
                 {
                     "channel_id": a.channel_id,
@@ -485,7 +499,14 @@ def _priority_for_score(score: float) -> ChannelPriority:
     return ChannelPriority.INACTIVE
 
 
-def _retrieval_budget(priority: ChannelPriority) -> int:
+def _retrieval_budget(priority: ChannelPriority, compact: bool = False) -> int:
+    if compact:
+        return {
+            ChannelPriority.PRIMARY: 2,
+            ChannelPriority.SECONDARY: 1,
+            ChannelPriority.WATCHLIST: 0,
+            ChannelPriority.INACTIVE: 0,
+        }[priority]
     return {
         ChannelPriority.PRIMARY: 6,
         ChannelPriority.SECONDARY: 3,
@@ -500,7 +521,7 @@ def detect_scenario_id(shock_text: str) -> str:
     if any(
         k in text
         for k in ("liberation day", "reciprocal tariff", "tariff", "trade policy", "trade war")
-    ) and ("2025" in text or "april" in text):
+    ):
         return "liberation_day_2025"
     if any(k in text for k in ("ukraine", "invasion", "russia", "belarus", "crimea", "donbas")):
         return "ukraine_2022"
@@ -622,7 +643,7 @@ def score_channel(
     shock_text: str,
     shock_parsed: dict[str, Any],
     regime: dict[str, str],
-) -> tuple[float, str]:
+) -> tuple[float, str, dict[str, float]]:
     """Step 0.4 — explainable channel activation score (0-100)."""
     text = shock_text.lower()
     regime_blob = " ".join(regime.values()).lower()
@@ -653,14 +674,29 @@ def score_channel(
         + 0.15 * evidence_avail
         + 0.10 * sector_match
     )
-    score = round(raw * 100, 1)
+    base_score = round(raw * 100, 1)
+    score = base_score
 
     scenario_id = detect_scenario_id(shock_text)
     boosts = SCENARIO_CHANNEL_BOOSTS.get(scenario_id, {})
-    if channel.channel_id in boosts:
-        score = max(score, boosts[channel.channel_id])
+    scenario_floor = boosts.get(channel.channel_id)
+    if scenario_floor is not None and scenario_floor > score:
+        score = scenario_floor
+
+    components: dict[str, float] = {
+        "event_pct": round(event_match * 100, 1),
+        "mechanism_pct": round(mechanism_match * 100, 1),
+        "regime_pct": round(regime_match * 100, 1),
+        "evidence_pct": round(evidence_avail * 100, 1),
+        "sector_pct": round(sector_match * 100, 1),
+        "base_score": base_score,
+    }
+    if scenario_floor is not None and scenario_floor > base_score:
+        components["scenario_floor"] = scenario_floor
 
     reasons: list[str] = []
+    if scenario_floor is not None and scenario_floor > base_score:
+        reasons.append("scenario profile floor applied")
     if event_match > 0.3:
         reasons.append("event/entity match")
     if regime_match > 0.5:
@@ -670,7 +706,7 @@ def score_channel(
     if not reasons:
         reasons.append("low direct match")
 
-    return score, "; ".join(reasons)
+    return score, "; ".join(reasons), components
 
 
 def prioritize_channels(
@@ -678,6 +714,7 @@ def prioritize_channels(
     shock_parsed: dict[str, Any],
     regime: dict[str, str],
     channel_evidence: dict[str, list[str]] | None = None,
+    compact: bool = False,
 ) -> list[ChannelActivation]:
     """Steps 0.3–0.7 — score channels, retrieve evidence, check sufficiency."""
     evidence_corpus = channel_evidence or _merged_channel_evidence(
@@ -685,9 +722,9 @@ def prioritize_channels(
     )
     activations: list[ChannelActivation] = []
     for channel in TRANSMISSION_CHANNELS:
-        score, reason = score_channel(channel, shock_text, shock_parsed, regime)
+        score, reason, components = score_channel(channel, shock_text, shock_parsed, regime)
         priority = _priority_for_score(score)
-        budget = _retrieval_budget(priority)
+        budget = _retrieval_budget(priority, compact=compact)
         evidence = evidence_corpus.get(channel.channel_id, [])[:budget]
         queries = CHANNEL_QUERIES.get(channel.channel_id, [])[: max(1, budget // 2)]
 
@@ -701,6 +738,7 @@ def prioritize_channels(
                 retrieval_budget=budget,
                 evidence=evidence,
                 queries=queries,
+                score_components=components,
             )
         )
 
@@ -708,10 +746,12 @@ def prioritize_channels(
     return activations
 
 
-def build_agent_packets(activations: list[ChannelActivation]) -> dict[str, str]:
+def build_agent_packets(activations: list[ChannelActivation], compact: bool = False) -> dict[str, str]:
     """Step 0.8 — route channel evidence to specialist agents."""
     active = {a.channel_id: a for a in activations if a.priority != ChannelPriority.INACTIVE}
     packets: dict[str, str] = {}
+    max_channels = 2 if compact else 99
+    max_bullets = 2 if compact else 99
 
     for agent, channel_ids in AGENT_CHANNEL_MAP.items():
         lines = [
@@ -723,13 +763,15 @@ def build_agent_packets(activations: list[ChannelActivation]) -> dict[str, str]:
         ]
         included = 0
         for cid in channel_ids:
+            if included >= max_channels:
+                break
             act = active.get(cid)
             if not act:
                 continue
             included += 1
             lines.append(f"[{act.priority.value.upper()}] {act.name} (score {act.score})")
             lines.append(f"  Activation reason: {act.reason}")
-            for item in act.evidence:
+            for item in act.evidence[:max_bullets]:
                 lines.append(f"  • {item}")
             lines.append("")
 
@@ -741,31 +783,128 @@ def build_agent_packets(activations: list[ChannelActivation]) -> dict[str, str]:
     return packets
 
 
-def format_layer0_summary(activations: list[ChannelActivation], shock_parsed: dict[str, Any]) -> str:
+def _format_score_drivers(components: dict[str, float]) -> str:
+    """One-line interpretable breakdown of what drove the channel score."""
+    drivers: list[str] = []
+    for key, label in (
+        ("event_pct", "shock keywords"),
+        ("mechanism_pct", "transmission mechanism"),
+        ("regime_pct", "macro regime fit"),
+        ("evidence_pct", "historical corpus depth"),
+        ("sector_pct", "sector/asset exposure"),
+    ):
+        value = components.get(key, 0.0)
+        if value >= 20:
+            drivers.append(f"{label} {value:.0f}%")
+    floor = components.get("scenario_floor")
+    base = components.get("base_score")
+    if floor is not None and base is not None and floor > base:
+        drivers.append(f"scenario floor raised {base:.0f} -> {floor:.0f}")
+    return "; ".join(drivers) if drivers else "minimal overlap with shock text and regime"
+
+
+def _count_by_priority(activations: list[ChannelActivation]) -> dict[ChannelPriority, int]:
+    counts = {p: 0 for p in ChannelPriority}
+    for act in activations:
+        counts[act.priority] += 1
+    return counts
+
+
+def format_layer0_summary(
+    activations: list[ChannelActivation],
+    shock_parsed: dict[str, Any],
+    regime: dict[str, str] | None = None,
+    evidence_corpus: dict[str, list[str]] | None = None,
+) -> str:
     """Human-readable Layer 0 output for terminal display."""
+    counts = _count_by_priority(activations)
+    total = len(activations)
+    scenario_id = shock_parsed.get("scenario_id", "generic")
+
     lines = [
         "**Layer 0 — Transmission Channel Prioritization**",
         "",
-        f"Scenario: {shock_parsed.get('scenario_id', 'generic')}",
+        f"Scenario profile: **{scenario_id}**",
         f"Event type: {', '.join(shock_parsed.get('event_type', []))}",
         f"Entities: {', '.join(shock_parsed.get('entities', []))}",
         f"Affected systems: {', '.join(shock_parsed.get('affected_systems', []))}",
+        f"Horizon: {shock_parsed.get('time_horizon', '5_trading_days')}",
         "",
-        "**Activated channels:**",
+        f"**Channel ontology:** {total} transmission channels scored (not a single event analogue).",
+        (
+            f"**Activation tiers:** {counts[ChannelPriority.PRIMARY]} PRIMARY (>=70), "
+            f"{counts[ChannelPriority.SECONDARY]} SECONDARY (>=50), "
+            f"{counts[ChannelPriority.WATCHLIST]} WATCHLIST (>=30), "
+            f"{counts[ChannelPriority.INACTIVE]} INACTIVE (<30)."
+        ),
+        "",
+        "**How the score works (0-100):** keyword fit between your shock text and each channel's "
+        "activation vocabulary, weighted by macro regime at cutoff (growth, inflation, liquidity, "
+        "volatility, trade), plus whether we hold curated historical evidence for that channel. "
+        "Known scenario profiles (Ukraine 2022, Liberation Day tariffs) apply score floors so "
+        "channels with strong past analogues are not dropped when the shock text is brief.",
+        "",
+        "Weights: shock keywords 30% | mechanism 25% | regime 20% | evidence corpus 15% | sector 10%.",
+        "Retrieval budget: PRIMARY up to 6 bullets | SECONDARY 3 | WATCHLIST 1 | INACTIVE 0.",
+        "",
     ]
-    for act in activations:
-        if act.priority == ChannelPriority.INACTIVE:
-            continue
+
+    if regime:
+        lines.append("**Macro regime at cutoff (anchors scoring):**")
+        for key in ("growth", "inflation", "liquidity", "rates", "valuation", "volatility", "trade"):
+            if key in regime:
+                lines.append(f"- {key.replace('_', ' ').title()}: {regime[key]}")
+        lines.append("")
+
+    active = [a for a in activations if a.priority != ChannelPriority.INACTIVE]
+    inactive = [a for a in activations if a.priority == ChannelPriority.INACTIVE]
+
+    if active:
+        lines.append("**Activated for debate & evidence retrieval:**")
+        lines.append("")
+        for act in active:
+            lines.append(f"**[{act.priority.value.upper()}] {act.name} — score {act.score}**")
+            lines.append(f"Why: {act.reason}")
+            lines.append(f"Drivers: {_format_score_drivers(act.score_components)}")
+            preview = act.evidence
+            if not preview and evidence_corpus:
+                preview = evidence_corpus.get(act.channel_id, [])[:1]
+            if preview:
+                lines.append("Historical evidence (channel-specific, not whole-event analogue):")
+                for item in preview[:3]:
+                    lines.append(f"  • {item}")
+            else:
+                lines.append("  _(No evidence retrieved — score below watchlist threshold.)_")
+            lines.append("")
+
+    if inactive:
+        lines.append(f"**Inactive this run ({len(inactive)} channels — score < 30, no RAG budget):**")
+        for act in inactive:
+            preview = ""
+            if evidence_corpus:
+                corpus_item = evidence_corpus.get(act.channel_id, [])
+                if corpus_item:
+                    preview = f" | e.g. {corpus_item[0][:90]}{'...' if len(corpus_item[0]) > 90 else ''}"
+            lines.append(
+                f"- {act.name}: **{act.score}** — {act.reason}{preview}"
+            )
+        lines.append("")
+
+    if scenario_id == "generic":
         lines.append(
-            f"- [{act.priority.value.upper()}] {act.name}: **{act.score}** — {act.reason} "
-            f"({len(act.evidence)} evidence items)"
+            "_Tip: name the event explicitly (e.g. Liberation Day Apr 2025 tariffs, Ukraine Feb 2022) "
+            "to unlock the full scenario profile, regime snapshot, and channel score floors._"
         )
-    lines.append("")
-    lines.append("_Evidence retrieved per channel (not top-3 event analogues)._")
+        lines.append("")
+
+    lines.append(
+        "_Evidence is organised by transmission channel so agents reason through mechanisms, "
+        "not one blended historical event._"
+    )
     return "\n".join(lines)
 
 
-def format_shared_evidence_block(activations: list[ChannelActivation]) -> str:
+def format_shared_evidence_block(activations: list[ChannelActivation], compact: bool = False) -> str:
     """Shared evidence section injected into master context for all agents."""
     lines = [
         "TRANSMISSION-CHANNEL EVIDENCE (Layer 0 — channel-first retrieval)",
@@ -775,11 +914,19 @@ def format_shared_evidence_block(activations: list[ChannelActivation]) -> str:
         "Weight primary channels most heavily; use secondary channels as modifiers.",
         "",
     ]
+    max_channels = 3 if compact else 99
+    max_bullets = 2 if compact else 4
+    shown = 0
     for act in activations:
         if act.priority in (ChannelPriority.INACTIVE, ChannelPriority.WATCHLIST):
             continue
+        if compact and act.priority != ChannelPriority.PRIMARY:
+            continue
+        if shown >= max_channels:
+            break
+        shown += 1
         lines.append(f"▸ {act.name} [{act.priority.value}, score {act.score}]")
-        for item in act.evidence[:4]:
+        for item in act.evidence[:max_bullets]:
             lines.append(f"    • {item}")
         lines.append("")
     return "\n".join(lines)
@@ -788,6 +935,7 @@ def format_shared_evidence_block(activations: list[ChannelActivation]) -> str:
 def run_layer0_pipeline(
     shock_text: str,
     regime: dict[str, str] | None = None,
+    compact: bool = False,
 ) -> Layer0State:
     """Run full Layer 0 pipeline before Layer 1 debate."""
     shock = shock_text.strip() or DEFAULT_SHOCK_UKRAINE
@@ -795,9 +943,14 @@ def run_layer0_pipeline(
     scenario_id = shock_parsed.get("scenario_id", "generic")
     regime_data = regime or get_regime_for_shock(shock)
     evidence_corpus = _merged_channel_evidence(scenario_id)
-    activations = prioritize_channels(shock, shock_parsed, regime_data, evidence_corpus)
-    agent_packets = build_agent_packets(activations)
-    summary = format_layer0_summary(activations, shock_parsed)
+    activations = prioritize_channels(shock, shock_parsed, regime_data, evidence_corpus, compact=compact)
+    agent_packets = build_agent_packets(activations, compact=compact)
+    summary = format_layer0_summary(
+        activations,
+        shock_parsed,
+        regime=regime_data,
+        evidence_corpus=evidence_corpus,
+    )
 
     return Layer0State(
         shock_text=shock,
@@ -814,8 +967,9 @@ def build_agent_system_prompt(
     layer0: Layer0State,
     agent_role: str,
     agent_prompt: str,
+    compact: bool = False,
 ) -> str:
     """Assemble system prompt: base context + shared channels + agent packet."""
-    shared = format_shared_evidence_block(layer0.activations)
+    shared = format_shared_evidence_block(layer0.activations, compact=compact)
     packet = layer0.agent_packets.get(agent_role, "")
     return f"{master_context_base}\n\n{shared}\n\n{packet}\n\n{agent_prompt}"

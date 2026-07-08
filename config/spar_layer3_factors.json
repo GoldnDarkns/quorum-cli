@@ -1,0 +1,87 @@
+{
+  "description": "Layer 3 factor loadings, hedge universe, and portfolio recommendation config for SPAR.",
+  "sector_etfs": ["SP500", "XLE", "XLF", "XLK", "ITA", "XLY"],
+  "factor_names": ["market", "smb", "hml"],
+  "sector_factor_loadings": {
+    "SP500": {"market": 1.0, "smb": 0.0, "hml": 0.0},
+    "XLE": {"market": 0.85, "smb": -0.05, "hml": 0.25},
+    "XLF": {"market": 1.05, "smb": 0.10, "hml": 0.15},
+    "XLK": {"market": 1.15, "smb": -0.10, "hml": -0.20},
+    "ITA": {"market": 0.95, "smb": 0.05, "hml": 0.10},
+    "XLY": {"market": 1.10, "smb": 0.15, "hml": -0.05}
+  },
+  "daily_volatility_pct": {
+    "SP500": 1.2,
+    "XLE": 2.0,
+    "XLF": 1.5,
+    "XLK": 1.8,
+    "ITA": 1.6,
+    "XLY": 1.7
+  },
+  "default_portfolio_weights": {
+    "SP500": 0.35,
+    "XLE": 0.10,
+    "XLF": 0.15,
+    "XLK": 0.20,
+    "ITA": 0.05,
+    "XLY": 0.15
+  },
+  "scenario_factor_shocks_by_direction": {
+    "negative": {"market": -0.045, "smb": -0.020, "hml": 0.010},
+    "positive": {"market": 0.030, "smb": 0.010, "hml": -0.005},
+    "neutral": {"market": -0.008, "smb": 0.000, "hml": 0.002}
+  },
+  "channel_factor_adjustments": {
+    "energy": {"market": -0.012, "hml": 0.018},
+    "commodity": {"market": -0.010, "hml": 0.015},
+    "inflation": {"market": -0.008, "hml": 0.012},
+    "trade": {"market": -0.015, "smb": -0.008},
+    "geopolitical": {"market": -0.018, "smb": -0.005},
+    "credit": {"market": -0.020, "smb": 0.005},
+    "defence": {"market": 0.005, "hml": 0.008}
+  },
+  "hedge_universe": {
+    "GLD": {
+      "label": "Gold (GLD)",
+      "typical_hedge_against": ["geopolitical_risk_premium", "inflation_shock"],
+      "stress_return_pct": 2.5,
+      "daily_vol_pct": 1.1
+    },
+    "TLT": {
+      "label": "Long Treasuries (TLT)",
+      "typical_hedge_against": ["growth_shock", "risk_off", "monetary_policy_constraint"],
+      "stress_return_pct": 1.8,
+      "daily_vol_pct": 1.5
+    },
+    "SHY": {
+      "label": "Short Treasuries (SHY)",
+      "typical_hedge_against": ["liquidity_park"],
+      "stress_return_pct": 0.3,
+      "daily_vol_pct": 0.2
+    }
+  },
+  "hedge_covariance_daily_pct2": {
+    "GLD": {"GLD": 1.21, "TLT": 0.12, "SHY": 0.02},
+    "TLT": {"GLD": 0.12, "TLT": 2.25, "SHY": 0.08},
+    "SHY": {"GLD": 0.02, "TLT": 0.08, "SHY": 0.04}
+  },
+  "sector_hedge_cov_daily_pct2": {
+    "SP500": {"GLD": -0.35, "TLT": -0.55, "SHY": -0.05},
+    "XLE": {"GLD": 0.15, "TLT": -0.20, "SHY": -0.03},
+    "XLF": {"GLD": -0.25, "TLT": -0.45, "SHY": -0.04},
+    "XLK": {"GLD": -0.30, "TLT": -0.50, "SHY": -0.05},
+    "ITA": {"GLD": -0.20, "TLT": -0.35, "SHY": -0.03},
+    "XLY": {"GLD": -0.28, "TLT": -0.48, "SHY": -0.04}
+  },
+  "portfolio_policy": {
+    "max_hedge_sleeve_pct": 0.35,
+    "min_cash_pct": 0.05,
+    "max_single_sector_cut_pct": 0.08,
+    "sector_trim_threshold_pct": -2.0,
+    "sector_boost_threshold_pct": 2.0,
+    "use_min_variance_hedge": true,
+    "hedge_assets_active": ["GLD", "TLT"]
+  },
+  "var_confidence": 0.95,
+  "z_score_95": 1.645
+}

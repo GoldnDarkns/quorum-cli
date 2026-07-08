@@ -1,0 +1,31 @@
+{
+  "agent_id": "political_geopolitical_claude",
+  "round_1_assessment": {
+    "geopolitical_risk_premium": {
+      "activation_reason": "event/entity match",
+      "score": 96.0,
+      "description": "The Liberation Day trade policy package, with broad reciprocal tariffs and sector-specific rates, activates the geopolitical risk premium channel."
+    },
+    "sanctions_trade_policy_shock": {
+      "activation_reason": "event/entity match; economic mechanism match",
+      "score": 96.0,
+      "description": "The immediate implementation timeline for the Liberation Day trade policy package amplifies the sanctions/trade/policy shock channel, with potential for significant market disruption."
+    },
+    "safe_haven_fx_flow": {
+      "activation_reason": "event/entity match",
+      "score": 80.0,
+      "description": "The strengthening USD and flight to Treasuries in response to the trade policy package activation of the safe-haven channel, with potential for continued market volatility."
+    },
+    "defence_spending_repricing": {
+      "activation_reason": "low direct match",
+      "score": 45.0,
+      "description": "The sector-specific rates on imports from major trading partners may lead to increased defence spending in the US and its allies, but this channel is not directly activated by the Liberation Day trade policy package."
+    }
+  },
+  "market_implications": {
+    "equity_futures": "fell sharply overnight",
+    "vix": "rose",
+    "usd": "strengthened",
+    "bond_yields": "moved lower on growth concerns"
+  }
+}

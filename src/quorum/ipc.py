@@ -780,6 +780,25 @@ class IPCHandler:
 
         return question, model_ids, method, max_turns, synthesizer_mode, role_assignments
 
+    async def _wait_for_resume(self, timeout_message: str = "Auto-resuming after timeout") -> None:
+        """Block until resume_discussion or timeout."""
+        self._pause_event.clear()
+        try:
+            await asyncio.wait_for(
+                self._pause_event.wait(),
+                timeout=PAUSE_TIMEOUT_SECONDS,
+            )
+        except asyncio.TimeoutError:
+            await self.emit_event_async("pause_timeout", {
+                "discussion_id": self._current_discussion_id,
+                "message": timeout_message,
+                "timeout_seconds": PAUSE_TIMEOUT_SECONDS,
+            })
+
+    async def _handle_human_review_pause(self, message: Any) -> None:
+        """Pause for SPAR human review when plausibility gate fails."""
+        await self._wait_for_resume("Auto-acknowledging human review after timeout")
+
     async def _handle_phase_pause(self, message: Any) -> None:
         """Handle pause between phases with timeout.
 
@@ -797,19 +816,7 @@ class IPCHandler:
             "next_phase_params": message.params,
             "method": message.method,
         })
-        self._pause_event.clear()
-
-        try:
-            await asyncio.wait_for(
-                self._pause_event.wait(),
-                timeout=PAUSE_TIMEOUT_SECONDS
-            )
-        except asyncio.TimeoutError:
-            await self.emit_event_async("pause_timeout", {
-                "discussion_id": self._current_discussion_id,
-                "message": "Auto-resuming after timeout",
-                "timeout_seconds": PAUSE_TIMEOUT_SECONDS,
-            })
+        await self._wait_for_resume()
 
     async def _handle_run_discussion(self, params: dict) -> dict:
         """Handle run_discussion request.
@@ -893,6 +900,14 @@ class IPCHandler:
                             return False  # Cancelled during pause
 
                     await self._emit_message_async(message)
+
+                    if self._is_human_review_required(message):
+                        await self._handle_human_review_pause(message)
+                        if self._cancel_requested:
+                            await self.emit_event_async("discussion_cancelled", {
+                                "discussion_id": self._current_discussion_id
+                            })
+                            return False
                 return True  # Completed normally
 
             try:
@@ -945,6 +960,7 @@ class IPCHandler:
         from .team import (
             CritiqueResponse,
             FinalPosition,
+            HumanReviewRequired,
             IndependentAnswer,
             PhaseMarker,
             SynthesisResult,
@@ -1007,6 +1023,15 @@ class IPCHandler:
                 "content": message.content,
                 "role": message.role,
                 "round_type": message.round_type,
+                "method": message.method,
+            })
+
+        elif isinstance(message, HumanReviewRequired):
+            return ("human_review_required", {
+                "reason": message.reason,
+                "consensus_score": message.consensus_score,
+                "dissent_score": message.dissent_score,
+                "threshold": message.threshold,
                 "method": message.method,
             })
 
@@ -1312,6 +1337,11 @@ class IPCHandler:
         """Check if message is a PhaseMarker."""
         from .team import PhaseMarker
         return isinstance(message, PhaseMarker)
+
+    def _is_human_review_required(self, message: Any) -> bool:
+        """Check if message is SPAR HumanReviewRequired."""
+        from .team import HumanReviewRequired
+        return isinstance(message, HumanReviewRequired)
 
 
 def _prewarm_imports() -> None:

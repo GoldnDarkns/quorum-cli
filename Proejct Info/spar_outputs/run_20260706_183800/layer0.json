@@ -1,0 +1,82 @@
+{
+  "regime": {
+    "growth": "MODERATE-STRONG",
+    "inflation": "HIGH AND RISING",
+    "liquidity": "TIGHTENING",
+    "rates": "HIKE EXPECTED MARCH 2022",
+    "valuation": "CORRECTING (S&P YTD -8.8%)",
+    "volatility": "ELEVATED (VIX 31.0)"
+  },
+  "shock_parsed": {
+    "entities": [
+      "Russia",
+      "Ukraine"
+    ],
+    "event_type": [
+      "geopolitical_shock"
+    ],
+    "affected_systems": [
+      "energy",
+      "financials",
+      "equities_broad",
+      "defence"
+    ],
+    "time_horizon": "5_trading_days"
+  },
+  "activated_channels": [
+    {
+      "channel_id": "sanctions_trade_policy",
+      "name": "Sanctions / Trade / Policy Shock",
+      "score": 51.7,
+      "priority": "secondary",
+      "reason": "event/entity match; economic mechanism match",
+      "retrieval_budget": 3,
+      "evidence_count": 3
+    },
+    {
+      "channel_id": "monetary_policy_constraint",
+      "name": "Monetary Policy Constraint",
+      "score": 51.3,
+      "priority": "secondary",
+      "reason": "event/entity match; macro-regime relevance; economic mechanism match",
+      "retrieval_budget": 3,
+      "evidence_count": 3
+    },
+    {
+      "channel_id": "relief_rally_priced_in",
+      "name": "Relief Rally / Priced-In Shock Dampener",
+      "score": 38.7,
+      "priority": "watchlist",
+      "reason": "macro-regime relevance",
+      "retrieval_budget": 1,
+      "evidence_count": 1
+    },
+    {
+      "channel_id": "geopolitical_risk_premium",
+      "name": "Geopolitical Risk Premium",
+      "score": 37.7,
+      "priority": "watchlist",
+      "reason": "macro-regime relevance",
+      "retrieval_budget": 1,
+      "evidence_count": 1
+    },
+    {
+      "channel_id": "inflation_shock",
+      "name": "Inflation Shock",
+      "score": 34.0,
+      "priority": "watchlist",
+      "reason": "macro-regime relevance",
+      "retrieval_budget": 1,
+      "evidence_count": 1
+    },
+    {
+      "channel_id": "sector_earnings_exposure",
+      "name": "Sector Earnings Exposure",
+      "score": 33.3,
+      "priority": "watchlist",
+      "reason": "event/entity match; economic mechanism match",
+      "retrieval_budget": 1,
+      "evidence_count": 1
+    }
+  ]
+}

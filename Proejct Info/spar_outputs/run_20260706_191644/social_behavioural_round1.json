@@ -1,0 +1,89 @@
+{
+  "agent_id": "social_behavioural_deepseek",
+  "event": {
+    "name": "Tariff Shock",
+    "type": "Supply Shock"
+  },
+  "activation_reason": "low direct match",
+  "score": 88.0,
+  "reasoning": [
+    {
+      "channel": "Inflation Shock",
+      "reason": "Tariff shock = negative supply shock: import prices rise -> goods CPI pressure even when headline inflation moderating."
+    },
+    {
+      "channel": "Consumer Sentiment / Behavioural",
+      "reason": "US Consumer Sentiment already at decade-low levels due to inflation anxiety (7.5% CPI in Jan 2022). Consumers already stressed before this geopolitical event - this shock lands on a psychologically fragile consumer base."
+    },
+    {
+      "channel": "Gasoline Shock",
+      "reason": "Gasoline price pass-through to discretionary spending (XLY already -12.6% YTD)."
+    }
+  ],
+  "context_specific_data": {
+    "US Consumer Sentiment (pre-invasion)": [
+      {
+        "indicator": "University of Michigan Consumer Sentiment",
+        "value": 61.7,
+        "date": "February 2022"
+      },
+      {
+        "indicator": "The primary driver: inflation anxiety (7.5% CPI in Jan 2022)",
+        "value": null
+      }
+    ],
+    "Retail Investor Positioning": [
+      {
+        "indicator": "AAII Sentiment Survey",
+        "date": "Week of February 17, 2022"
+      },
+      {
+        "indicator": "Bullish: Neutral: Bearish",
+        "value": {
+          "Bullish": 19.2,
+          "Neutral": 34.0,
+          "Bearish": 46.8
+        }
+      }
+    ],
+    "Labour Market and Household Resilience": [
+      {
+        "indicator": "US Unemployment Rate",
+        "value": 4.0,
+        "date": "January 2022"
+      },
+      {
+        "indicator": "Real wage growth: Wages + CPI",
+        "value": "-5.7% YoY vs. CPI +7.5%"
+      }
+    ],
+    "Social Amplification Risk": [
+      {
+        "indicator": "Ukraine conflict media coverage",
+        "value": null
+      },
+      {
+        "indicator": "TikTok and Twitter real-time coverage creates faster fear transmission than in previous geopolitical events (pre-social media)",
+        "value": null
+      }
+    ],
+    "Corporate Reputational / Behavioural Risk": [
+      {
+        "indicator": "Companies with visible Russian operations faced boycott/divestment pressure even before formal sanctions",
+        "value": null
+      },
+      {
+        "indicator": "McDonald's, Coca-Cola, IKEA had Russian stores \u2192 boycott risk",
+        "value": null
+      }
+    ],
+    "Behavioural Transmission to Market": [
+      {
+        "channel": "Retail panic amplification: retail investors with already-bearish sentiment may over-sell on invasion news -> downside overshoot"
+      },
+      {
+        "channel": "Gasoline shock \u2192 consumer confidence \u2192 consumer discretionary sector sell-off (XLY specifically exposed)"
+      }
+    ]
+  }
+}

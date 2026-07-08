@@ -249,6 +249,15 @@ export interface PhaseCompleteEvent {
   method?: string;
 }
 
+export interface HumanReviewRequiredEvent {
+  discussion_id?: string;
+  reason: string;
+  consensus_score?: number | null;
+  dissent_score?: number | null;
+  threshold: number;
+  method?: string;
+}
+
 export interface PauseTimeoutEvent {
   discussion_id?: string;
   message: string;
@@ -263,6 +272,7 @@ export interface EventMap {
   ready: ReadyEvent;
   phase_complete: PhaseCompleteEvent;
   pause_timeout: PauseTimeoutEvent;
+  human_review_required: HumanReviewRequiredEvent;
   phase_start: PhaseStartEvent;
   thinking: ThinkingEvent;
   thinking_complete: ThinkingCompleteEvent;

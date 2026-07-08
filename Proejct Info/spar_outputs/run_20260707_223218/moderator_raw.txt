@@ -1,0 +1,22 @@
+```json
+{
+  "type": "consensus_scenario",
+  "direction": "negative",
+  "magnitude_pct": {"SP500": -4.0, "XLE": -6.7, "XLF": -3.9, "XLK": -5.8, "ITA": +1.2, "XLY": -3.0},
+  "confidence": 0.85,
+  "primary_transmission_channels": ["Geopolitical Risk Premium", "Trade Policy Shock"],
+  "plausibility_score": 78,
+  "consensus_summary": "The consensus scenario predicts a negative market reaction primarily driven by geopolitical risk premiums and sector-specific tariffs, with moderate adjustments for potential relief dynamics."
+}
+```
+
+```json
+{
+  "type": "minority_dissent",
+  "dissenting_agents": ["Social Agent", "Environmental & Technology Specialist"],
+  "direction": "negative",
+  "magnitude_pct": {"SP500": -4.5, "XLE": -7.0, "XLF": -2.9, "XLK": -6.2, "ITA": +1.8, "XLY": -3.5},
+  "preserved_dissent_summary": "The dissenting agents argue for a more pronounced negative impact due to pre-existing market sentiment and the potential for operational disruptions from cyber attacks on supply chains.",
+  "plausibility_score": 65
+}
+```

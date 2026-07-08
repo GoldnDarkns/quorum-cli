@@ -1,4 +1,5 @@
 {
+  "offline_compact_layer0": true,
   "ollama_options": {
     "temperature": 0,
     "num_ctx": 8192
@@ -26,7 +27,7 @@
       }
     },
     "thesis": {
-      "description": "Full Approach B-offline — five distinct 7B families (default for paper runs)",
+      "description": "Five 7B families — Llama, Qwen, Mistral, InternLM, DeepSeek-R1",
       "default": "qwen2.5:7b",
       "roles": {
         "Political": "llama3.1:8b",
@@ -36,11 +37,24 @@
         "DevilsAdvocate": "deepseek-r1:7b",
         "Moderator": "qwen2.5:7b"
       }
+    },
+    "demo-diverse": {
+      "description": "Six families for Liberation Day demo — IBM, Alibaba, Mistral, Google, NVIDIA, Microsoft",
+      "default": "qwen2.5:7b",
+      "roles": {
+        "Political": "granite3.3:8b",
+        "Economic": "qwen2.5:7b",
+        "Environmental": "mistral:7b",
+        "Social": "gemma3:4b",
+        "DevilsAdvocate": "nemotron-mini:4b",
+        "Moderator": "phi4-mini"
+      }
     }
   },
   "pull_order": {
+    "uniform": ["qwen2.5:7b"],
     "fast-thesis": ["qwen2.5:7b", "llama3.1:8b", "deepseek-r1:7b"],
     "thesis": ["qwen2.5:7b", "llama3.1:8b", "mistral:7b", "internlm2:7b", "deepseek-r1:7b"],
-    "uniform": ["qwen2.5:7b"]
+    "demo-diverse": ["qwen2.5:7b", "mistral:7b", "granite3.3:8b", "gemma3:4b", "nemotron-mini:4b", "phi4-mini"]
   }
 }

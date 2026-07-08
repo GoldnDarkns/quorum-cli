@@ -1,0 +1,147 @@
+{
+  "regime": {
+    "growth": "MODERATE \u2014 Q1 2025 GDP tracking ~2.3% annualised",
+    "inflation": "MODERATING BUT STICKY \u2014 CPI ~3.1% YoY (Mar 2025)",
+    "liquidity": "NEUTRAL \u2014 Fed funds 4.25-4.50%; QT continuing at reduced pace",
+    "rates": "PATIENT \u2014 FOMC on hold; cuts priced H2 2025 if growth softens",
+    "valuation": "FULL \u2014 S&P 500 near YTD highs; forward P/E ~21x",
+    "volatility": "ELEVATED ON POLICY RISK \u2014 VIX ~22 pre-announcement; trade headlines dominant",
+    "trade": "UNCERTAIN \u2014 reciprocal tariff framework debated for weeks; positioning cautious"
+  },
+  "shock_parsed": {
+    "scenario_id": "liberation_day_2025",
+    "entities": [
+      "United States"
+    ],
+    "event_type": [
+      "trade_policy_shock"
+    ],
+    "affected_systems": [
+      "technology",
+      "consumer",
+      "financials",
+      "industrials",
+      "equities_broad"
+    ],
+    "time_horizon": "5_trading_days"
+  },
+  "activated_channels": [
+    {
+      "channel_id": "sanctions_trade_policy",
+      "name": "Sanctions / Trade / Policy Shock",
+      "score": 96.0,
+      "priority": "primary",
+      "reason": "event/entity match; economic mechanism match",
+      "retrieval_budget": 2,
+      "evidence_count": 2
+    },
+    {
+      "channel_id": "sector_earnings_exposure",
+      "name": "Sector Earnings Exposure",
+      "score": 90.0,
+      "priority": "primary",
+      "reason": "event/entity match; economic mechanism match",
+      "retrieval_budget": 2,
+      "evidence_count": 2
+    },
+    {
+      "channel_id": "inflation_shock",
+      "name": "Inflation Shock",
+      "score": 88.0,
+      "priority": "primary",
+      "reason": "low direct match",
+      "retrieval_budget": 2,
+      "evidence_count": 2
+    },
+    {
+      "channel_id": "supply_chain_disruption",
+      "name": "Supply Chain Disruption",
+      "score": 86.0,
+      "priority": "primary",
+      "reason": "event/entity match",
+      "retrieval_budget": 2,
+      "evidence_count": 2
+    },
+    {
+      "channel_id": "consumer_sentiment_behavioural",
+      "name": "Consumer Sentiment / Behavioural Shock",
+      "score": 82.0,
+      "priority": "primary",
+      "reason": "event/entity match",
+      "retrieval_budget": 2,
+      "evidence_count": 2
+    },
+    {
+      "channel_id": "safe_haven_fx_flow",
+      "name": "Safe-Haven / FX Flow",
+      "score": 80.0,
+      "priority": "primary",
+      "reason": "event/entity match",
+      "retrieval_budget": 2,
+      "evidence_count": 2
+    },
+    {
+      "channel_id": "credit_financial_conditions",
+      "name": "Credit / Financial Conditions",
+      "score": 78.0,
+      "priority": "primary",
+      "reason": "low direct match",
+      "retrieval_budget": 2,
+      "evidence_count": 2
+    },
+    {
+      "channel_id": "monetary_policy_constraint",
+      "name": "Monetary Policy Constraint",
+      "score": 74.0,
+      "priority": "secondary",
+      "reason": "event/entity match; economic mechanism match",
+      "retrieval_budget": 1,
+      "evidence_count": 1
+    },
+    {
+      "channel_id": "geopolitical_risk_premium",
+      "name": "Geopolitical Risk Premium",
+      "score": 68.0,
+      "priority": "secondary",
+      "reason": "low direct match",
+      "retrieval_budget": 1,
+      "evidence_count": 1
+    },
+    {
+      "channel_id": "energy_commodity_shock",
+      "name": "Energy / Commodity Price Shock",
+      "score": 62.0,
+      "priority": "secondary",
+      "reason": "low direct match",
+      "retrieval_budget": 1,
+      "evidence_count": 1
+    },
+    {
+      "channel_id": "relief_rally_priced_in",
+      "name": "Relief Rally / Priced-In Shock Dampener",
+      "score": 58.0,
+      "priority": "secondary",
+      "reason": "macro-regime relevance",
+      "retrieval_budget": 1,
+      "evidence_count": 1
+    },
+    {
+      "channel_id": "defence_spending_repricing",
+      "name": "Defence Spending Repricing",
+      "score": 45.0,
+      "priority": "watchlist",
+      "reason": "low direct match",
+      "retrieval_budget": 0,
+      "evidence_count": 0
+    },
+    {
+      "channel_id": "cyber_operational_disruption",
+      "name": "Cyber / Operational Disruption",
+      "score": 35.0,
+      "priority": "watchlist",
+      "reason": "low direct match",
+      "retrieval_budget": 0,
+      "evidence_count": 0
+    }
+  ]
+}

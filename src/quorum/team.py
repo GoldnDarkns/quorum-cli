@@ -21,6 +21,7 @@ from .methods import (
     ConsensusStatus,
     CritiqueResponse,
     FinalPosition,
+    HumanReviewRequired,
     IndependentAnswer,
     PhaseMarker,
     SynthesisResult,
@@ -96,6 +97,7 @@ __all__ = [
     "ConsensusStatus",
     "SynthesisResult",
     "TeamTextMessage",
+    "HumanReviewRequired",
 ]
 
 

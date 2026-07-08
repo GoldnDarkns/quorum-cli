@@ -20,6 +20,7 @@ from .base import (
     ConsensusStatus,
     CritiqueResponse,
     FinalPosition,
+    HumanReviewRequired,
     IndependentAnswer,
     PhaseMarker,
     SynthesisResult,
@@ -44,6 +45,7 @@ __all__ = [
     "ConsensusStatus",
     "SynthesisResult",
     "TeamTextMessage",
+    "HumanReviewRequired",
     # NOTE: Method classes (StandardMethod, OxfordMethod, etc.) are NOT exported.
     # They are accessed via lazy loading in team.py to:
     # 1. Reduce startup time (heavy imports deferred until method is actually used)

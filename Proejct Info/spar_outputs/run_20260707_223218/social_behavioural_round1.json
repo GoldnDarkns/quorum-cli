@@ -1,0 +1,30 @@
+{
+  "agent_id": "social_behavioural_deepseek",
+  "round": 1,
+  "event": "liberation_day_tariffs_20250402",
+  "direction": "negative",
+  "magnitude_pct": {
+    "SP500": -6.5,
+    "XLE": -9.0,
+    "XLF": -7.8,
+    "XLK": -8.2,
+    "ITA": -4.5,
+    "XLY": -10.0
+  },
+  "confidence": 0.85,
+  "key_assumption": "Retail investor sentiment is already fragile due to pre-existing inflationary concerns and a bearish AAII reading, amplifying the market's negative reaction to the tariff announcement.",
+  "supporting_evidence": [
+    "AAII Sentiment Survey (Feb 2022): 46.8% Bearish \u2013 indicating a high level of pre-existing risk aversion.",
+    "Consumer Sentiment: University of Michigan Consumer Sentiment 61.7 (Feb 2022) - reflecting significant inflation anxiety and reduced purchasing power.",
+    "Media Amplification Risk: Social media coverage of the Ukraine conflict combined with existing petrol pump price anxieties will accelerate behavioural overshoot."
+  ],
+  "transmission_channels": [
+    "Trade Policy Shock \u2192 import prices \u2192 XLY margin compression (driven by consumer discretionary sector sensitivity)",
+    "Inflation Shock \u2192 negative real wages \u2192 AAII bearishness & retail selling",
+    "Social Amplification Risk: TikTok/Twitter coverage of the tariff announcement accelerates fear transmission and retail panic."
+  ],
+  "channel_assessment": {
+    "primary_channel": "Trade Policy Shock \u2192 import prices \u2192 XLY margin compression",
+    "channel_adjustments": "The pre-existing bearish sentiment in retail investors amplifies the negative impact of the tariff announcement on XLY, creating a more pronounced overshoot than would be expected based solely on trade policy fundamentals."
+  }
+}

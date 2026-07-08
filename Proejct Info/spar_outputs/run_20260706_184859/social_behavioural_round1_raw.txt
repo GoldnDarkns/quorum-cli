@@ -1,0 +1,35 @@
+```json
+{
+  "agent_id": "social_behavioural_deepseek",
+  "event": {
+    "name": "US announces broad reciprocal tariffs under 'Liberation Day' trade policy package",
+    "date": "April 2, 2025"
+  },
+  "analysis": {
+    "consumer_sentiment": {
+      "description": "The announcement of tariffs is likely to exacerbate existing inflationary pressures and uncertainty among consumers. Given the already bearish sentiment from AAII survey (46.8% bearish in Feb 2022), this event could lead to increased consumer anxiety, potentially driving a further decline in retail investor confidence.",
+      "impact": "Negative"
+    },
+    "inflation_shock": {
+      "description": "The tariffs are expected to increase costs for consumers and businesses alike, contributing to inflationary pressures. The already high CPI (7.5% YoY as of Jan 2022) will be further strained.",
+      "impact": "Negative"
+    },
+    "behavioural_transmission_to_market": {
+      "description": "The announcement could lead to a flight-to-cash scenario, with investors seeking safer assets like money market funds. This would likely result in increased volatility and potential sell-offs across equity markets as investors re-evaluate their risk exposure.",
+      "impact": "Negative"
+    },
+    "media_narrative_speed": {
+      "description": "The rapid dissemination of news through social media platforms could amplify the impact on consumer sentiment. The uncertainty surrounding tariffs, combined with existing inflationary concerns, may lead to a faster-than-normal decline in retail investor confidence.",
+      "impact": "Negative"
+    },
+    "corporate_reputational_risk": {
+      "description": "Companies involved in trade with affected countries could face reputational risks and potential divestment pressures. This is particularly true for those with significant operations or investments in the targeted regions, which may lead to a broader market sell-off.",
+      "impact": "Negative"
+    }
+  },
+  "conclusion": {
+    "overall_impact": "Negative",
+    "reasoning": "The announcement of broad reciprocal tariffs under the 'Liberation Day' trade policy package is likely to exacerbate existing inflationary pressures and uncertainty among consumers. The already bearish sentiment from AAII survey (46.8% bearish in Feb 2022) suggests that this event could lead to increased consumer anxiety, potentially driving a further decline in retail investor confidence."
+  }
+}
+```

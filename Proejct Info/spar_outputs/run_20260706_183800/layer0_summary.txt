@@ -1,0 +1,14 @@
+**Layer 0 — Transmission Channel Prioritization**
+
+Event type: geopolitical_shock
+Entities: Russia, Ukraine
+
+**Activated channels:**
+- [SECONDARY] Sanctions / Trade / Policy Shock: **51.7** — event/entity match; economic mechanism match (3 evidence items)
+- [SECONDARY] Monetary Policy Constraint: **51.3** — event/entity match; macro-regime relevance; economic mechanism match (3 evidence items)
+- [WATCHLIST] Relief Rally / Priced-In Shock Dampener: **38.7** — macro-regime relevance (1 evidence items)
+- [WATCHLIST] Geopolitical Risk Premium: **37.7** — macro-regime relevance (1 evidence items)
+- [WATCHLIST] Inflation Shock: **34.0** — macro-regime relevance (1 evidence items)
+- [WATCHLIST] Sector Earnings Exposure: **33.3** — event/entity match; economic mechanism match (1 evidence items)
+
+_Evidence retrieved per channel (not top-3 event analogues)._

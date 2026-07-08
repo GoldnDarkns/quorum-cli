@@ -106,6 +106,8 @@ interface StoreState {
   totalPhases: number;  // How many phases in current method
   messages: DiscussionMessage[];
   isPaused: boolean;
+  humanReviewPending: boolean;
+  humanReviewReason: string;
   thinkingModel: string | null;  // Model currently generating response
   currentQuestion: string;
   completedThinking: string[];  // Models that finished thinking in current phase
@@ -161,6 +163,8 @@ interface StoreState {
   setPhaseTransition: (completed: number, next: number) => void;  // For phase_complete event
   pauseDiscussion: () => void;
   resumeDiscussion: () => void;
+  setHumanReview: (reason: string) => void;
+  clearHumanReview: () => void;
   setThinkingModel: (model: string | null) => void;
   addCompletedThinking: (model: string) => void;
   clearCompletedThinking: () => void;
@@ -212,6 +216,8 @@ const initialState = {
   totalPhases: 5,  // Standard has 5 phases
   messages: [],
   isPaused: false,
+  humanReviewPending: false,
+  humanReviewReason: "",
   thinkingModel: null,
   currentQuestion: "",
   completedThinking: [] as string[],
@@ -360,6 +366,8 @@ export const useStore = create<StoreState>()(
         state.currentQuestion = question;
         state.messages = [];
         state.isPaused = false;
+        state.humanReviewPending = false;
+        state.humanReviewReason = "";
         state.thinkingModel = null;
         state.currentPhase = 0;
         state.previousPhase = 0;
@@ -396,7 +404,22 @@ export const useStore = create<StoreState>()(
 
     pauseDiscussion: () => set((state) => { state.isPaused = true; }),
 
-    resumeDiscussion: () => set((state) => { state.isPaused = false; }),
+    resumeDiscussion: () => set((state) => {
+      state.isPaused = false;
+      state.humanReviewPending = false;
+      state.humanReviewReason = "";
+    }),
+
+    setHumanReview: (reason) => set((state) => {
+      state.humanReviewPending = true;
+      state.humanReviewReason = reason;
+      state.isPaused = true;
+    }),
+
+    clearHumanReview: () => set((state) => {
+      state.humanReviewPending = false;
+      state.humanReviewReason = "";
+    }),
 
     setThinkingModel: (model) => set((state) => { state.thinkingModel = model; }),
 
@@ -414,6 +437,8 @@ export const useStore = create<StoreState>()(
         state.isDiscussionRunning = false;
         state.isDiscussionComplete = true;
         state.isPaused = false;
+        state.humanReviewPending = false;
+        state.humanReviewReason = "";
         state.thinkingModel = null;
       }),
 
@@ -426,6 +451,8 @@ export const useStore = create<StoreState>()(
         state.currentQuestion = "";
         state.messages = [];
         state.isPaused = false;
+        state.humanReviewPending = false;
+        state.humanReviewReason = "";
         state.thinkingModel = null;
         state.completedThinking = [];
       }),
@@ -475,6 +502,8 @@ export const useStore = create<StoreState>()(
         state.totalPhases = 5;
         state.messages = [];
         state.isPaused = false;
+        state.humanReviewPending = false;
+        state.humanReviewReason = "";
         state.thinkingModel = null;
         state.currentQuestion = "";
         state.completedThinking = [];

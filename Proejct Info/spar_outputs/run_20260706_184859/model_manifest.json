@@ -1,0 +1,30 @@
+{
+  "preset": "thesis",
+  "description": "Full Approach B-offline \u2014 five distinct 7B families (default for paper runs)",
+  "default": "qwen2.5:7b",
+  "agents": {
+    "Political": "llama3.1:8b",
+    "Economic": "qwen2.5:7b",
+    "Environmental": "mistral:7b",
+    "Social": "internlm2:7b",
+    "DevilsAdvocate": "deepseek-r1:7b"
+  },
+  "moderator": "qwen2.5:7b",
+  "unique_models": [
+    "deepseek-r1:7b",
+    "internlm2:7b",
+    "llama3.1:8b",
+    "mistral:7b",
+    "qwen2.5:7b"
+  ],
+  "ollama_options": {
+    "temperature": 0,
+    "num_ctx": 4096
+  },
+  "ollama_options_long": {
+    "temperature": 0,
+    "num_ctx": 8192
+  },
+  "scenario": "liberation-day",
+  "task_preview": "On April 2, 2025, the United States announced broad reciprocal tariffs under the 'Liberation Day' trade policy package, with sector-specific rates on imports from major trading partners and immediate "
+}

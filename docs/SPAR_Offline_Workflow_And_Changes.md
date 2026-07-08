@@ -86,12 +86,13 @@ Configuration: `config/spar_offline_models.json`
 |--------|---------------|----------|
 | `uniform` | 1× `qwen2.5:7b` | Baseline A — same model, five personas |
 | `fast-thesis` | 3× llama, qwen, deepseek-r1 | Quick multi-family test (~35 min) |
-| `thesis` | 5× families (default) | Full Approach B-offline for paper |
+| `thesis` | 5× families | Llama, Qwen, Mistral, InternLM, DeepSeek-R1 |
+| `demo-diverse` | 6× families (**default**) | IBM Granite, Qwen, Mistral, Gemma, Nemotron, Phi |
 
 Pull models (Windows):
 
 ```powershell
-powershell -File scripts/pull_spar_offline_models.ps1 -Preset thesis
+powershell -File scripts/pull_spar_offline_models.ps1 -Preset demo-diverse
 ```
 
 Environment template: `.env.spar-offline.example`
@@ -100,8 +101,10 @@ Environment template: `.env.spar-offline.example`
 
 | Phase | `num_ctx` | Reason |
 |-------|-----------|--------|
-| Round 1 | 8192 | System prompt ~17k chars with Layer 0 evidence |
+| Round 1 | 8192 | System prompt ~8–10k chars with **compact** Layer 0 evidence |
 | Round 2 + Moderator | 12288 | System prompt + growing debate transcript |
+
+Set `offline_compact_layer0: true` in `config/spar_offline_models.json` (default) to cap channel bullets for 8GB GPUs.
 
 ---
 
@@ -170,16 +173,16 @@ Environment template: `.env.spar-offline.example`
 
 ```powershell
 # 1. Ensure Ollama is running and models are pulled
-powershell -File scripts/pull_spar_offline_models.ps1 -Preset thesis
+powershell -File scripts/pull_spar_offline_models.ps1 -Preset demo-diverse
 
 # 2. Full run (45–60 min on RTX 4060 Ti 8GB)
-uv run python examples/spar_ollama_pilot.py --preset thesis --scenario liberation-day
+uv run python examples/spar_ollama_pilot.py --preset demo-diverse --scenario liberation-day
 
 # 3. Step-by-step / resume after failure
-uv run python examples/spar_ollama_pilot.py --preset thesis --scenario liberation-day --round layer0
-uv run python examples/spar_ollama_pilot.py --preset thesis --scenario liberation-day --round 1
-uv run python examples/spar_ollama_pilot.py --preset thesis --scenario liberation-day --round 2 --run-id <id> --resume
-uv run python examples/spar_ollama_pilot.py --preset thesis --scenario liberation-day --round moderator --run-id <id> --resume
+uv run python examples/spar_ollama_pilot.py --preset demo-diverse --scenario liberation-day --round layer0
+uv run python examples/spar_ollama_pilot.py --preset demo-diverse --scenario liberation-day --round 1
+uv run python examples/spar_ollama_pilot.py --preset demo-diverse --scenario liberation-day --round 2 --run-id <id> --resume
+uv run python examples/spar_ollama_pilot.py --preset demo-diverse --scenario liberation-day --round moderator --run-id <id> --resume
 ```
 
 ### Output artifacts (`run_<timestamp>/`)

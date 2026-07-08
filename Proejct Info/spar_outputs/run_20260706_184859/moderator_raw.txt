@@ -1,0 +1,18 @@
+{
+  "type": "consensus_scenario",
+  "direction": "negative",
+  "magnitude_pct": {"SP500": -3.7, "XLE": -4.5, "XLF": -2.8, "XLK": -3.9, "ITA": -1.2, "XLY": -3.4},
+  "confidence": 0.85,
+  "primary_transmission_channels": ["Sanctions / Trade / Policy Shock", "Sector Earnings Exposure", "Inflation Shock", "Supply Chain Disruption", "Consumer Sentiment / Behavioural Shock", "Safe-Haven / FX Flow"],
+  "plausibility_score": 92,
+  "consensus_summary": "The majority consensus is that the announcement of broad reciprocal tariffs will lead to a negative market reaction, with SP500 expected to decline by -3.7%, and sectors like XLE and XLY facing more significant declines."
+}
+
+{
+  "type": "minority_dissent",
+  "dissenting_agents": ["Devil's Advocate", "Environmental Agent"],
+  "dissent_direction": "negative",
+  "magnitude_pct": {"SP500": -8.8, "XLE": -6.7, "XLF": -9.3, "XLK": -10.2, "ITA": -7.5, "XLY": -8.4},
+  "preserved_dissent_summary": "The minority dissent highlighted the potential for a relief rally as uncertainty resolves and existing geopolitical risk premiums may have already priced in significant risks. However, this view was overruled by the majority due to concerns about ongoing market uncertainties and the complex interplay between trade policies, energy markets, and investor sentiment.",
+  "plausibility_score": 78
+}

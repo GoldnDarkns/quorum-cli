@@ -105,6 +105,17 @@ class SynthesisResult:
 
 
 @dataclass
+class HumanReviewRequired:
+    """SPAR Layer 2 safety stop when plausibility gate fails."""
+
+    reason: str
+    consensus_score: float | None
+    dissent_score: float | None
+    threshold: float
+    method: str = "spar"
+
+
+@dataclass
 class TeamTextMessage:
     """A chat message with team/role metadata for debate methods."""
     source: str
@@ -115,7 +126,17 @@ class TeamTextMessage:
 
 
 # Type alias for all message types
-MessageType = ThinkingIndicator | ThinkingComplete | PhaseMarker | IndependentAnswer | CritiqueResponse | TeamTextMessage | FinalPosition | SynthesisResult
+MessageType = (
+    ThinkingIndicator
+    | ThinkingComplete
+    | PhaseMarker
+    | IndependentAnswer
+    | CritiqueResponse
+    | TeamTextMessage
+    | FinalPosition
+    | SynthesisResult
+    | HumanReviewRequired
+)
 
 
 # =============================================================================

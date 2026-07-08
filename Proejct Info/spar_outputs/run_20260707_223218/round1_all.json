@@ -1,0 +1,148 @@
+{
+  "political_geopolitical": {
+    "agent_id": "political_geopolitical_claude",
+    "round": 1,
+    "event": "liberation_day_tariffs_20250402",
+    "direction": "negative",
+    "magnitude_pct": {
+      "SP500": -5.0,
+      "XLE": -3.0,
+      "XLF": -4.0,
+      "XLK": -6.0,
+      "ITA": 1.0,
+      "XLY": -2.5
+    },
+    "confidence": 0.85,
+    "key_assumption": "The tariff shock will escalate geopolitical tensions and trigger a significant risk-off sentiment in markets.",
+    "supporting_evidence": [
+      "Geopolitical Risk Premium (score 68.0): Elevated pre-event GPR index (142 vs avg 103) suggests heightened sensitivity to geopolitical shocks.",
+      "Sanctions / Trade / Policy Shock (score 96.0): Event directly matches the channel, with sector-specific rates and immediate implementation timeline."
+    ],
+    "transmission_channels": [
+      "Geopolitical Risk Premium \u2192 risk-off sentiment \u2192 broad market decline",
+      "Sanctions / Trade / Policy Shock \u2192 policy uncertainty \u2192 sector-specific underperformance (XLF, XLK)",
+      "Safe-Haven / FX Flow \u2192 USD appreciation \u2192 further pressure on equities"
+    ],
+    "channel_assessment": {
+      "primary_channel": "Geopolitical Risk Premium",
+      "channel_adjustments": "The April 2025 regime, with elevated GPR (142), indicates a heightened sensitivity to geopolitical shocks compared to historical analogues."
+    }
+  },
+  "economic_fiscal_market": {
+    "agent_id": "economic_fiscal_market_gpt4o",
+    "round": 1,
+    "event": "liberation_day_tariffs_20250402",
+    "direction": "negative",
+    "magnitude_pct": {
+      "SP500": -3.8,
+      "XLE": -5.2,
+      "XLF": -4.1,
+      "XLK": -6.7,
+      "ITA": -3.9,
+      "XLY": -4.5
+    },
+    "confidence": 0.85,
+    "key_assumption": "The immediate implementation of sector-specific tariffs will lead to higher input costs and reduced trade, negatively impacting corporate earnings and equity prices.",
+    "supporting_evidence": [
+      "Liberation Day Apr 2025: broad reciprocal tariffs on major trading partners; sector-specific rates; immediate implementation timeline.",
+      "2018-19 US-China tariff rounds: S&P 500 -6.8% peak-to-trough over tariff escalation window; XLF and XLK underperformed.",
+      "Equity futures fell sharply overnight Apr 2 2025 \u2014 broad beta risk-off across sectors except potential short-term defensives."
+    ],
+    "transmission_channels": [
+      "Trade Policy Shock \u2192 import prices \u2192 XLY margin compression",
+      "Inflation Shock \u2192 higher input costs \u2192 XLE and XLK earnings pressure",
+      "Monetary Policy Constraint \u2192 Fed boxed in (cannot ease into 7.5% CPI) \u2192 SP500 risk premium increase"
+    ],
+    "channel_assessment": {
+      "primary_channel": "Trade Policy Shock \u2192 import prices \u2192 XLY margin compression",
+      "channel_adjustments": "The immediate implementation timeline and sector-specific rates amplify the negative impact on corporate earnings, which is more severe than historical trade-war analogues due to current market conditions."
+    }
+  },
+  "environmental_technology": {
+    "agent_id": "environmental_technology_gemini",
+    "round": 1,
+    "event": "liberation_day_tariffs_20250402",
+    "direction": "negative",
+    "magnitude_pct": {
+      "SP500": -3.5,
+      "XLE": -6.0,
+      "XLF": -4.0,
+      "XLK": -7.0,
+      "ITA": -5.0,
+      "XLY": -2.0
+    },
+    "confidence": 0.85,
+    "key_assumption": "Disruption to energy infrastructure and semiconductor supply chains will lead to margin compression in the Energy and Technology sectors",
+    "supporting_evidence": [
+      "Russia produces 10-11 million barrels/day oil (\u224810% global supply) and exports 5M bbl/day \u2014 Europe receives ~2.5M bbl/day from Russia",
+      "Ukraine produces 70% of global neon gas supply, essential for chip lithography",
+      "CISA had issued alerts in January 2022 about Russian cyber threat escalation ahead of potential invasion"
+    ],
+    "transmission_channels": [
+      "Supply Chain Disruption \u2192 Energy Infrastructure disruption \u2192 XLE margin compression",
+      "Supply Chain Disruption \u2192 Semiconductor supply chain disruption \u2192 XLK margin compression",
+      "Cyber Risk \u2192 Operational disruptions \u2192 XLF, XLK, and ITA margin compression"
+    ],
+    "channel_assessment": {
+      "primary_channel": "Supply Chain Disruption",
+      "channel_adjustments": "The April 2025 regime data shows moderate growth, elevated volatility, and full valuation, which increases the sensitivity of sectors to supply chain disruptions"
+    }
+  },
+  "social_behavioural": {
+    "agent_id": "social_behavioural_deepseek",
+    "round": 1,
+    "event": "liberation_day_tariffs_20250402",
+    "direction": "negative",
+    "magnitude_pct": {
+      "SP500": -6.5,
+      "XLE": -9.0,
+      "XLF": -7.8,
+      "XLK": -8.2,
+      "ITA": -4.5,
+      "XLY": -10.0
+    },
+    "confidence": 0.85,
+    "key_assumption": "Retail investor sentiment is already fragile due to pre-existing inflationary concerns and a bearish AAII reading, amplifying the market's negative reaction to the tariff announcement.",
+    "supporting_evidence": [
+      "AAII Sentiment Survey (Feb 2022): 46.8% Bearish \u2013 indicating a high level of pre-existing risk aversion.",
+      "Consumer Sentiment: University of Michigan Consumer Sentiment 61.7 (Feb 2022) - reflecting significant inflation anxiety and reduced purchasing power.",
+      "Media Amplification Risk: Social media coverage of the Ukraine conflict combined with existing petrol pump price anxieties will accelerate behavioural overshoot."
+    ],
+    "transmission_channels": [
+      "Trade Policy Shock \u2192 import prices \u2192 XLY margin compression (driven by consumer discretionary sector sensitivity)",
+      "Inflation Shock \u2192 negative real wages \u2192 AAII bearishness & retail selling",
+      "Social Amplification Risk: TikTok/Twitter coverage of the tariff announcement accelerates fear transmission and retail panic."
+    ],
+    "channel_assessment": {
+      "primary_channel": "Trade Policy Shock \u2192 import prices \u2192 XLY margin compression",
+      "channel_adjustments": "The pre-existing bearish sentiment in retail investors amplifies the negative impact of the tariff announcement on XLY, creating a more pronounced overshoot than would be expected based solely on trade policy fundamentals."
+    }
+  },
+  "devils_advocate": {
+    "agent_id": "devils_advocate_claude",
+    "round": 1,
+    "event": "liberation_day_tariffs_20250402",
+    "direction": "negative",
+    "magnitude_pct": {
+      "SP500": -3.8,
+      "XLE": -6.7,
+      "XLF": -1.9,
+      "XLK": 0.4,
+      "ITA": 2.2,
+      "XLY": 0.8
+    },
+    "confidence": 0.5,
+    "key_assumption": "The relief rally channel is being systematically ignored.",
+    "supporting_evidence": [
+      "The VIX was 31 on Feb 23 \u2014 far above its average of 19."
+    ],
+    "transmission_channels": [
+      "Relief Rally / Priced-In Shock Dampener",
+      "Geopolitical Risk Premium"
+    ],
+    "channel_assessment": {
+      "primary_channel": "Relief Rally / Priced-In Shock Dampener",
+      "channel_adjustments": ""
+    }
+  }
+}

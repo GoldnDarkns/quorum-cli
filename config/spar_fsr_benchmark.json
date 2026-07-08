@@ -1,0 +1,82 @@
+{
+  "source": "U.S. Federal Reserve Financial Stability Report (curated benchmark excerpts)",
+  "citation": "https://www.federalreserve.gov/publications/financial-stability-report.htm",
+  "description": "Expert stress-scenario language from Fed FSR editions used as an objective plausibility benchmark (paper Layer 2, prong 3).",
+  "scenarios": {
+    "ukraine_2022": {
+      "fsr_editions": ["2022-May", "2023-May", "2024-May"],
+      "passages": [
+        {
+          "id": "fsr_geo_energy_2022",
+          "themes": ["geopolitical", "energy", "commodity", "inflation"],
+          "text": "Russia's invasion of Ukraine has increased uncertainty about the economic outlook and heightened risks to financial stability. Disruptions to commodity markets, particularly for energy and agricultural products, could put additional upward pressure on inflation and weigh on economic activity."
+        },
+        {
+          "id": "fsr_geo_spillovers_2023",
+          "themes": ["geopolitical", "sanctions", "global", "banking"],
+          "text": "Geopolitical tensions remain a key source of risk. An intensification of geopolitical tensions could lead to sharp moves in commodity prices, tighter financial conditions, and spillovers to funding markets and internationally active banks."
+        },
+        {
+          "id": "fsr_energy_vol_2022",
+          "themes": ["energy", "volatility", "equity", "risk_premium"],
+          "text": "Higher and more volatile energy prices could reduce household purchasing power, compress corporate margins, and contribute to a repricing of risk assets as investors demand greater compensation for uncertainty."
+        },
+        {
+          "id": "fsr_inflation_monetary_2022",
+          "themes": ["inflation", "monetary_policy", "rates", "financial_conditions"],
+          "text": "Persistently elevated inflation may require tighter monetary policy than currently anticipated, which could lead to a sharp tightening in financial conditions, declines in asset prices, and increased stress at vulnerable firms."
+        }
+      ]
+    },
+    "liberation_day_2025": {
+      "fsr_editions": ["2024-May", "2025-May"],
+      "passages": [
+        {
+          "id": "fsr_trade_uncertainty_2024",
+          "themes": ["trade", "tariffs", "policy_uncertainty", "investment"],
+          "text": "Increased trade policy uncertainty and the possibility of higher tariffs could weigh on business investment, disrupt supply chains, and raise input costs, with adverse effects on corporate earnings and equity valuations."
+        },
+        {
+          "id": "fsr_trade_inflation_2024",
+          "themes": ["trade", "tariffs", "inflation", "consumer"],
+          "text": "A broad escalation of trade restrictions may pass through to consumer prices, complicate the disinflation process, and prompt a reassessment of the interest-rate path, potentially triggering tighter financial conditions."
+        },
+        {
+          "id": "fsr_supply_chain_2024",
+          "themes": ["trade", "supply_chain", "manufacturing", "technology"],
+          "text": "Trade and industrial-policy shocks could re-segment global supply chains, raising production costs for import-dependent sectors and increasing earnings volatility for firms with concentrated overseas exposure."
+        },
+        {
+          "id": "fsr_equity_correction_2024",
+          "themes": ["equity", "valuation", "risk_off", "volatility"],
+          "text": "Equity valuations remain sensitive to growth surprises. A negative shock to the growth outlook — including from trade disruptions — could precipitate a rapid risk-off move, wider credit spreads, and a flight to safer assets."
+        }
+      ]
+    },
+    "generic": {
+      "fsr_editions": ["2023-May", "2024-May", "2025-May"],
+      "passages": [
+        {
+          "id": "fsr_financial_conditions_2023",
+          "themes": ["financial_conditions", "credit", "leverage"],
+          "text": "A sharp tightening in financial conditions could reveal vulnerabilities among highly leveraged businesses and households, leading to rising defaults and pressure on lenders with concentrated exposures."
+        },
+        {
+          "id": "fsr_geopolitical_generic_2024",
+          "themes": ["geopolitical", "uncertainty", "commodity"],
+          "text": "Geopolitical developments remain an important source of tail risk. An adverse geopolitical event could disrupt commodity flows, elevate risk premiums across asset classes, and impair market liquidity."
+        },
+        {
+          "id": "fsr_market_functioning_2023",
+          "themes": ["liquidity", "treasury", "market_functioning"],
+          "text": "Strains in market functioning — particularly during periods of rapid repricing — could amplify shocks as dealers reduce risk capacity and investors withdraw from less liquid segments."
+        },
+        {
+          "id": "fsr_cyber_operational_2024",
+          "themes": ["cyber", "operational_risk", "infrastructure"],
+          "text": "Cyber incidents and operational disruptions at critical infrastructure or large financial institutions could impair payment and settlement systems and trigger broader confidence effects."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "preset": "fast-thesis",
+  "description": "Recommended first offline thesis test \u2014 3 model families, ~35 min on RTX 4060 Ti 8GB",
+  "default": "qwen2.5:7b",
+  "agents": {
+    "Political": "llama3.1:8b",
+    "Economic": "qwen2.5:7b",
+    "Environmental": "qwen2.5:7b",
+    "Social": "llama3.1:8b",
+    "DevilsAdvocate": "deepseek-r1:7b"
+  },
+  "moderator": "qwen2.5:7b",
+  "unique_models": [
+    "deepseek-r1:7b",
+    "llama3.1:8b",
+    "qwen2.5:7b"
+  ],
+  "ollama_options": {
+    "temperature": 0,
+    "num_ctx": 2048
+  },
+  "scenario": "liberation-day",
+  "task_preview": "On April 2, 2025, the United States announced broad reciprocal tariffs under the 'Liberation Day' trade policy package, with sector-specific rates on imports from major trading partners and immediate "
+}

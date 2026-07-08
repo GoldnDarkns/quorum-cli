@@ -1,0 +1,21 @@
+ {
+  "event": "Liberation Day Trade Policy Announcement",
+  "date": "April 2, 2025",
+  "impact_channels": [
+    {
+      "channel": "Supply Chain Disruption",
+      "description": "Broad reciprocal tariffs may disrupt global supply chains, particularly in sectors with high import dependency. This could lead to increased costs, reduced efficiency, and potential shortages of goods.",
+      "sectors": ["Automotive", "Electronics", "Agriculture"]
+    },
+    {
+      "channel": "Energy/Commodity",
+      "description": "Tariffs on energy-intensive sectors could lead to increased costs for producers, potentially driving up global energy prices. This could also impact commodities related to these sectors.",
+      "sectors": ["Energy", "Metals and Mining"]
+    },
+    {
+      "channel": "Cyber/Operational",
+      "description": "Trade tensions may escalate into cyber attacks, particularly if perceived as retaliation for tariff measures. This could disrupt critical infrastructure and supply chains.",
+      "sectors": ["Financial Services", "Technology"]
+    }
+  ]
+}

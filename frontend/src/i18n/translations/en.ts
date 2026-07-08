@@ -146,8 +146,8 @@ export const en: Translations = {
   // Phase Names - SPAR
   "phase.spar.1": "Layer 0: Channel Prioritization",
   "phase.spar.2": "Round 1: Domain Analysis",
-  "phase.spar.3": "Round 2: Live Debate",
-  "phase.spar.4": "Moderator Synthesis",
+  "phase.spar.3": "Live Debate + DCS",
+  "phase.spar.4": "Moderator + Plausibility Gate",
 
   // Phase Messages (backend → frontend)
   "phase.standard.1.msg": "{count} participants will answer independently...",
@@ -179,8 +179,8 @@ export const en: Translations = {
   "phase.tradeoff.4.msg": "Synthesizing recommendation with tradeoff analysis.",
   "phase.spar.1.msg": "Transmission channels are scored and evidence is retrieved per channel.",
   "phase.spar.2.msg": "Five domain specialists produce independent Round 1 analyses.",
-  "phase.spar.3.msg": "Agents speak in turn, read the transcript, and respond to each other directly.",
-  "phase.spar.4.msg": "The Moderator synthesises the full debate transcript.",
+  "phase.spar.3.msg": "Agents debate in turn. After each round, DCS decides EXPLORE (another round) or EXPLOIT (Moderator).",
+  "phase.spar.4.msg": "Moderator synthesises consensus + dissent, then Plausibility Gate and Layer 3 run if enabled.",
 
   // Roles
   "role.for": "FOR",
@@ -199,6 +199,12 @@ export const en: Translations = {
   "role.social": "SOCIAL",
   "role.devilsAdvocate": "DEVIL'S ADVOCATE",
   "role.moderator": "MODERATOR",
+  "role.dcs": "DCS",
+  "role.plausibilityGate": "PLAUSIBILITY GATE",
+  "role.benchmarks": "MODEL BENCHMARKS",
+  "role.layer3": "LAYER 3",
+  "role.artifacts": "ARTIFACTS",
+  "role.portfolio": "PORTFOLIO REC",
 
   // Rounds
   "round.opening": "Opening Statements",
@@ -207,6 +213,12 @@ export const en: Translations = {
   "round.layer0": "Layer 0",
   "round.round1": "Round 1",
   "round.round2": "Round 2",
+  "round.dcs": "Debate Continuation Score",
+  "round.plausibilityGate": "Plausibility Gate",
+  "round.modelBenchmarks": "Model Benchmark Analysis",
+  "round.layer3": "Layer 3 Quantification",
+  "round.moderator": "Moderator Synthesis",
+  "round.portfolioRecommendation": "Portfolio Recommendation",
 
   // Messages
   "msg.independentAnswer": "(Independent Answer)",
@@ -223,6 +235,7 @@ export const en: Translations = {
   "msg.startingDiscussion": "Starting discussion...",
   "msg.phaseInProgress": "Phase {phase}: {name} in progress...",
   "msg.pausePrompt": "{previousPhase} complete. Press Enter to continue to {nextPhase}...",
+  "msg.humanReviewPrompt": "Low plausibility — human review required. {reason} Press Enter to acknowledge.",
   "msg.discussionComplete": "Discussion Complete",
   "msg.pressEscNewDiscussion": "Press ESC to start a new discussion",
 
@@ -237,6 +250,8 @@ export const en: Translations = {
   "consensus.yes": "YES",
   "consensus.no": "NO",
   "consensus.partial": "PARTIAL",
+  "consensus.cleared": "CLEARED",
+  "consensus.humanReview": "HUMAN REVIEW",
 
   // Synthesis labels by method
   "synthesis.aporia": "Aporia Reached",
@@ -348,7 +363,7 @@ export const en: Translations = {
   "terminology.differences.delphi": "Outlier Perspectives",
   "terminology.differences.brainstorm": "Alternative Directions",
   "terminology.differences.tradeoff": "Key Tradeoffs",
-  "terminology.differences.spar": "Dissenting Views",
+  "terminology.differences.spar": "Pipeline Summary",
 
   // Method Terminology - By Labels
   "terminology.by.standard": "Synthesized by",

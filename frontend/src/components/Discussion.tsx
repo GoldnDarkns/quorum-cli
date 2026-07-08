@@ -21,6 +21,8 @@ export function Discussion() {
     nextPhase,
     currentMethod,
     isPaused,
+    humanReviewPending,
+    humanReviewReason,
     thinkingModel,
     completedThinking,
     availableModels,
@@ -132,9 +134,11 @@ export function Discussion() {
       {/* Pause prompt */}
       {isPaused && (
         <Box marginTop={1}>
-          <Box borderStyle="round" borderColor="cyan" paddingX={2} paddingY={0}>
-            <Text color="cyan" bold>
-              ⏸  {t("msg.pausePrompt", { previousPhase: previousPhaseName, nextPhase: nextPhaseName })}
+          <Box borderStyle="round" borderColor={humanReviewPending ? "red" : "cyan"} paddingX={2} paddingY={0}>
+            <Text color={humanReviewPending ? "red" : "cyan"} bold>
+              {humanReviewPending
+                ? `⚠  ${t("msg.humanReviewPrompt", { reason: humanReviewReason })}`
+                : `⏸  ${t("msg.pausePrompt", { previousPhase: previousPhaseName, nextPhase: nextPhaseName })}`}
             </Text>
           </Box>
         </Box>

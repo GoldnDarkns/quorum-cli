@@ -1,11 +1,11 @@
 """Tests for SPAR Layer 0 transmission-channel-first pipeline."""
 
 from quorum.methods.spar_layer0 import (
+    TRANSMISSION_CHANNELS,
     ChannelPriority,
     detect_scenario_id,
     run_layer0_pipeline,
     score_channel,
-    TRANSMISSION_CHANNELS,
 )
 
 
@@ -47,7 +47,10 @@ def test_evidence_per_channel_not_single_analogue_block():
 def test_layer0_summary_for_ui():
     layer0 = run_layer0_pipeline("Russia invasion of Ukraine")
     assert "Layer 0" in layer0.summary_text
-    assert "Activated channels" in layer0.summary_text
+    assert "Channel ontology" in layer0.summary_text
+    assert "Activated for debate" in layer0.summary_text
+    assert "PRIMARY" in layer0.summary_text
+    assert "How the score works" in layer0.summary_text
 
 
 def test_score_channel_deterministic():
@@ -55,9 +58,10 @@ def test_score_channel_deterministic():
     shock = "Russia oil gas invasion Ukraine energy supply"
     parsed = {"entities": ["Russia"], "event_type": ["military_escalation"], "scenario_id": "ukraine_2022"}
     regime = {"inflation": "HIGH AND RISING", "liquidity": "TIGHTENING", "volatility": "ELEVATED"}
-    score, reason = score_channel(channel, shock, parsed, regime)
+    score, reason, components = score_channel(channel, shock, parsed, regime)
     assert score >= 75
     assert reason
+    assert "event_pct" in components
 
 
 LIBERATION_DAY_SHOCK = (
@@ -82,7 +86,16 @@ def test_liberation_day_trade_channels_primary():
     assert trade.score >= 75
     assert any("Liberation Day" in item or "tariff" in item.lower() for item in trade.evidence)
 
-    assert "geopolitical" not in layer0.summary_text.lower() or "Scenario: liberation_day_2025" in layer0.summary_text
+    assert "liberation_day_2025" in layer0.summary_text
+
+
+def test_tariff_without_date_uses_liberation_profile():
+    shock = "The United States announced broad reciprocal tariffs on major trading partners."
+    assert detect_scenario_id(shock) == "liberation_day_2025"
+    layer0 = run_layer0_pipeline(shock)
+    active = [a for a in layer0.activations if a.priority == ChannelPriority.PRIMARY]
+    assert len(active) >= 5
+    assert "liberation_day_2025" in layer0.summary_text
 
 
 def test_liberation_day_agent_packets_use_trade_evidence():

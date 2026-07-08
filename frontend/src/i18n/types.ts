@@ -198,6 +198,12 @@ export type TranslationKey =
   | "role.social"
   | "role.devilsAdvocate"
   | "role.moderator"
+  | "role.dcs"
+  | "role.plausibilityGate"
+  | "role.benchmarks"
+  | "role.layer3"
+  | "role.artifacts"
+  | "role.portfolio"
 
   // Rounds
   | "round.opening"
@@ -206,6 +212,12 @@ export type TranslationKey =
   | "round.layer0"
   | "round.round1"
   | "round.round2"
+  | "round.dcs"
+  | "round.plausibilityGate"
+  | "round.modelBenchmarks"
+  | "round.layer3"
+  | "round.moderator"
+  | "round.portfolioRecommendation"
 
   // Messages
   | "msg.independentAnswer"
@@ -222,6 +234,7 @@ export type TranslationKey =
   | "msg.startingDiscussion"
   | "msg.phaseInProgress"
   | "msg.pausePrompt"
+  | "msg.humanReviewPrompt"
   | "msg.discussionComplete"
   | "msg.pressEscNewDiscussion"
 
@@ -236,6 +249,8 @@ export type TranslationKey =
   | "consensus.yes"
   | "consensus.no"
   | "consensus.partial"
+  | "consensus.cleared"
+  | "consensus.humanReview"
 
   // Synthesis labels by method
   | "synthesis.aporia"

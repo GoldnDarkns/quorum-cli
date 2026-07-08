@@ -1,11 +1,11 @@
 # Pull Ollama models for SPAR offline presets (Windows).
 # Usage:
 #   powershell -File scripts/pull_spar_offline_models.ps1
-#   powershell -File scripts/pull_spar_offline_models.ps1 -Preset thesis
+#   powershell -File scripts/pull_spar_offline_models.ps1 -Preset demo-diverse
 
 param(
-    [ValidateSet("uniform", "fast-thesis", "thesis")]
-    [string]$Preset = "fast-thesis"
+    [ValidateSet("uniform", "fast-thesis", "thesis", "demo-diverse")]
+    [string]$Preset = "demo-diverse"
 )
 
 $ErrorActionPreference = "Stop"

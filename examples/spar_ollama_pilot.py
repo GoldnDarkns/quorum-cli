@@ -6,11 +6,11 @@ Uses the same Layer 0 pipeline and live Round 2 debate as Quorum's SPAR method.
 Supports per-agent model mapping via config/spar_offline_models.json presets.
 
 Usage:
-    # Recommended first thesis test (3 models, Liberation Day):
-    uv run python examples/spar_ollama_pilot.py --preset fast-thesis --scenario liberation-day
+    # Recommended Liberation Day demo (6 model families):
+    uv run python examples/spar_ollama_pilot.py --preset demo-diverse --scenario liberation-day
 
-    # Full five-family variety:
-    uv run python examples/spar_ollama_pilot.py --preset thesis --scenario liberation-day
+    # Quick thesis test (3 models):
+    uv run python examples/spar_ollama_pilot.py --preset fast-thesis --scenario liberation-day
 
     # Single-model baseline (replicate Ukraine pilot):
     uv run python examples/spar_ollama_pilot.py --preset uniform --round 1
@@ -32,11 +32,24 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from quorum.methods.spar import (
+    LIVE_DEBATE_ROUND_INSTRUCTION,
     ROUND2_LIVE_DEBATE_INSTRUCTION,
     _format_agent_response,
     _parse_json_response,
     build_moderator_user_message,
 )
+from quorum.methods.spar_plausibility_gate import (
+    evaluate_plausibility_gate,
+    format_plausibility_gate_summary,
+)
+from quorum.methods.spar_model_benchmarks import build_analysis_report, format_benchmark_report
+from quorum.methods.spar_layer3 import (
+    format_layer3_summary,
+    format_portfolio_recommendation,
+    run_layer3_quantification,
+    save_layer3_artifacts,
+)
+from quorum.config import get_settings
 from quorum.methods.spar_layer0 import (
     build_agent_system_prompt,
     resolve_master_context,
@@ -85,6 +98,7 @@ class OfflineModelMap:
     ollama_options_long: dict[str, Any]
     preset: str
     description: str
+    compact_layer0: bool = True
 
     def for_role(self, role_key: str) -> str:
         return self.roles.get(role_key, self.default)
@@ -124,6 +138,7 @@ def load_model_map(
             ollama_options_long={"temperature": 0, "num_ctx": 12288},
             preset="uniform",
             description=f"Single model override: {override_model}",
+            compact_layer0=True,
         )
 
     if not config_path.exists():
@@ -143,6 +158,7 @@ def load_model_map(
         ollama_options_long=raw.get("ollama_options_long", {"temperature": 0, "num_ctx": 12288}),
         preset=preset,
         description=entry.get("description", ""),
+        compact_layer0=bool(raw.get("offline_compact_layer0", True)),
     )
 
 
@@ -212,9 +228,9 @@ def ollama_chat(
     return data.get("message", {}).get("content", "")
 
 
-def run_layer0(task: str, run_dir: Path) -> object:
+def run_layer0(task: str, run_dir: Path, compact: bool = True) -> object:
     print(f"\n{'='*60}\n[Layer 0] Transmission-channel prioritization...\n{'='*60}")
-    layer0 = run_layer0_pipeline(task)
+    layer0 = run_layer0_pipeline(task, compact=compact)
     (run_dir / "layer0_summary.txt").write_text(layer0.summary_text, encoding="utf-8")
     (run_dir / "layer0.json").write_text(json.dumps(layer0.to_dict(), indent=2), encoding="utf-8")
     print(layer0.summary_text[:800])
@@ -261,7 +277,9 @@ def run_round1(
         print(f"\n{'='*60}\n[{label}] Round 1 — {model}\n{'='*60}")
         master = resolve_master_context(task, PROMPTS)
         agent_prompt = load_prompt(prompt_file)
-        system = build_agent_system_prompt(master, layer0, role_key, agent_prompt)
+        system = build_agent_system_prompt(
+            master, layer0, role_key, agent_prompt, compact=models.compact_layer0
+        )
         user = f"{task.strip()}\n\nProduce your Round 1 JSON output now. JSON only."
         raw = ollama_chat(model, system, user, base_url, models.ollama_options)
         (run_dir / f"{agent_id}_round1_raw.txt").write_text(raw, encoding="utf-8")
@@ -290,6 +308,107 @@ def _round2_complete(run_dir: Path, agent_id: str) -> bool:
     return (run_dir / f"{agent_id}_round2.json").exists()
 
 
+def run_debate_with_dcs(
+    models: OfflineModelMap,
+    base_url: str,
+    run_dir: Path,
+    layer0: object,
+    displays: dict[str, str],
+    round1_results: dict[str, dict],
+    task: str,
+    resume: bool = False,
+) -> tuple[dict[str, dict], dict[int, dict[str, dict]], list[dict]]:
+    """Run live debate rounds 2..N with DCS explore/exploit between rounds."""
+    settings = get_settings()
+    dcs_enabled = settings.spar_dcs_enabled
+    threshold = settings.spar_dcs_threshold
+    max_rounds = settings.spar_max_debate_rounds
+
+    debate_rounds: dict[int, dict[str, dict]] = {}
+    debate_raw_by_round: dict[int, dict[str, str]] = {}
+    dcs_history: list[dict] = []
+    debate: list[str] = [_build_round1_transcript(displays)]
+    prior_speeches: dict[str, str] | None = None
+    final_results: dict[str, dict] = {}
+
+    for debate_round in range(2, max_rounds + 1):
+        debate.append(f"\n=== ROUND {debate_round} — Live cross-examination ===\n")
+        round_results: dict[str, dict] = {}
+        round_raw: dict[str, str] = {}
+        round_speeches: dict[str, str] = {}
+
+        for role_key, agent_id, prompt_file, ipc_role in AGENTS:
+            if resume and debate_round == 2 and _round2_complete(run_dir, agent_id):
+                label = ipc_role.replace("_", " ").title()
+                prior = json.loads((run_dir / f"{agent_id}_round2.json").read_text(encoding="utf-8"))
+                round_results[agent_id] = prior
+                round_speeches[agent_id] = prior.get("live_response", "")
+                debate.append(f"--- {ipc_role} (speaking now) ---\n{prior.get('live_response', '')}\n")
+                print(f"\n[{label}] Round {debate_round} — skipped (already complete)")
+                continue
+
+            model = models.for_role(role_key)
+            label = ipc_role.replace("_", " ").title()
+            print(f"\n{'='*60}\n[{label}] Round {debate_round} — {model}\n{'='*60}")
+            master = resolve_master_context(task, PROMPTS)
+            agent_prompt = load_prompt(prompt_file)
+            system = build_agent_system_prompt(
+                master, layer0, role_key, agent_prompt, compact=models.compact_layer0
+            )
+            transcript = _cap_transcript("\n".join(debate))
+            user = LIVE_DEBATE_ROUND_INSTRUCTION.format(
+                round_num=debate_round,
+                role_label=label,
+                transcript=transcript,
+            )
+            raw = ollama_chat(model, system, user, base_url, models.debate_options)
+            round_raw[agent_id] = raw
+            round_results[agent_id] = {"round": debate_round, "live_response": raw, "model": model}
+            round_speeches[agent_id] = raw
+            if debate_round == 2:
+                (run_dir / f"{agent_id}_round2_raw.txt").write_text(raw, encoding="utf-8")
+                (run_dir / f"{agent_id}_round2.json").write_text(
+                    json.dumps(round_results[agent_id], indent=2), encoding="utf-8"
+                )
+            else:
+                (run_dir / f"{agent_id}_round{debate_round}_raw.txt").write_text(raw, encoding="utf-8")
+                (run_dir / f"{agent_id}_round{debate_round}.json").write_text(
+                    json.dumps(round_results[agent_id], indent=2), encoding="utf-8"
+                )
+            debate.append(f"--- {ipc_role} (speaking now) ---\n{raw}\n")
+            print(f"  OK — {len(raw)} chars")
+
+        debate_rounds[debate_round] = round_results
+        debate_raw_by_round[debate_round] = round_raw
+        final_results = round_results
+        (run_dir / "live_debate_transcript.txt").write_text("\n".join(debate), encoding="utf-8")
+
+        if not dcs_enabled:
+            break
+
+        decision = compute_dcs(
+            round_number=debate_round,
+            round1_results=round1_results,
+            prior_live_speeches=prior_speeches,
+            current_live_speeches=round_speeches,
+            debate_transcript="\n".join(debate),
+            threshold=threshold,
+            max_rounds=max_rounds,
+            round1_displays=displays if debate_round == 2 else None,
+        )
+        dcs_history.append(decision.to_dict())
+        (run_dir / "dcs_scores.json").write_text(json.dumps(dcs_history, indent=2), encoding="utf-8")
+        print(f"\n{format_dcs_summary(decision)}")
+
+        if decision.action == "exploit":
+            break
+        prior_speeches = round_speeches
+
+    serializable = {str(rnd): data for rnd, data in sorted(debate_rounds.items())}
+    (run_dir / "debate_rounds_all.json").write_text(json.dumps(serializable, indent=2), encoding="utf-8")
+    return final_results, debate_rounds, dcs_history
+
+
 def run_round2_live(
     models: OfflineModelMap,
     base_url: str,
@@ -298,39 +417,46 @@ def run_round2_live(
     displays: dict[str, str],
     task: str,
     resume: bool = False,
+    round1_results: dict[str, dict] | None = None,
 ) -> dict[str, dict]:
-    results: dict[str, dict] = {}
-    debate: list[str] = [_build_round1_transcript(displays), "\n=== ROUND 2 — Live cross-examination ===\n"]
-    existing_path = run_dir / "round2_all.json"
-    if resume and existing_path.exists():
-        results = json.loads(existing_path.read_text(encoding="utf-8"))
+    """Backward-compatible wrapper — runs DCS-aware debate and returns final round."""
+    r1 = round1_results
+    if r1 is None:
+        r1_path = run_dir / "round1_all.json"
+        r1 = json.loads(r1_path.read_text(encoding="utf-8")) if r1_path.exists() else {}
+    final, _rounds, _dcs = run_debate_with_dcs(
+        models, base_url, run_dir, layer0, displays, r1, task, resume=resume
+    )
+    (run_dir / "round2_all.json").write_text(json.dumps(final, indent=2), encoding="utf-8")
+    return final
 
-    for role_key, agent_id, prompt_file, ipc_role in AGENTS:
-        if resume and _round2_complete(run_dir, agent_id):
-            label = ipc_role.replace("_", " ").title()
-            prior = json.loads((run_dir / f"{agent_id}_round2.json").read_text(encoding="utf-8"))
-            results[agent_id] = prior
-            debate.append(f"--- {ipc_role} (speaking now) ---\n{prior.get('live_response', '')}\n")
-            print(f"\n[{label}] Round 2 — skipped (already complete)")
-            continue
 
-        model = models.for_role(role_key)
-        label = ipc_role.replace("_", " ").title()
-        print(f"\n{'='*60}\n[{label}] Round 2 — {model}\n{'='*60}")
-        master = resolve_master_context(task, PROMPTS)
-        agent_prompt = load_prompt(prompt_file)
-        system = build_agent_system_prompt(master, layer0, role_key, agent_prompt)
-        transcript = _cap_transcript("\n".join(debate))
-        user = ROUND2_LIVE_DEBATE_INSTRUCTION.format(role_label=label, transcript=transcript)
-        raw = ollama_chat(model, system, user, base_url, models.debate_options)
-        (run_dir / f"{agent_id}_round2_raw.txt").write_text(raw, encoding="utf-8")
-        results[agent_id] = {"round": 2, "live_response": raw, "model": model}
-        (run_dir / f"{agent_id}_round2.json").write_text(json.dumps(results[agent_id], indent=2), encoding="utf-8")
-        debate.append(f"--- {ipc_role} (speaking now) ---\n{raw}\n")
-        print(f"  OK — {len(raw)} chars")
+def run_plausibility_gate(run_dir: Path, moderator_raw: str, scenario_id: str = "generic") -> dict:
+    """Evaluate Layer 2 plausibility gate and optionally pause for human review."""
+    settings = get_settings()
+    decision, fsr_result = evaluate_plausibility_gate(
+        moderator_raw,
+        threshold=settings.spar_plausibility_threshold,
+        enabled=settings.spar_plausibility_gate_enabled,
+        scenario_id=scenario_id,
+        fsr_enabled=settings.spar_fsr_benchmark_enabled,
+        moderator_weight=settings.spar_fsr_moderator_weight,
+        fsr_weight=settings.spar_fsr_weight,
+    )
+    payload = decision.to_dict()
+    (run_dir / "plausibility_gate.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(f"\n{format_plausibility_gate_summary(decision, fsr_result)}")
 
-    (run_dir / "live_debate_transcript.txt").write_text("\n".join(debate), encoding="utf-8")
-    return results
+    if (
+        settings.spar_plausibility_gate_enabled
+        and not decision.passed
+        and settings.spar_human_review_block
+    ):
+        try:
+            input("\n[HUMAN REVIEW] Press Enter to acknowledge low plausibility and end run...")
+        except EOFError:
+            print("\n[HUMAN REVIEW] Non-interactive mode — flagged in plausibility_gate.json")
+    return payload
 
 
 def run_moderator(
@@ -341,22 +467,31 @@ def run_moderator(
     task: str,
     round1_displays: dict[str, str],
     round2_results: dict,
+    debate_rounds: dict[int, dict] | None = None,
 ) -> str:
     model = models.for_role("Moderator")
     print(f"\n{'='*60}\n[Moderator] Synthesizing — {model}\n{'='*60}")
     master = resolve_master_context(task, PROMPTS)
     mod = load_prompt("moderator.txt")
-    system = build_agent_system_prompt(master, layer0, "Moderator", mod)
-    user = build_moderator_user_message(task, layer0, round1_displays, round2_results)
+    system = build_agent_system_prompt(
+        master, layer0, "Moderator", mod, compact=models.compact_layer0
+    )
+    user = build_moderator_user_message(
+        task,
+        layer0,
+        round1_displays,
+        round2_results=round2_results,
+        debate_rounds=debate_rounds,
+    )
     raw = ollama_chat(model, system, user, base_url, models.debate_options)
     (run_dir / "moderator_raw.txt").write_text(raw, encoding="utf-8")
     print("  Done — saved moderator_raw.txt")
     return raw
 
 
-def load_layer0(task: str, run_dir: Path) -> object:
+def load_layer0(task: str, run_dir: Path, compact: bool = True) -> object:
     """Run Layer 0 pipeline and persist summary (always scenario-aware)."""
-    layer0 = run_layer0_pipeline(task)
+    layer0 = run_layer0_pipeline(task, compact=compact)
     (run_dir / "layer0_summary.txt").write_text(layer0.summary_text, encoding="utf-8")
     (run_dir / "layer0.json").write_text(json.dumps(layer0.to_dict(), indent=2), encoding="utf-8")
     return layer0
@@ -366,8 +501,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="SPAR Ollama offline pilot (Layer 0 + live debate)")
     parser.add_argument(
         "--preset",
-        choices=["uniform", "fast-thesis", "thesis"],
-        default="thesis",
+        choices=["uniform", "fast-thesis", "thesis", "demo-diverse"],
+        default="demo-diverse",
         help="Model mapping preset from config/spar_offline_models.json",
     )
     parser.add_argument(
@@ -403,7 +538,13 @@ def main() -> None:
     manifest = models.to_manifest()
     manifest["scenario"] = args.scenario
     manifest["task_preview"] = task[:200]
+    bench_report = build_analysis_report(args.preset)
+    manifest["model_benchmark_report"] = bench_report
     (run_dir / "model_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    (run_dir / "model_benchmark_report.json").write_text(
+        json.dumps(bench_report, indent=2), encoding="utf-8"
+    )
+    print(format_benchmark_report(args.preset))
 
     print(f"Output directory: {run_dir}")
     print(f"Preset: {models.preset} — {models.description}")
@@ -416,11 +557,11 @@ def main() -> None:
     layer0_path = run_dir / "layer0.json"
 
     if args.round == "layer0":
-        run_layer0(task, run_dir)
+        run_layer0(task, run_dir, compact=models.compact_layer0)
         print(f"\nDone. Layer 0 saved in: {run_dir}")
         return
 
-    layer0 = load_layer0(task, run_dir)
+    layer0 = load_layer0(task, run_dir, compact=models.compact_layer0)
 
     if args.round in ("1", "all"):
         r1 = run_round1(models, args.base_url, run_dir, layer0, task, resume=args.resume)
@@ -433,7 +574,10 @@ def main() -> None:
             raise SystemExit(f"Round 1 results not found in {run_dir}. Run --round 1 first.")
         displays = rebuild_round1_displays(run_dir)
         (run_dir / "round1_displays.json").write_text(json.dumps(displays, indent=2), encoding="utf-8")
-        r2 = run_round2_live(models, args.base_url, run_dir, layer0, displays, task, resume=args.resume)
+        r1 = json.loads((run_dir / "round1_all.json").read_text(encoding="utf-8"))
+        r2, debate_rounds, _dcs = run_debate_with_dcs(
+            models, args.base_url, run_dir, layer0, displays, r1, task, resume=args.resume
+        )
         (run_dir / "round2_all.json").write_text(json.dumps(r2, indent=2), encoding="utf-8")
 
     if args.round in ("moderator", "all"):
@@ -454,7 +598,39 @@ def main() -> None:
             raw = raw_path.read_text(encoding="utf-8") if raw_path.exists() else json.dumps(parsed)
             displays[agent_id] = _format_agent_response(raw, parsed)
         r2 = json.loads((run_dir / "round2_all.json").read_text(encoding="utf-8"))
-        run_moderator(models, args.base_url, run_dir, layer0, task, displays, r2)
+        debate_rounds_path = run_dir / "debate_rounds_all.json"
+        debate_rounds = None
+        if debate_rounds_path.exists():
+            raw_rounds = json.loads(debate_rounds_path.read_text(encoding="utf-8"))
+            debate_rounds = {int(k): v for k, v in raw_rounds.items()}
+        run_moderator(
+            models, args.base_url, run_dir, layer0, task, displays, r2, debate_rounds=debate_rounds
+        )
+        moderator_raw = (run_dir / "moderator_raw.txt").read_text(encoding="utf-8")
+        scenario_id = layer0.shock_parsed.get("scenario_id", "generic")
+        gate_payload = run_plausibility_gate(run_dir, moderator_raw, scenario_id=scenario_id)
+        settings = get_settings()
+        if settings.spar_layer3_enabled and (
+            not settings.spar_plausibility_gate_enabled or gate_payload.get("passed")
+        ):
+            round1_path = run_dir / "round1_all.json"
+            round1_results = (
+                json.loads(round1_path.read_text(encoding="utf-8"))
+                if round1_path.exists()
+                else {}
+            )
+            l3 = run_layer3_quantification(
+                moderator_raw,
+                round1_results=round1_results,
+                moderator_plausibility=gate_payload.get("consensus_score"),
+            )
+            (run_dir / "layer3_quant.json").write_text(json.dumps(l3.to_dict(), indent=2), encoding="utf-8")
+            (run_dir / "portfolio_recommendation.json").write_text(
+                json.dumps(l3.portfolio_recommendation.to_dict(), indent=2), encoding="utf-8"
+            )
+            save_layer3_artifacts(run_dir, l3)
+            print(f"\n{format_layer3_summary(l3)}")
+            print(f"\n{format_portfolio_recommendation(l3.portfolio_recommendation)}")
 
     print(f"\nDone. Results in: {run_dir}")
     if args.round == "1":
